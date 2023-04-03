@@ -169,3 +169,6 @@ dist
 # wrangler project
 
 .wrangler/
+
+# turborepo
+.turbo

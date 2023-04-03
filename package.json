@@ -18,7 +18,6 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev --local --persist",
-    "deploy": "wrangler publish",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --ext .ts,.js,.cjs,.mjs --fix",
