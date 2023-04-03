@@ -17,7 +17,7 @@
   },
   "private": true,
   "scripts": {
-    "start": "wrangler dev",
+    "dev": "wrangler dev --local --persist",
     "deploy": "wrangler publish",
     "test": "vitest run",
     "test:watch": "vitest",

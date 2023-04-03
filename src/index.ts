@@ -2,6 +2,7 @@ import { app } from './routes';
 
 export type Env = {
   ENVIRONMENT: 'development' | 'production';
+  R2_STORE: R2Bucket;
 };
 
 export default {

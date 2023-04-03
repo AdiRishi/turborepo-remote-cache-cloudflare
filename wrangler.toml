@@ -5,3 +5,8 @@ usage_model = 'bundled'
 
 [vars]
 ENVIRONMENT = 'production'
+
+[[r2_buckets]]
+binding = 'R2_STORE'
+bucket_name = 'turborepo-cache-store'
+preview_bucket_name = 'turborepo-cache-store-preview'
