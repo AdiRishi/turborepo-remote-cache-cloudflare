@@ -5,8 +5,9 @@ usage_model = 'bundled'
 
 [vars]
 ENVIRONMENT = 'production'
-# The below option requires the AUTH_SECRET variable to be set
-# Remember to use wrangler secrets and use a sufficiently secure cryptographic token
+# When enabling authentication, the following secrets are needed
+# - AUTH_SECRET (must a valid Bearer auth token)
+# Run `echo <VALUE> | wrangler secret put <NAME>` for each of these
 REQUIRE_AUTH = true
 
 [[r2_buckets]]
