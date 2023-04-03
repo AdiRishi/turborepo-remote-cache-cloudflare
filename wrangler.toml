@@ -14,3 +14,6 @@ REQUIRE_AUTH = true
 binding = 'R2_STORE'
 bucket_name = 'turborepo-cache'
 preview_bucket_name = 'turborepo-cache-preview'
+
+[triggers]
+crons = ["0 3 * * *"]
