@@ -6,6 +6,7 @@ This implementation is **built from the ground up for [Cloudflare Workers](https
 ## Quick start
 
 The easiest way to deploy this repository is using the link below
+
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/YOURUSERNAME/YOURREPO)
 
 If you want to clone the repository and deploy it via the CLI, use the following steps
