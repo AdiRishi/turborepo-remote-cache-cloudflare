@@ -1,12 +1,15 @@
-name = "turborepo-remote-cache-cf"
+name = "turborepo-remote-cache"
 main = "src/index.ts"
 compatibility_date = "2023-04-03"
 usage_model = 'bundled'
 
 [vars]
 ENVIRONMENT = 'production'
+# The below option requires the AUTH_SECRET variable to be set
+# Remember to use wrangler secrets and use a sufficiently secure cryptographic token
+REQUIRE_AUTH = true
 
 [[r2_buckets]]
 binding = 'R2_STORE'
-bucket_name = 'turborepo-cache-store'
-preview_bucket_name = 'turborepo-cache-store-preview'
+bucket_name = 'turborepo-cache'
+preview_bucket_name = 'turborepo-cache-preview'

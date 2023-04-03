@@ -3,6 +3,8 @@ import { app } from './routes';
 export type Env = {
   ENVIRONMENT: 'development' | 'production';
   R2_STORE: R2Bucket;
+  REQUIRE_AUTH: boolean;
+  AUTH_SECRET: string;
 };
 
 export default {

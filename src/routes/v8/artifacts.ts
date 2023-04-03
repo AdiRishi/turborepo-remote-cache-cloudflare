@@ -24,7 +24,16 @@ artifactRouter.put(
       return c.json({ error: 'EXPECTED_CONTENT_TYPE_OCTET_STREAM' }, 400);
     }
 
-    const r2Object = await c.env.R2_STORE.put(`${teamId}/${artifactId}`, c.req.body);
+    // if present the turborepo client has signed the artifact body
+    const artifactTag = c.req.headers.get('x-artifact-tag');
+
+    const r2Metadata: Record<string, string> = {};
+    if (artifactTag) {
+      r2Metadata.artifactTag = artifactTag;
+    }
+    const r2Object = await c.env.R2_STORE.put(`${teamId}/${artifactId}`, c.req.body, {
+      customMetadata: r2Metadata,
+    });
 
     return c.json({ teamId, artifactId, storagePath: r2Object.key, size: r2Object.size });
   }
@@ -49,6 +58,9 @@ artifactRouter.get(
     }
 
     c.header('Content-Type', 'application/octet-stream');
+    if (r2Object.customMetadata?.artifactTag) {
+      c.header('x-artifact-tag', r2Object.customMetadata.artifactTag);
+    }
     c.status(200);
     return c.body(r2Object.body);
   }
@@ -76,6 +88,7 @@ artifactRouter.head(
   }
 );
 
-artifactRouter.post('/events', (c) => {
+artifactRouter.post('/events', async (c) => {
+  console.log(await c.req.json());
   return c.json({});
 });
