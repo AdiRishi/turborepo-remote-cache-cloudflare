@@ -19,7 +19,8 @@
   "scripts": {
     "start": "wrangler dev",
     "deploy": "wrangler publish",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint . --ext .ts,.js,.cjs,.mjs --fix",
     "prettier": "prettier --check ."
   },
