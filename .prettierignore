@@ -1,0 +1,10 @@
+**/.git
+**/.svn
+**/.hg
+**/node_modules
+**/.next
+**/.nuxt
+**/.output
+**/dist
+**/functions/*.js
+**/functions/*.js.map

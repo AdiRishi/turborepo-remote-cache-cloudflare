@@ -1,0 +1,9 @@
+node_modules
+.nuxt
+.output
+.turbo
+assets
+functions/*.js
+functions/*.js.*
+public
+dist
