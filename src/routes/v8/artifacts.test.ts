@@ -32,20 +32,6 @@ describe('v8 Artifacts API', () => {
       expect(await res.json()).toEqual({ error: 'MISSING_TEAM_ID' });
     });
 
-    test('should accept both teamId and slug as query params', async () => {
-      const request = createArtifactGetRequest(
-        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
-      );
-      const res = await app.fetch(request, workerEnv);
-      expect(res.status).toBe(200);
-
-      const request2 = createArtifactGetRequest(
-        `http://localhost/v8/artifacts/existing-${artifactId}?slug=${teamId}`
-      );
-      const res2 = await app.fetch(request2, workerEnv);
-      expect(res2.status).toBe(200);
-    });
-
     test('should return 404 when artifact does not exist', async () => {
       const request = createArtifactGetRequest(
         `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
@@ -62,13 +48,23 @@ describe('v8 Artifacts API', () => {
       expect(res.status).toBe(200);
     });
 
+    test('should accept both teamId and slug as query params', async () => {
+      const request = createArtifactGetRequest(
+        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
+      );
+      const res = await app.fetch(request, workerEnv);
+      expect(res.status).toBe(200);
+
+      const request2 = createArtifactGetRequest(
+        `http://localhost/v8/artifacts/existing-${artifactId}?slug=${teamId}`
+      );
+      const res2 = await app.fetch(request2, workerEnv);
+      expect(res2.status).toBe(200);
+    });
+
     test('should return artifact content when artifact exists', async () => {
-      const request = new Request(
-        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`,
-        {
-          headers: { Authorization: 'Bearer ' + workerEnv.AUTH_SECRET },
-          method: 'GET',
-        }
+      const request = createArtifactGetRequest(
+        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
       );
       const res = await app.fetch(request, workerEnv);
       expect(res.status).toBe(200);
@@ -76,12 +72,8 @@ describe('v8 Artifacts API', () => {
     });
 
     test('should return the proper content type when artifact exists', async () => {
-      const request = new Request(
-        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`,
-        {
-          headers: { Authorization: 'Bearer ' + workerEnv.AUTH_SECRET },
-          method: 'GET',
-        }
+      const request = createArtifactGetRequest(
+        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
       );
       const res = await app.fetch(request, workerEnv);
       expect(res.status).toBe(200);
@@ -90,12 +82,8 @@ describe('v8 Artifacts API', () => {
     });
 
     test('should return the artifact tag', async () => {
-      const request = new Request(
-        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`,
-        {
-          headers: { Authorization: 'Bearer ' + workerEnv.AUTH_SECRET },
-          method: 'GET',
-        }
+      const request = createArtifactGetRequest(
+        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
       );
       const res = await app.fetch(request, workerEnv);
       expect(res.status).toBe(200);
@@ -106,17 +94,8 @@ describe('v8 Artifacts API', () => {
   });
 
   describe('PUT artifact endpoint', () => {
-    test('should return 400 when teamId is missing', async () => {
-      const request = new Request(`http://localhost/v8/artifacts/${artifactId}`, {
-        headers: { Authorization: 'Bearer ' + workerEnv.AUTH_SECRET },
-        method: 'PUT',
-      });
-      const res = await app.fetch(request, workerEnv);
-      expect(res.status).toBe(400);
-    });
-
-    test('should successfully save artifact', async () => {
-      const request = new Request(`http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`, {
+    function createArtifactPutRequest(url: string, includeTag = false) {
+      const request = new Request(url, {
         headers: {
           Authorization: 'Bearer ' + workerEnv.AUTH_SECRET,
           'Content-Type': 'application/octet-stream',
@@ -124,6 +103,22 @@ describe('v8 Artifacts API', () => {
         method: 'PUT',
         body: artifactContent,
       });
+      if (includeTag) {
+        request.headers.set('x-artifact-tag', artifactTag);
+      }
+      return request;
+    }
+
+    test('should return 400 when teamId is missing', async () => {
+      const request = createArtifactPutRequest(`http://localhost/v8/artifacts/${artifactId}`);
+      const res = await app.fetch(request, workerEnv);
+      expect(res.status).toBe(400);
+    });
+
+    test('should successfully save artifact', async () => {
+      const request = createArtifactPutRequest(
+        `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
+      );
       const res = await app.fetch(request, workerEnv);
       expect(res.status).toBe(201);
 
@@ -132,27 +127,93 @@ describe('v8 Artifacts API', () => {
     });
 
     test('should accept both teamId and slug as query params', async () => {
-      const request = new Request(`http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`, {
-        headers: {
-          Authorization: 'Bearer ' + workerEnv.AUTH_SECRET,
-          'Content-Type': 'application/octet-stream',
-        },
-        method: 'PUT',
-        body: artifactContent,
-      });
+      const request = createArtifactPutRequest(
+        `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
+      );
       const res = await app.fetch(request, workerEnv);
       expect(res.status).toBe(201);
 
-      const request2 = new Request(`http://localhost/v8/artifacts/${artifactId}?slug=${teamId}`, {
-        headers: {
-          Authorization: 'Bearer ' + workerEnv.AUTH_SECRET,
-          'Content-Type': 'application/octet-stream',
-        },
-        method: 'PUT',
-        body: artifactContent,
-      });
+      const request2 = createArtifactPutRequest(
+        `http://localhost/v8/artifacts/${artifactId}?slug=${teamId}`
+      );
       const res2 = await app.fetch(request2, workerEnv);
       expect(res2.status).toBe(201);
+    });
+
+    test('should save artifact tag when provided', async () => {
+      const request = createArtifactPutRequest(
+        `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`,
+        true
+      );
+      const res = await app.fetch(request, workerEnv);
+      expect(res.status).toBe(201);
+
+      const artifact = await workerEnv.R2_STORE.get(`${teamId}/${artifactId}`);
+      expect(await artifact?.text()).toEqual(artifactContent);
+      expect(artifact?.customMetadata?.artifactTag).toEqual(artifactTag);
+    });
+  });
+
+  describe('HEAD artifact endpoint', () => {
+    beforeEach(async () => {
+      await workerEnv.R2_STORE.put(`${teamId}/existing-${artifactId}`, artifactContent, {
+        customMetadata: { artifactTag },
+      });
+    });
+
+    function createArtifactHeadRequest(url: string) {
+      return new Request(url, {
+        headers: { Authorization: 'Bearer ' + workerEnv.AUTH_SECRET },
+        method: 'HEAD',
+      });
+    }
+
+    test('should return 400 when teamId is missing', async () => {
+      const request = createArtifactHeadRequest(`http://localhost/v8/artifacts/${artifactId}`);
+      const res = await app.fetch(request, workerEnv);
+      expect(res.status).toBe(400);
+    });
+
+    test('should return 404 when artifact does not exist', async () => {
+      const request = createArtifactHeadRequest(
+        `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
+      );
+      const res = await app.fetch(request, workerEnv);
+      expect(res.status).toBe(404);
+    });
+
+    test('should return 200 when artifact exists', async () => {
+      const request = createArtifactHeadRequest(
+        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
+      );
+      const res = await app.fetch(request, workerEnv);
+      expect(res.status).toBe(200);
+    });
+
+    test('should accept both teamId and slug as query params', async () => {
+      const request = createArtifactHeadRequest(
+        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
+      );
+      const res = await app.fetch(request, workerEnv);
+      expect(res.status).toBe(200);
+
+      const request2 = createArtifactHeadRequest(
+        `http://localhost/v8/artifacts/existing-${artifactId}?slug=${teamId}`
+      );
+      const res2 = await app.fetch(request2, workerEnv);
+      expect(res2.status).toBe(200);
+    });
+  });
+
+  describe('Artifact events endpoint', () => {
+    test('it should return 200', async () => {
+      const request = new Request('http://localhost/v8/artifacts/events', {
+        headers: { Authorization: 'Bearer ' + workerEnv.AUTH_SECRET },
+        method: 'POST',
+        body: JSON.stringify({}),
+      });
+      const res = await app.fetch(request, workerEnv);
+      expect(res.status).toBe(200);
     });
   });
 });
