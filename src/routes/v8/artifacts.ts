@@ -7,13 +7,13 @@ import { Env } from '../..';
 export const artifactRouter = new Hono<{ Bindings: Env }>();
 
 artifactRouter.put(
-  '/:artifactId/:teamId?',
-  zValidator('param', z.object({ artifactId: z.string(), teamId: z.string().optional() })),
-  zValidator('query', z.object({ teamId: z.string().optional() })),
+  '/:artifactId',
+  zValidator('param', z.object({ artifactId: z.string() })),
+  zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
   async (c) => {
-    const { artifactId, teamId: teamIdSlug } = c.req.valid('param');
-    const { teamId: teamIdQuery } = c.req.valid('query');
-    const teamId = teamIdQuery ?? teamIdSlug;
+    const { artifactId } = c.req.valid('param');
+    const { teamId: teamIdQuery, slug } = c.req.valid('query');
+    const teamId = teamIdQuery ?? slug;
 
     if (!teamId) {
       return c.json({ error: 'MISSING_TEAM_ID' }, 400);
@@ -35,18 +35,18 @@ artifactRouter.put(
       customMetadata: r2Metadata,
     });
 
-    return c.json({ teamId, artifactId, storagePath: r2Object.key, size: r2Object.size });
+    return c.json({ teamId, artifactId, storagePath: r2Object.key, size: r2Object.size }, 201);
   }
 );
 
 artifactRouter.get(
   '/:artifactId/:teamId?',
-  zValidator('param', z.object({ artifactId: z.string(), teamId: z.string().optional() })),
-  zValidator('query', z.object({ teamId: z.string().optional() })),
+  zValidator('param', z.object({ artifactId: z.string() })),
+  zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
   async (c) => {
-    const { artifactId, teamId: teamIdSlug } = c.req.valid('param');
-    const { teamId: teamIdQuery } = c.req.valid('query');
-    const teamId = teamIdQuery ?? teamIdSlug;
+    const { artifactId } = c.req.valid('param');
+    const { teamId: teamIdQuery, slug } = c.req.valid('query');
+    const teamId = teamIdQuery ?? slug;
 
     if (!teamId) {
       return c.json({ error: 'MISSING_TEAM_ID' }, 400);
@@ -67,13 +67,13 @@ artifactRouter.get(
 );
 
 artifactRouter.head(
-  '/:artifactId/:teamId?',
-  zValidator('param', z.object({ artifactId: z.string(), teamId: z.string().optional() })),
-  zValidator('query', z.object({ teamId: z.string().optional() })),
+  '/:artifactId',
+  zValidator('param', z.object({ artifactId: z.string() })),
+  zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
   async (c) => {
-    const { artifactId, teamId: teamIdSlug } = c.req.valid('param');
-    const { teamId: teamIdQuery } = c.req.valid('query');
-    const teamId = teamIdQuery ?? teamIdSlug;
+    const { artifactId } = c.req.valid('param');
+    const { teamId: teamIdQuery, slug } = c.req.valid('query');
+    const teamId = teamIdQuery ?? slug;
 
     if (!teamId) {
       return c.json({ error: 'MISSING_TEAM_ID' }, 400);
