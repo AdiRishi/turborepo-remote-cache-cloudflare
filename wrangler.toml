@@ -6,7 +6,7 @@ usage_model = 'bundled'
 [vars]
 ENVIRONMENT = 'production'
 # When enabling authentication, the following secrets are needed
-# - AUTH_SECRET (must a valid Bearer auth token)
+# - TURBO_TOKEN (must a valid Bearer auth token)
 # Run `echo <VALUE> | wrangler secret put <NAME>` for each of these
 REQUIRE_AUTH = true
 

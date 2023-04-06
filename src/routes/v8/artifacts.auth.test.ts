@@ -20,7 +20,7 @@ describe('Authentication module for artifacts API', () => {
       method: 'GET',
     });
     if (includeAuth) {
-      request.headers.set('Authorization', 'Bearer ' + getMiniflareBindings<Env>().AUTH_SECRET);
+      request.headers.set('Authorization', 'Bearer ' + getMiniflareBindings<Env>().TURBO_TOKEN);
     }
     return request;
   }

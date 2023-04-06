@@ -7,7 +7,7 @@ export const v8App = new Hono<{ Bindings: Env }>();
 
 v8App.use('/artifacts/*', async (c, next) => {
   if (c.env.REQUIRE_AUTH) {
-    const middleware = bearerAuth({ token: c.env.AUTH_SECRET });
+    const middleware = bearerAuth({ token: c.env.TURBO_TOKEN });
     await middleware(c, next);
   } else {
     await next();

@@ -5,7 +5,7 @@ export type Env = {
   ENVIRONMENT: 'development' | 'production';
   R2_STORE: R2Bucket;
   REQUIRE_AUTH: boolean;
-  AUTH_SECRET: string;
+  TURBO_TOKEN: string;
 };
 
 export default {

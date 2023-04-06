@@ -25,5 +25,5 @@ wrangler r2 bucket create turborepo-cache
 wrangler publish
 
 # 5. (Optional) Set a Bearer auth token
-echo "SECRET" |  wrangler secret put AUTH_SECRET
+echo "SECRET" |  wrangler secret put TURBO_TOKEN
 ```
