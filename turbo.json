@@ -2,6 +2,9 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "pipeline": {
+    "dev": {
+      "cache": false
+    },
     "dev:scheduled": {
       "cache": false
     }

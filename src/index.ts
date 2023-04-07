@@ -6,6 +6,7 @@ export type Env = {
   R2_STORE: R2Bucket;
   REQUIRE_AUTH: boolean;
   TURBO_TOKEN: string;
+  BUCKET_OBJECT_EXPIRATION_HOURS: number;
 };
 
 export default {

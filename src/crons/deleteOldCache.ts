@@ -1,8 +1,7 @@
 import { Env } from '..';
 
-const BUCKET_CUTOFF_HOURS = 30 * 24; // 30 days
-
 export async function deleteOldCache(env: Env) {
+  const BUCKET_CUTOFF_HOURS = env.BUCKET_OBJECT_EXPIRATION_HOURS;
   let truncated = false;
   let cursor: string | undefined;
   let list: R2Objects;
@@ -11,7 +10,7 @@ export async function deleteOldCache(env: Env) {
   do {
     list = await env.R2_STORE.list({ limit: 500, cursor });
     truncated = list.truncated;
-    cursor = list.cursor;
+    cursor = list.truncated ? list.cursor : undefined;
 
     for (const object of list.objects) {
       if (isDateOlderThan(object.uploaded, BUCKET_CUTOFF_HOURS)) {
