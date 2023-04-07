@@ -51,7 +51,7 @@ You can change how long objects will be retained via the `BUCKET_OBJECT_EXPIRATI
 
 This section will describe **my recommended** way of setting up remote caching in turborepo. There are many ways to go about this. You can read can read more about this topic at the [official turborepo docs](https://turbo.build/repo/docs/core-concepts/remote-caching).
 
-1. Create `.turbo/config.json` at the root of your project with the following content
+**1. Create `.turbo/config.json` at the root of your project with the following content**
 
 ```json
 {
@@ -62,7 +62,7 @@ This section will describe **my recommended** way of setting up remote caching i
 
 **Note**: The teamId must begin with `team`
 
-2. Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)
+**2. Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)**
 
 ```json
 {
@@ -70,13 +70,13 @@ This section will describe **my recommended** way of setting up remote caching i
 }
 ```
 
-3. Install the `dotenv-cli` npm package
+**3. Install the `dotenv-cli` npm package**
 
 ```sh
 yarn install --dev dotenv-cli
 ```
 
-4. Create a `.env` file at your project root with the following content
+**4. Create a `.env` file at your project root with the following content**
 
 ```dotenv
 # The turbo token must be a valid Bearer auth token
@@ -90,7 +90,7 @@ Keep the following in mind
 - Remember to add the `.env` file to `.gitignore`
 - If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
 
-5. Modify your turbo commands to load the `.env` file prior to execution
+**5. Modify your turbo commands to load the `.env` file prior to execution**
 
 Instead of running a command like `turbo run build` directly, we simply run `dotenv -- turbo run build`. This will load everything in our `.env` file into the processes environment variables.
 
