@@ -17,12 +17,14 @@
   },
   "private": true,
   "scripts": {
+    "build": "wrangler publish --dry-run --outdir dist",
     "dev": "wrangler dev --local --persist",
     "dev:scheduled": "wrangler dev --local --persist --test-scheduled",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --ext .ts,.js,.cjs,.mjs --fix",
-    "prettier": "prettier --check ."
+    "prettier": "prettier --check .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.1.2",

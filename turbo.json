@@ -2,6 +2,13 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "pipeline": {
+    "typecheck": {
+      "outputs": []
+    },
+    "lint": {
+      "dependsOn": ["typecheck"],
+      "outputs": []
+    },
     "dev": {
       "cache": false
     },
