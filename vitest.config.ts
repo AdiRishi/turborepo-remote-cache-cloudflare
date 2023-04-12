@@ -5,6 +5,8 @@ export default defineConfig({
     environment: 'miniflare',
     environmentOptions: {
       envPath: './.dev.vars',
+      modules: true,
+      scriptPath: './dist/index.js',
     },
     reporters: ['verbose'],
     coverage: {
