@@ -17,6 +17,12 @@
     },
     "dev:scheduled": {
       "cache": false
+    },
+    "test": {
+      "dependsOn": ["build"]
+    },
+    "test:watch": {
+      "dependsOn": ["build"]
     }
   }
 }
