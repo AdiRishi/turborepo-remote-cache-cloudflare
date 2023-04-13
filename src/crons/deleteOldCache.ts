@@ -1,4 +1,5 @@
 import { Env } from '..';
+import { isDateOlderThan } from '../utils/date';
 
 export async function deleteOldCache(env: Env) {
   const BUCKET_CUTOFF_HOURS = env.BUCKET_OBJECT_EXPIRATION_HOURS;
@@ -20,15 +21,9 @@ export async function deleteOldCache(env: Env) {
   } while (truncated);
 
   if (keysMarkedForDeletion.length > 0) {
-    console.log(`Deleting ${keysMarkedForDeletion.length} keys`, keysMarkedForDeletion);
+    if (env.ENVIRONMENT === 'development') {
+      console.log(`Deleting ${keysMarkedForDeletion.length} keys`, keysMarkedForDeletion);
+    }
     await env.R2_STORE.delete(keysMarkedForDeletion);
   }
-}
-
-function isDateOlderThan(date: Date, hours: number) {
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const hoursDiff = diff / (1000 * 60 * 60);
-  console.log('hoursDiff', hoursDiff);
-  return hoursDiff > hours;
 }

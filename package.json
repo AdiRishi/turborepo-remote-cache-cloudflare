@@ -23,7 +23,7 @@
     "dev:scheduled": "wrangler dev --local --persist --test-scheduled",
     "test": "NODE_OPTIONS=--experimental-vm-modules vitest run",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules vitest",
-    "lint": "eslint . --ext .ts,.js,.cjs,.mjs --fix",
+    "lint": "eslint . --ext .ts,.js,.cjs,.mjs,.json --fix",
     "prettier": "prettier --check .",
     "typecheck": "tsc --noEmit"
   },

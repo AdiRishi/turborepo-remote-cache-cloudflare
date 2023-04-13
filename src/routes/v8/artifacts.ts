@@ -89,6 +89,5 @@ artifactRouter.head(
 );
 
 artifactRouter.post('/events', async (c) => {
-  console.log(await c.req.json());
   return c.json({});
 });
