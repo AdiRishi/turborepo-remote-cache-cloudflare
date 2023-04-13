@@ -1,5 +1,4 @@
 export function isDateOlderThan(date: Date, hours: number) {
-  console.log('I AM RUNNING');
   const now = new Date();
   const diffInMilliseconds = now.getTime() - date.getTime();
 
