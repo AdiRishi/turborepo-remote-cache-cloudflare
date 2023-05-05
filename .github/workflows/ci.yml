@@ -19,5 +19,6 @@ jobs:
           cache: 'yarn'
       - run: yarn install
       - run: yarn lint
+      - run: yarn typecheck
       - run: yarn build
       - run: yarn test
