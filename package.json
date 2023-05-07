@@ -25,7 +25,7 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules vitest run --coverage",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules vitest",
     "lint": "eslint . --ext .ts,.js,.cjs,.mjs,.json --fix",
-    "prettier": "prettier --check .",
+    "format": "prettier --write .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

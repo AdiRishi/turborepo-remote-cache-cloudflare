@@ -1,6 +1,8 @@
 import { Env } from '..';
 import { isDateOlderThan } from '../utils/date';
 
+const CURSOR_SIZE = 500;
+
 export async function deleteOldCache(env: Env) {
   const BUCKET_CUTOFF_HOURS = env.BUCKET_OBJECT_EXPIRATION_HOURS;
   let truncated = false;
@@ -9,7 +11,7 @@ export async function deleteOldCache(env: Env) {
   const keysMarkedForDeletion: string[] = [];
 
   do {
-    list = await env.R2_STORE.list({ limit: 500, cursor });
+    list = await env.R2_STORE.list({ limit: CURSOR_SIZE, cursor });
     truncated = list.truncated;
     cursor = list.truncated ? list.cursor : undefined;
 
@@ -21,9 +23,9 @@ export async function deleteOldCache(env: Env) {
   } while (truncated);
 
   if (keysMarkedForDeletion.length > 0) {
-    if (env.ENVIRONMENT === 'development') {
-      console.log(`Deleting ${keysMarkedForDeletion.length} keys`, keysMarkedForDeletion);
-    }
+    // if (env.ENVIRONMENT === 'development') {
+    //   console.log(`Deleting ${keysMarkedForDeletion.length} keys`, keysMarkedForDeletion);
+    // }
     await env.R2_STORE.delete(keysMarkedForDeletion);
   }
 }

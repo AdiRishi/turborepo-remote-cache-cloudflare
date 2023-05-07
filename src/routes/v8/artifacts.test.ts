@@ -152,6 +152,16 @@ describe('v8 Artifacts API', () => {
       expect(await artifact?.text()).toEqual(artifactContent);
       expect(artifact?.customMetadata?.artifactTag).toEqual(artifactTag);
     });
+
+    test('should return 400 when content type is not application/octet-stream', async () => {
+      const request = createArtifactPutRequest(
+        `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
+      );
+      request.headers.delete('Content-Type');
+      const res = await app.fetch(request, workerEnv);
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({ error: 'EXPECTED_CONTENT_TYPE_OCTET_STREAM' });
+    });
   });
 
   describe('HEAD artifact endpoint', () => {

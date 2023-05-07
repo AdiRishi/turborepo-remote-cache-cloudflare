@@ -9,5 +9,5 @@ export function isDateOlderThan(date: Date, hours: number) {
   const millisecondsInHour = MILLISECONDS_IN_SECOND * SECONDS_IN_MINUTE * MINUTES_IN_HOUR;
   const thresholdInMilliseconds = hours * millisecondsInHour;
 
-  return diffInMilliseconds > thresholdInMilliseconds;
+  return diffInMilliseconds >= thresholdInMilliseconds;
 }
