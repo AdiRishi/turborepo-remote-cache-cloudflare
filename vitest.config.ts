@@ -11,7 +11,7 @@ export default defineConfig({
     reporters: ['verbose'],
     coverage: {
       provider: 'c8',
-      reporter: ['text'],
+      reporter: ['text', 'html', 'clover', 'json'],
     },
   },
 });
