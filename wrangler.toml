@@ -18,6 +18,3 @@ preview_bucket_name = 'turborepo-cache-preview'
 
 [triggers]
 crons = ["0 3 * * *"]
-
-[placement]
-mode = "smart"
