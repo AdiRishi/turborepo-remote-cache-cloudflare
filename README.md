@@ -34,8 +34,8 @@ echo "SECRET" | wrangler secret put TURBO_TOKEN
 
 In order to successfully run the [deploy](.github/workflows//deploy.yml) Github action you will need the following secrets
 
--   `CF_API_TOKEN`
--   `CF_ACCOUNT_ID`
+- `CF_API_TOKEN`
+- `CF_ACCOUNT_ID`
 
 _Note: These will be automatically set for you if you use the "Deploy with Workers" button._
 
@@ -55,8 +55,8 @@ This section will describe **my recommended** way of setting up remote caching i
 
 ```json
 {
-    "teamId": "team_myteam",
-    "apiUrl": "<the workers.dev url for your deployed worker>"
+  "teamId": "team_myteam",
+  "apiUrl": "<the workers.dev url for your deployed worker>"
 }
 ```
 
@@ -66,7 +66,7 @@ This section will describe **my recommended** way of setting up remote caching i
 
 ```json
 {
-    "remoteCache": { "signature": true }
+  "remoteCache": { "signature": true }
 }
 ```
 
@@ -86,9 +86,9 @@ TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
 
 Keep the following in mind
 
--   Replace `SECRET` with your chosen values.
--   Remember to add the `.env` file to `.gitignore`
--   If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
+- Replace `SECRET` with your chosen values.
+- Remember to add the `.env` file to `.gitignore`
+- If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
 
 **5. Modify your turbo commands to load the `.env` file prior to execution**
 
@@ -98,12 +98,12 @@ I would recommend modifying your scripts in `package.json` to use dotenv-cli so 
 
 ```json
 {
-    "scripts": {
-        "build": "dotenv -- turbo run build",
-        "dev": "dotenv -- turbo run dev",
-        "lint": "dotenv -- turbo run lint",
-        "test": "dotenv -- turbo run test"
-    }
+  "scripts": {
+    "build": "dotenv -- turbo run build",
+    "dev": "dotenv -- turbo run dev",
+    "lint": "dotenv -- turbo run lint",
+    "test": "dotenv -- turbo run test"
+  }
 }
 ```
 
