@@ -2,9 +2,8 @@ name: Deploy to Cloudflare Workers
 
 on:
   repository_dispatch:
-  # Uncomment the following section to enable automatic deploys on push to master
-  # push:
-  #   branches: ['master']
+  push:
+    branches: ['master']
 
 jobs:
   build-and-deploy:
@@ -25,5 +24,9 @@ jobs:
             echo "*** post commands ***"
             wrangler r2 bucket create turborepo-cache
             echo "******"
+          secrets: |
+            TURBO_TOKEN
+          command: publish
         env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN || 'TURBO_TOKEN_SECRET' }}
           CF_ACCOUNT_ID: ${{secrets.CF_ACCOUNT_ID}}
