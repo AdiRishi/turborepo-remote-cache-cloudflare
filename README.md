@@ -51,18 +51,7 @@ You can change how long objects will be retained via the `BUCKET_OBJECT_EXPIRATI
 
 This section will describe **my recommended** way of setting up remote caching in turborepo. There are many ways to go about this. You can read can read more about this topic at the [official turborepo docs](https://turbo.build/repo/docs/core-concepts/remote-caching).
 
-**1. Create `.turbo/config.json` at the root of your project with the following content**
-
-```json
-{
-    "teamId": "team_myteam",
-    "apiUrl": "<the workers.dev url for your deployed worker>"
-}
-```
-
-**Note**: The teamId must begin with `team`
-
-**2. Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)**
+**1. Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)**
 
 ```json
 {
@@ -70,23 +59,26 @@ This section will describe **my recommended** way of setting up remote caching i
 }
 ```
 
-**3. Install the `dotenv-cli` npm package**
+**2. Install the `dotenv-cli` npm package**
 
 ```sh
 yarn install --dev dotenv-cli
 ```
 
-**4. Create a `.env` file at your project root with the following content**
+**3. Create a `.env` file at your project root with the following content**
 
 ```dotenv
 # The turbo token must be a valid Bearer auth token
+TURBO_API=YOUR_API_URL
+TURBO_TEAM=team_myteam
 TURBO_TOKEN=SECRET
 TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
 ```
 
 Keep the following in mind
 
--   Replace `SECRET` with your chosen values.
+-   Replace `SECRET` and `YOUR_API_URL` with your chosen values.
+-   The TURBO*TEAM value must begin with `team*`
 -   Remember to add the `.env` file to `.gitignore`
 -   If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
 
