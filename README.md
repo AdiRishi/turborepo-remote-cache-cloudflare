@@ -68,10 +68,9 @@ yarn install --dev dotenv-cli
 **3. Create a `.env` file at your project root with the following content**
 
 ```dotenv
-# The turbo token must be a valid Bearer auth token
 TURBO_API=YOUR_API_URL
 TURBO_TEAM=team_myteam
-TURBO_TOKEN=SECRET
+TURBO_TOKEN=SECRET # The turbo token must be a valid Bearer auth token
 TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
 ```
 
