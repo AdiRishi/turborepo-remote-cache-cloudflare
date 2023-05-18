@@ -22,7 +22,7 @@ yarn install
 wrangler r2 bucket create turborepo-cache
 
 # 4. Publish the project
-wrangler publish
+wrangler deploy
 
 # 5. Set a Bearer auth token
 echo "SECRET" | wrangler secret put TURBO_TOKEN
