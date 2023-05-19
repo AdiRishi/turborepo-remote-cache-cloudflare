@@ -1,4 +1,4 @@
-import { MockedFunction, afterEach, expect, test, vi } from 'vitest';
+import { MockedFunction, afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { app } from '.';
 import { Env } from '../';
 import { deleteOldCache } from '../crons/deleteOldCache';
@@ -15,7 +15,13 @@ const deleteOldCacheMock = deleteOldCache as MockedFunction<typeof deleteOldCach
 const describe = setupMiniflareIsolatedStorage();
 
 describe('Command central /delete-old-cache route', () => {
-  const workerEnv = getMiniflareBindings<Env>();
+  let workerEnv: Env;
+  let ctx: ExecutionContext;
+
+  beforeEach(() => {
+    workerEnv = getMiniflareBindings();
+    ctx = new ExecutionContext();
+  });
 
   afterEach(() => {
     vi.restoreAllMocks();
@@ -29,7 +35,7 @@ describe('Command central /delete-old-cache route', () => {
         Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
       },
     });
-    const response = await app.fetch(request, workerEnv);
+    const response = await app.fetch(request, workerEnv, ctx);
     expect(response.status).toBe(200);
     expect(deleteOldCacheMock).toHaveBeenCalledOnce();
   });
@@ -41,7 +47,7 @@ describe('Command central /delete-old-cache route', () => {
         'Content-Type': 'application/json',
       },
     });
-    const response = await app.fetch(request, workerEnv);
+    const response = await app.fetch(request, workerEnv, ctx);
     expect(response.status).toBe(401);
     expect(deleteOldCacheMock).not.toHaveBeenCalled();
   });
@@ -53,10 +59,14 @@ describe('Command central /delete-old-cache route', () => {
         'Content-Type': 'application/json',
       },
     });
-    const response = await app.fetch(request, {
-      ...workerEnv,
-      REQUIRE_AUTH: false,
-    });
+    const response = await app.fetch(
+      request,
+      {
+        ...workerEnv,
+        REQUIRE_AUTH: false,
+      },
+      ctx
+    );
     expect(response.status).toBe(200);
     expect(deleteOldCacheMock).toHaveBeenCalledOnce();
   });

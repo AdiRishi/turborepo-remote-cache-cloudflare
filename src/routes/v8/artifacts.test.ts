@@ -5,7 +5,8 @@ import { Env } from '../..';
 const describe = setupMiniflareIsolatedStorage();
 
 describe('v8 Artifacts API', () => {
-  const workerEnv = getMiniflareBindings<Env>();
+  let workerEnv: Env;
+  let ctx: ExecutionContext;
   const artifactId = 'UNIQUE-artifactId-' + Math.random();
   const artifactTag = 'UNIQUE-artifactTag-' + Math.random();
   const teamId = 'UNIQUE-teamId-' + Math.random();
@@ -13,6 +14,8 @@ describe('v8 Artifacts API', () => {
 
   describe('GET artifact endpoint', () => {
     beforeEach(async () => {
+      workerEnv = getMiniflareBindings();
+      ctx = new ExecutionContext();
       await workerEnv.R2_STORE.put(`${teamId}/existing-${artifactId}`, artifactContent, {
         customMetadata: { artifactTag },
       });
@@ -27,7 +30,7 @@ describe('v8 Artifacts API', () => {
 
     test('should return 400 when teamId is missing', async () => {
       const request = createArtifactGetRequest(`http://localhost/v8/artifacts/${artifactId}`);
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(400);
       expect(await res.json()).toEqual({ error: 'MISSING_TEAM_ID' });
     });
@@ -36,7 +39,7 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactGetRequest(
         `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(404);
     });
 
@@ -44,7 +47,7 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactGetRequest(
         `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(200);
     });
 
@@ -52,13 +55,13 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactGetRequest(
         `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(200);
 
       const request2 = createArtifactGetRequest(
         `http://localhost/v8/artifacts/existing-${artifactId}?slug=${teamId}`
       );
-      const res2 = await app.fetch(request2, workerEnv);
+      const res2 = await app.fetch(request2, workerEnv, ctx);
       expect(res2.status).toBe(200);
     });
 
@@ -66,7 +69,7 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactGetRequest(
         `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(200);
       expect(await res.text()).toBe(artifactContent);
     });
@@ -75,7 +78,7 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactGetRequest(
         `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(200);
       expect(await res.text()).toBe(artifactContent);
       expect(res.headers.get('Content-Type')).toBe('application/octet-stream');
@@ -85,7 +88,7 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactGetRequest(
         `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(200);
       expect(await res.text()).toBe(artifactContent);
       expect(res.headers.get('Content-Type')).toBe('application/octet-stream');
@@ -94,6 +97,11 @@ describe('v8 Artifacts API', () => {
   });
 
   describe('PUT artifact endpoint', () => {
+    beforeEach(async () => {
+      workerEnv = getMiniflareBindings();
+      ctx = new ExecutionContext();
+    });
+
     function createArtifactPutRequest(url: string, includeTag = false) {
       const request = new Request(url, {
         headers: {
@@ -111,7 +119,7 @@ describe('v8 Artifacts API', () => {
 
     test('should return 400 when teamId is missing', async () => {
       const request = createArtifactPutRequest(`http://localhost/v8/artifacts/${artifactId}`);
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(400);
     });
 
@@ -119,7 +127,7 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactPutRequest(
         `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(201);
 
       const artifact = await workerEnv.R2_STORE.get(`${teamId}/${artifactId}`);
@@ -130,13 +138,13 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactPutRequest(
         `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(201);
 
       const request2 = createArtifactPutRequest(
         `http://localhost/v8/artifacts/${artifactId}?slug=${teamId}`
       );
-      const res2 = await app.fetch(request2, workerEnv);
+      const res2 = await app.fetch(request2, workerEnv, ctx);
       expect(res2.status).toBe(201);
     });
 
@@ -145,7 +153,7 @@ describe('v8 Artifacts API', () => {
         `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`,
         true
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(201);
 
       const artifact = await workerEnv.R2_STORE.get(`${teamId}/${artifactId}`);
@@ -158,7 +166,7 @@ describe('v8 Artifacts API', () => {
         `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
       );
       request.headers.delete('Content-Type');
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(400);
       expect(await res.json()).toEqual({ error: 'EXPECTED_CONTENT_TYPE_OCTET_STREAM' });
     });
@@ -166,6 +174,8 @@ describe('v8 Artifacts API', () => {
 
   describe('HEAD artifact endpoint', () => {
     beforeEach(async () => {
+      workerEnv = getMiniflareBindings();
+      ctx = new ExecutionContext();
       await workerEnv.R2_STORE.put(`${teamId}/existing-${artifactId}`, artifactContent, {
         customMetadata: { artifactTag },
       });
@@ -180,7 +190,7 @@ describe('v8 Artifacts API', () => {
 
     test('should return 400 when teamId is missing', async () => {
       const request = createArtifactHeadRequest(`http://localhost/v8/artifacts/${artifactId}`);
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(400);
     });
 
@@ -188,7 +198,7 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactHeadRequest(
         `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(404);
     });
 
@@ -196,7 +206,7 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactHeadRequest(
         `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(200);
     });
 
@@ -204,25 +214,30 @@ describe('v8 Artifacts API', () => {
       const request = createArtifactHeadRequest(
         `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
       );
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(200);
 
       const request2 = createArtifactHeadRequest(
         `http://localhost/v8/artifacts/existing-${artifactId}?slug=${teamId}`
       );
-      const res2 = await app.fetch(request2, workerEnv);
+      const res2 = await app.fetch(request2, workerEnv, ctx);
       expect(res2.status).toBe(200);
     });
   });
 
   describe('Artifact events endpoint', () => {
+    beforeEach(async () => {
+      workerEnv = getMiniflareBindings();
+      ctx = new ExecutionContext();
+    });
+
     test('it should return 200', async () => {
       const request = new Request('http://localhost/v8/artifacts/events', {
         headers: { Authorization: 'Bearer ' + workerEnv.TURBO_TOKEN },
         method: 'POST',
         body: JSON.stringify({}),
       });
-      const res = await app.fetch(request, workerEnv);
+      const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(200);
     });
   });
