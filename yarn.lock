@@ -824,9 +824,9 @@ base64-js@^1.3.1:
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
 
 better-sqlite3@^8.1.0:
-  version "8.3.0"
-  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-8.3.0.tgz#3873ddfd9f2af90b628657e8ff221786c93d1984"
-  integrity sha512-JTmvBZL/JLTc+3Msbvq6gK6elbU9/wVMqiudplHrVJpr7sVMR9KJrNhZAbW+RhXKlpMcuEhYkdcHa3TXKNXQ1w==
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-8.4.0.tgz#aa27bbc6bb42bb438fc55c88b146fcfe5978fa76"
+  integrity sha512-NmsNW1CQvqMszu/CFAJ3pLct6NEFlNfuGM6vw72KHkjOD1UDnL96XNN1BMQc1hiHo8vE2GbOWQYIpZ+YM5wrZw==
   dependencies:
     bindings "^1.5.0"
     prebuild-install "^7.1.0"
@@ -1530,10 +1530,10 @@ has-flag@^4.0.0:
   resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-4.0.0.tgz#944771fd9c81c81265c4d6941860da06bb59479b"
   integrity sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==
 
-hono@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/hono/-/hono-3.2.0.tgz#96f782db6b99a1a4c0d9393f2ecee5e5eb3aa3bb"
-  integrity sha512-dsPameDZC+VYainhDxUnuYRFUytpLBN9CF1QjrtPx7AtlOaNLMKc5pKsZF1dnPmGal/QaM9YDAEnzZLUJ1ugsA==
+hono@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/hono/-/hono-3.2.1.tgz#1a2c60811efba96f3f08aab9746104ca2c3d988f"
+  integrity sha512-yWpBvr5E5u2JPsVfgBOBlfqbpTCkTE5nZWB0WrA5QJYTQCf39WjhkZ4iFLP/tv4hgWBtXC+aWGyCHt11H10ghg==
 
 html-escaper@^2.0.0:
   version "2.0.2"
