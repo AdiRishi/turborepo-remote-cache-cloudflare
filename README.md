@@ -62,7 +62,7 @@ This section will describe **my recommended** way of setting up remote caching i
 **2. Install the `dotenv-cli` npm package**
 
 ```sh
-yarn install --dev dotenv-cli
+yarn add --dev dotenv-cli # You may have to add -W if you are installing this on your workspace root
 ```
 
 **3. Create a `.env` file at your project root with the following content**
