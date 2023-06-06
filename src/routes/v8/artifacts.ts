@@ -39,6 +39,7 @@ artifactRouter.put(
   }
 );
 
+// Hono router .get() method captures both GET and HEAD requests
 artifactRouter.get(
   '/:artifactId/:teamId?',
   zValidator('param', z.object({ artifactId: z.string() })),
@@ -63,28 +64,6 @@ artifactRouter.get(
     }
     c.status(200);
     return c.body(r2Object.body);
-  }
-);
-
-artifactRouter.head(
-  '/:artifactId',
-  zValidator('param', z.object({ artifactId: z.string() })),
-  zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
-  async (c) => {
-    const { artifactId } = c.req.valid('param');
-    const { teamId: teamIdQuery, slug } = c.req.valid('query');
-    const teamId = teamIdQuery ?? slug;
-
-    if (!teamId) {
-      return c.json({ error: 'MISSING_TEAM_ID' }, 400);
-    }
-
-    const r2Object = await c.env.R2_STORE.get(`${teamId}/${artifactId}`);
-    if (!r2Object) {
-      return c.json({ error: 'NOT_FOUND' }, 404);
-    }
-
-    return c.json({ exists: true });
   }
 );
 
