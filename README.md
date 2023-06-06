@@ -62,14 +62,15 @@ This section will describe **my recommended** way of setting up remote caching i
 **2. Install the `dotenv-cli` npm package**
 
 ```sh
-yarn add --dev dotenv-cli # You may have to add -W if you are installing this on your workspace root
+# You may have to add -W if you are installing this on your workspace root
+yarn add --dev dotenv-cli
 ```
 
 **3. Create a `.env` file at your project root with the following content**
 
 ```dotenv
 TURBO_API=YOUR_API_URL
-TURBO_TEAM=team_myteam
+TURBO_TEAM=team_my_team_name
 TURBO_TOKEN=SECRET # The turbo token must be a valid Bearer auth token
 TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
 ```
@@ -77,7 +78,7 @@ TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
 Keep the following in mind
 
 -   Replace `SECRET` and `YOUR_API_URL` with your chosen values.
--   The TURBO*TEAM value must begin with `team*`
+-   The TURBO_TEAM value must begin with `team_`
 -   Remember to add the `.env` file to `.gitignore`
 -   If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
 
