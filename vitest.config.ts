@@ -10,7 +10,7 @@ export default defineConfig({
     },
     reporters: ['verbose'],
     coverage: {
-      provider: 'c8',
+      provider: 'v8',
       reporter: ['text', 'html', 'clover', 'json'],
     },
   },
