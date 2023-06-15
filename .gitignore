@@ -158,7 +158,7 @@ dist
 
 .vscode-test
 
-# yarn v2
+# yarn v3
 
 .yarn/cache
 .yarn/unplugged
