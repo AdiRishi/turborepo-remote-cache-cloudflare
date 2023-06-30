@@ -10,3 +10,4 @@
 **/functions/*.js.map
 .wrangler/*
 **/coverage
+.yarn

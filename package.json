@@ -1,6 +1,30 @@
 {
   "name": "turborepo-remote-cache-cf",
-  "version": "0.0.0",
+  "description": "An implementation of the turborepo-remote-cache server custom made for Cloudflare Workers",
+  "keywords": [
+    "serverless",
+    "remote-caching",
+    "cloudflare-workers",
+    "vercel",
+    "turborepo",
+    "cloudflare-r2"
+  ],
+  "version": "1.0.0",
+  "author": {
+    "email": "adiswa123@gmail.com",
+    "name": "Adishwar Rishi",
+    "url": "https://github.com/AdiRishi"
+  },
+  "homepage": "https://github.com/AdiRishi/turborepo-remote-cache-cloudflare",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/issues"
+  },
+  "license": "MIT",
+  "readme": "README.md",
   "type": "module",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230518.0",
