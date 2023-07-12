@@ -97,7 +97,7 @@ describe('v8 Artifacts API', () => {
   });
 
   describe('PUT artifact endpoint', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       workerEnv = getMiniflareBindings();
       ctx = new ExecutionContext();
     });
@@ -226,7 +226,7 @@ describe('v8 Artifacts API', () => {
   });
 
   describe('Artifact events endpoint', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       workerEnv = getMiniflareBindings();
       ctx = new ExecutionContext();
     });

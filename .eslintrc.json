@@ -1,9 +1,17 @@
 {
   "root": true,
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended-type-checked",
+    "plugin:@typescript-eslint/stylistic-type-checked",
+    "prettier"
+  ],
   "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": true
+  },
   "plugins": ["@typescript-eslint", "prettier"],
-  "ignorePatterns": [".eslintrc.js"],
+  "ignorePatterns": [".eslintrc.json"],
   "rules": {
     "prettier/prettier": "error",
     "@typescript-eslint/no-unused-vars": [
@@ -13,6 +21,7 @@
         "varsIgnorePattern": "^_",
         "destructuredArrayIgnorePattern": "^_"
       }
-    ]
+    ],
+    "@typescript-eslint/consistent-type-definitions": ["error", "type"]
   }
 }
