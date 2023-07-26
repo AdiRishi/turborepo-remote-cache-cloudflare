@@ -1,15 +1,18 @@
 # Turborepo Remote Cache (For Cloudflare Workers!) [![CI](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/actions/workflows/ci.yml/badge.svg)](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/actions/workflows/ci.yml)
 
-An open source implementation of the [Turborepo custom remote cache server](https://turbo.build/repo/docs/core-concepts/remote-caching).
-This implementation is **built from the ground up for [Cloudflare Workers](https://developers.cloudflare.com/workers/)**
+An open source implementation of the [Turborepo custom remote cache server](https://turbo.build/repo/docs/core-concepts/remote-caching) **purpose-built from the ground up for [Cloudflare Workers](https://developers.cloudflare.com/workers/)**
 
 ## Quick start
 
-The easiest way to deploy this repository is using the link below
+### Deploy using Cloudflare's deploy button
+
+To deploy this repository quickly, click the following link:
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
 
-If you want to clone the repository and deploy it via the CLI, use the following steps
+### Deploy Using the CLI
+
+For a more hands-on deployment using the CLI, follow the steps below:
 
 ```sh
 # 1. Clone the repository
@@ -34,24 +37,25 @@ echo "SECRET" | wrangler secret put TURBO_TOKEN
 
 In order to successfully run the [deploy](.github/workflows//deploy.yml) Github action you will need the following secrets
 
--   `CF_API_TOKEN`
--   `CF_ACCOUNT_ID`
+-   `CLOUDFLARE_API_TOKEN`
+-   `CLOUDFLARE_ACCOUNT_ID`
 
 _Note: These will be automatically set for you if you use the "Deploy with Workers" button._
 
 ### Automatic deletion of old cache files
 
-This project sets up a [cron trigger](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for Cloudflare workers which will automatically delete old cache files within the bound R2 bucket.
+This project sets up a [cron trigger](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for Cloudflare workers, which automatically deletes old cache files within the bound R2 bucket. This behavior can be customized:
 
-You can disable this behavior by removing the `[triggers]` configuration in [wrangler.toml](./wrangler.toml)
-
-You can change how long objects will be retained via the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.toml](./wrangler.toml) or via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
+-   To disable the automatic deletion, remove the [triggers] configuration in [wrangler.toml](./wrangler.toml)
+-   To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.toml](./wrangler.toml) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
 
 ## Setting up remote caching in your Turborepo project
 
-This section will describe **my recommended** way of setting up remote caching in turborepo. There are many ways to go about this. You can read can read more about this topic at the [official turborepo docs](https://turbo.build/repo/docs/core-concepts/remote-caching).
+Here's my recommended approach for setting up remote caching in your Turborepo project. You can read more about this topic in the [official Turborepo documentation](https://turbo.build/repo/docs/core-concepts/remote-caching).
 
-**1. Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)**
+### Step 1: Update `turbo.json`
+
+Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)
 
 ```json
 {
@@ -59,14 +63,18 @@ This section will describe **my recommended** way of setting up remote caching i
 }
 ```
 
-**2. Install the `dotenv-cli` npm package**
+### Step 2: Install `dotenv-cli`
+
+Install the `dotenv-cli` npm package:
 
 ```sh
 # You may have to add -W if you are installing this on your workspace root
 yarn add --dev dotenv-cli
 ```
 
-**3. Create a `.env` file at your project root with the following content**
+### Step 3: Create a `.env` File
+
+Create a `.env` file at your project root with the following content:
 
 ```dotenv
 TURBO_API=YOUR_API_URL
@@ -78,15 +86,15 @@ TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
 Keep the following in mind
 
 -   Replace `SECRET` and `YOUR_API_URL` with your chosen values.
--   The TURBO_TEAM value must begin with `team_`
+-   The `TURBO_TEAM` value must begin with `team_`
 -   Remember to add the `.env` file to `.gitignore`
 -   If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
 
-**5. Modify your turbo commands to load the `.env` file prior to execution**
+### Step 4: Modify Turbo Commands
 
-Instead of running a command like `turbo run build` directly, we simply run `dotenv -- turbo run build`. This will load everything in our `.env` file into the processes environment variables.
+Load the `.env` file prior to execution. Instead of running a command like `turbo run build` directly, use `dotenv -- turbo run build`. This loads everything in our `.env` file into the process's environment variables.
 
-I would recommend modifying your scripts in `package.json` to use dotenv-cli so you don't have to remember this each time. E.g.
+Here's how to modify your scripts in `package.json` to use dotenv-cli:
 
 ```json
 {
