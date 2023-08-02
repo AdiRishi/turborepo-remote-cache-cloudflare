@@ -3047,9 +3047,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"miniflare@npm:^3.20230801.0":
-  version: 3.20230801.0
-  resolution: "miniflare@npm:3.20230801.0"
+"miniflare@npm:^3.20230801.1":
+  version: 3.20230801.1
+  resolution: "miniflare@npm:3.20230801.1"
   dependencies:
     acorn: ^8.8.0
     acorn-walk: ^8.2.0
@@ -3063,11 +3063,11 @@ __metadata:
     source-map-support: 0.5.21
     stoppable: ^1.1.0
     undici: ^5.13.0
-    workerd: ^1.20230801.0
+    workerd: 1.20230801.0
     ws: ^8.11.0
     youch: ^3.2.2
     zod: ^3.20.6
-  checksum: 665c2866688b10a23efbb9eca4447f0412de18f0dcdb2560d9a6a5bd6b14ee1ce8567837176f188d51e018cd8f61f73b84a312808f305b414c85a97c3b5999f2
+  checksum: 88aaca7387ef1e10d6ddeb5d8168030882510996320c77548081e08b0701942429a1b67e693cbf920e2a7f992904a72b01212b147ac416da3346a32ab02b3b68
   languageName: node
   linkType: hard
 
@@ -4265,7 +4265,7 @@ __metadata:
     eslint-config-prettier: ^8.9.0
     eslint-plugin-prettier: ^5.0.0
     hono: ^3.3.4
-    miniflare: ^3.20230801.0
+    miniflare: ^3.20230801.1
     prettier: ^3.0.0
     typescript: ^5.1.6
     vitest: ^0.33.0
@@ -4600,7 +4600,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"workerd@npm:^1.20230801.0":
+"workerd@npm:1.20230801.0":
   version: 1.20230801.0
   resolution: "workerd@npm:1.20230801.0"
   dependencies:
