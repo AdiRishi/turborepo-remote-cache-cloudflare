@@ -45,9 +45,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudflare/workerd-darwin-64@npm:1.20230801.0":
+  version: 1.20230801.0
+  resolution: "@cloudflare/workerd-darwin-64@npm:1.20230801.0"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@cloudflare/workerd-darwin-arm64@npm:1.20230724.0":
   version: 1.20230724.0
   resolution: "@cloudflare/workerd-darwin-arm64@npm:1.20230724.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@cloudflare/workerd-darwin-arm64@npm:1.20230801.0":
+  version: 1.20230801.0
+  resolution: "@cloudflare/workerd-darwin-arm64@npm:1.20230801.0"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
@@ -59,6 +73,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudflare/workerd-linux-64@npm:1.20230801.0":
+  version: 1.20230801.0
+  resolution: "@cloudflare/workerd-linux-64@npm:1.20230801.0"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@cloudflare/workerd-linux-arm64@npm:1.20230724.0":
   version: 1.20230724.0
   resolution: "@cloudflare/workerd-linux-arm64@npm:1.20230724.0"
@@ -66,9 +87,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudflare/workerd-linux-arm64@npm:1.20230801.0":
+  version: 1.20230801.0
+  resolution: "@cloudflare/workerd-linux-arm64@npm:1.20230801.0"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
 "@cloudflare/workerd-windows-64@npm:1.20230724.0":
   version: 1.20230724.0
   resolution: "@cloudflare/workerd-windows-64@npm:1.20230724.0"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@cloudflare/workerd-windows-64@npm:1.20230801.0":
+  version: 1.20230801.0
+  resolution: "@cloudflare/workerd-windows-64@npm:1.20230801.0"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -2988,7 +3023,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"miniflare@npm:3.20230724.0, miniflare@npm:^3.20230724.0":
+"miniflare@npm:3.20230724.0":
   version: 3.20230724.0
   resolution: "miniflare@npm:3.20230724.0"
   dependencies:
@@ -3009,6 +3044,30 @@ __metadata:
     youch: ^3.2.2
     zod: ^3.20.6
   checksum: e76837d39a1df21495324edc99b89268987bfdeb7a04f7df54452ebe822507d73a45debf5ae3697a2dbb8d3de98267257f050ca34e94e999767f65dbaaf30ec4
+  languageName: node
+  linkType: hard
+
+"miniflare@npm:^3.20230801.0":
+  version: 3.20230801.0
+  resolution: "miniflare@npm:3.20230801.0"
+  dependencies:
+    acorn: ^8.8.0
+    acorn-walk: ^8.2.0
+    better-sqlite3: ^8.1.0
+    capnp-ts: ^0.7.0
+    exit-hook: ^2.2.1
+    glob-to-regexp: ^0.4.1
+    http-cache-semantics: ^4.1.0
+    kleur: ^4.1.5
+    set-cookie-parser: ^2.6.0
+    source-map-support: 0.5.21
+    stoppable: ^1.1.0
+    undici: ^5.13.0
+    workerd: ^1.20230801.0
+    ws: ^8.11.0
+    youch: ^3.2.2
+    zod: ^3.20.6
+  checksum: 665c2866688b10a23efbb9eca4447f0412de18f0dcdb2560d9a6a5bd6b14ee1ce8567837176f188d51e018cd8f61f73b84a312808f305b414c85a97c3b5999f2
   languageName: node
   linkType: hard
 
@@ -4206,7 +4265,7 @@ __metadata:
     eslint-config-prettier: ^8.9.0
     eslint-plugin-prettier: ^5.0.0
     hono: ^3.3.4
-    miniflare: ^3.20230724.0
+    miniflare: ^3.20230801.0
     prettier: ^3.0.0
     typescript: ^5.1.6
     vitest: ^0.33.0
@@ -4538,6 +4597,32 @@ __metadata:
   bin:
     workerd: bin/workerd
   checksum: 06f98f24c07aec3a4e873b049f5b6a1fcb9138eb09b496a96bdc4c8bf8d9a1d6f4b2b6e9b4212afcd1bb0b2faae982ee07b4a42f2a1443998329729b9e73a175
+  languageName: node
+  linkType: hard
+
+"workerd@npm:^1.20230801.0":
+  version: 1.20230801.0
+  resolution: "workerd@npm:1.20230801.0"
+  dependencies:
+    "@cloudflare/workerd-darwin-64": 1.20230801.0
+    "@cloudflare/workerd-darwin-arm64": 1.20230801.0
+    "@cloudflare/workerd-linux-64": 1.20230801.0
+    "@cloudflare/workerd-linux-arm64": 1.20230801.0
+    "@cloudflare/workerd-windows-64": 1.20230801.0
+  dependenciesMeta:
+    "@cloudflare/workerd-darwin-64":
+      optional: true
+    "@cloudflare/workerd-darwin-arm64":
+      optional: true
+    "@cloudflare/workerd-linux-64":
+      optional: true
+    "@cloudflare/workerd-linux-arm64":
+      optional: true
+    "@cloudflare/workerd-windows-64":
+      optional: true
+  bin:
+    workerd: bin/workerd
+  checksum: 21deea26ad8816927ca812a0e5a2e4fb055f9e4e2c75ca54ddbab040bd9abfa34bb2b4f688aea8ff88ec39e82abb183868fd7fbc52a89bf5015b77d123583614
   languageName: node
   linkType: hard
 
