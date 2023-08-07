@@ -52,7 +52,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hono/zod-validator": "^0.1.4",
+    "@hono/zod-validator": "^0.1.5",
     "hono": "^3.3.4",
     "zod": "^3.21.4"
   },
