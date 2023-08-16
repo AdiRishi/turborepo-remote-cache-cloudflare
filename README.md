@@ -9,7 +9,8 @@ If you're a Turborepo user, this project offers compelling advantages:
 -   🚀 **Faster Builds**: Harness the power of remote caching to significantly speed up your builds
 -   🌐 **Independence from Vercel**: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
 -   💰 **Cost Savings**: Say goodbye to surprise egress costs when downloading artifacts. This means fewer unexpected charges on your cloud bill.
--   👛 **Affordable Start**: Begin with Cloudflare Workers' [generous free tier](https://developers.cloudflare.com/workers/platform/pricing), making it cost-effective from the get-go.
+-   🌍 **Global Deployment**: Code deploys instantly across the globe in over 300 countries, ensuring unmatched performance and reliability.
+-   👛 **Affordable Start**: With Cloudflare Workers' [generous free tier](https://developers.cloudflare.com/workers/platform/pricing), you can make up to 100,000 requests every day at no cost. It's a cost-effective way to get started and scale your application.
 
 ## Quick start
 
