@@ -5,10 +5,8 @@ usage_model = 'bundled'
 
 [vars]
 ENVIRONMENT = 'production'
-# When enabling authentication, the following secrets are needed
 # - TURBO_TOKEN (must a valid Bearer auth token)
 # Run `echo <VALUE> | wrangler secret put <NAME>` for each of these
-REQUIRE_AUTH = true
 BUCKET_OBJECT_EXPIRATION_HOURS = 720 # 30 days
 
 [[r2_buckets]]
