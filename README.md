@@ -2,7 +2,7 @@
 
 An open source implementation of the [Turborepo custom remote cache server](https://turbo.build/repo/docs/core-concepts/remote-caching) **purpose-built from the ground up for [Cloudflare Workers](https://developers.cloudflare.com/workers/)**
 
-## Why should I use this?
+## 🤔 Why should I use this?
 
 If you're a Turborepo user, this project offers compelling advantages:
 
@@ -12,7 +12,7 @@ If you're a Turborepo user, this project offers compelling advantages:
 -   🌍 **Global Deployment**: Code deploys instantly across the globe in over 300 countries, ensuring unmatched performance and reliability.
 -   👛 **Affordable Start**: With Cloudflare Workers' [generous free tier](https://developers.cloudflare.com/workers/platform/pricing), you can make up to 100,000 requests every day at no cost. It's a cost-effective way to get started and scale your application.
 
-## Quick start
+## ⚡️ Quick start
 
 ### Deploy using Cloudflare's deploy button
 
@@ -41,7 +41,7 @@ wrangler deploy
 echo "SECRET" | wrangler secret put TURBO_TOKEN
 ```
 
-## Configuration
+## ⚙️ Configuration
 
 ### Github actions requirements
 
@@ -59,7 +59,7 @@ This project sets up a [cron trigger](https://developers.cloudflare.com/workers/
 -   To disable the automatic deletion, remove the [triggers] configuration in [wrangler.toml](./wrangler.toml)
 -   To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.toml](./wrangler.toml) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
 
-## Setting up remote caching in your Turborepo project
+## ▲ Setting up remote caching in your Turborepo project
 
 Here's my recommended approach for setting up remote caching in your Turborepo project. You can read more about this topic in the [official Turborepo documentation](https://turbo.build/repo/docs/core-concepts/remote-caching).
 
