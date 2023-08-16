@@ -25,15 +25,12 @@ describe('Authentication module for artifacts API', () => {
     return request;
   }
 
-  describe('should require authentication when REQUIRE_AUTH is true', () => {
+  describe('should require authentication when uploading artifacts', () => {
     let workerEnv: Env;
     let ctx: ExecutionContext;
 
     beforeEach(() => {
-      workerEnv = {
-        ...getMiniflareBindings<Env>(),
-        REQUIRE_AUTH: true,
-      };
+      workerEnv = getMiniflareBindings<Env>();
       ctx = new ExecutionContext();
     });
 
@@ -44,36 +41,6 @@ describe('Authentication module for artifacts API', () => {
       );
       const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(401);
-    });
-
-    test('should return 200 when Authorization header is present', async () => {
-      const request = createArtifactGetRequest(
-        `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`
-      );
-      const res = await app.fetch(request, workerEnv, ctx);
-      expect(res.status).toBe(200);
-    });
-  });
-
-  describe('should not require authentication when REQUIRE_AUTH is false', () => {
-    let workerEnv: Env;
-    let ctx: ExecutionContext;
-
-    beforeEach(() => {
-      workerEnv = {
-        ...getMiniflareBindings<Env>(),
-        REQUIRE_AUTH: false,
-      };
-      ctx = new ExecutionContext();
-    });
-
-    test('should return 200 when Authorization header is missing', async () => {
-      const request = createArtifactGetRequest(
-        `http://localhost/v8/artifacts/${artifactId}?teamId=${teamId}`,
-        false
-      );
-      const res = await app.fetch(request, workerEnv, ctx);
-      expect(res.status).toBe(200);
     });
 
     test('should return 200 when Authorization header is present', async () => {

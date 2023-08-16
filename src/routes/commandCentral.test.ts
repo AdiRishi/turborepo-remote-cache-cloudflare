@@ -51,23 +51,4 @@ describe('Command central /delete-old-cache route', () => {
     expect(response.status).toBe(401);
     expect(deleteOldCacheMock).not.toHaveBeenCalled();
   });
-
-  test('should invoke the deleteOldCache method if auth is not required', async () => {
-    const request = new Request('http://localhost/commandCentral/delete-expired-objects', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const response = await app.fetch(
-      request,
-      {
-        ...workerEnv,
-        REQUIRE_AUTH: false,
-      },
-      ctx
-    );
-    expect(response.status).toBe(200);
-    expect(deleteOldCacheMock).toHaveBeenCalledOnce();
-  });
 });
