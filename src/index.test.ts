@@ -6,7 +6,7 @@ import { Env } from '.';
 
 const describe = setupMiniflareIsolatedStorage();
 
-describe('rest-api worker', () => {
+describe('remote-cache worker', () => {
   let worker: UnstableDevWorker;
   let workerEnv: Env;
   let ctx: ExecutionContext;
@@ -39,17 +39,6 @@ describe('rest-api worker', () => {
     const request = new Request('http://localhost/ping');
     const res = await app.fetch(request, workerEnv, ctx);
     expect(await res.text()).toBe('pong');
-  });
-
-  it('should respond to the latency-test route via invoking the app', async () => {
-    const request = new Request('http://localhost/latency-test', {
-      method: 'POST',
-      body: JSON.stringify({}),
-    });
-    const res = await app.fetch(request, workerEnv, ctx);
-    expect(await res.json()).toEqual({
-      content: '🎉😄😇🎉😄😇🎉😄😇🎉😄😇',
-    });
   });
 
   it('should respond to the throw-exception route via invoking the app', async () => {
