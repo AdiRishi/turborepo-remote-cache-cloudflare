@@ -6,7 +6,7 @@ export const performanceTestingRouter = new Hono<{ Bindings: Env }>();
 performanceTestingRouter.post('/r2-round-trip', async (c) => {
   const artifactId = 'UNIQUE-artifactId-' + Math.random();
   const artifactTag = 'UNIQUE-artifactTag-' + Math.random();
-  const teamId = 'arishi-performance-testing';
+  const teamId = 'performance-testing';
   const artifactContent = '🎉😄😇🎉😄😇🎉😄😇🎉😄😇';
   // store and get back content to simulate latency
   await c.env.R2_STORE.put(`${teamId}/existing-${artifactId}`, artifactContent, {
