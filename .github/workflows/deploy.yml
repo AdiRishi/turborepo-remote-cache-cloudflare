@@ -5,10 +5,6 @@ on:
   push:
     branches: ['master']
 
-env:
-  CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -23,6 +19,9 @@ jobs:
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          wranglerVersion: 'latest'
           preCommands: |
             echo "*** post commands ***"
             wrangler r2 bucket create turborepo-cache
