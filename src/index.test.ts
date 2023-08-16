@@ -40,4 +40,24 @@ describe('rest-api worker', () => {
     const res = await app.fetch(request, workerEnv, ctx);
     expect(await res.text()).toBe('pong');
   });
+
+  it('should respond to the latency-test route via invoking the app', async () => {
+    const request = new Request('http://localhost/latency-test', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+    const res = await app.fetch(request, workerEnv, ctx);
+    expect(await res.json()).toEqual({
+      content: '🎉😄😇🎉😄😇🎉😄😇🎉😄😇',
+    });
+  });
+
+  it('should respond to the throw-exception route via invoking the app', async () => {
+    const request = new Request('http://localhost/throw-exception');
+    const res = await app.fetch(request, workerEnv, ctx);
+    expect(res.status).toBe(500);
+    expect(await res.json()).toEqual({
+      error: 'Expected error',
+    });
+  });
 });
