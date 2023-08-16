@@ -9,6 +9,7 @@ export const app = new Hono<{ Bindings: Env }>();
 app.use('*', cors());
 
 app.get('/ping', (c) => c.text('pong'));
+app.post('/latency-test', (c) => c.json({ timestamp: Date.now().toString() }));
 
 app.route('/v8', v8App);
 app.route('/commandCentral', commandCentralRouter);
