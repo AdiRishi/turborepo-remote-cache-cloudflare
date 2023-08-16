@@ -45,9 +45,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudflare/workerd-darwin-64@npm:1.20230814.1":
+  version: 1.20230814.1
+  resolution: "@cloudflare/workerd-darwin-64@npm:1.20230814.1"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@cloudflare/workerd-darwin-arm64@npm:1.20230807.0":
   version: 1.20230807.0
   resolution: "@cloudflare/workerd-darwin-arm64@npm:1.20230807.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@cloudflare/workerd-darwin-arm64@npm:1.20230814.1":
+  version: 1.20230814.1
+  resolution: "@cloudflare/workerd-darwin-arm64@npm:1.20230814.1"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
@@ -59,6 +73,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudflare/workerd-linux-64@npm:1.20230814.1":
+  version: 1.20230814.1
+  resolution: "@cloudflare/workerd-linux-64@npm:1.20230814.1"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@cloudflare/workerd-linux-arm64@npm:1.20230807.0":
   version: 1.20230807.0
   resolution: "@cloudflare/workerd-linux-arm64@npm:1.20230807.0"
@@ -66,9 +87,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudflare/workerd-linux-arm64@npm:1.20230814.1":
+  version: 1.20230814.1
+  resolution: "@cloudflare/workerd-linux-arm64@npm:1.20230814.1"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
 "@cloudflare/workerd-windows-64@npm:1.20230807.0":
   version: 1.20230807.0
   resolution: "@cloudflare/workerd-windows-64@npm:1.20230807.0"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@cloudflare/workerd-windows-64@npm:1.20230814.1":
+  version: 1.20230814.1
+  resolution: "@cloudflare/workerd-windows-64@npm:1.20230814.1"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -3018,9 +3053,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"miniflare@npm:^3.20230807.0":
-  version: 3.20230807.0
-  resolution: "miniflare@npm:3.20230807.0"
+"miniflare@npm:^3.20230814.1":
+  version: 3.20230814.1
+  resolution: "miniflare@npm:3.20230814.1"
   dependencies:
     acorn: ^8.8.0
     acorn-walk: ^8.2.0
@@ -3034,11 +3069,11 @@ __metadata:
     source-map-support: 0.5.21
     stoppable: ^1.1.0
     undici: ^5.13.0
-    workerd: 1.20230807.0
+    workerd: 1.20230814.1
     ws: ^8.11.0
     youch: ^3.2.2
     zod: ^3.20.6
-  checksum: 4a2bd53ff52b175d3ddeb3a917adb5b1f1fa54f156c19369063d06d53c34c209f15f5c9c6f7456b3d890ba7d71e3dcffe0fa15fad7416d6d2be96c98a905b3c0
+  checksum: 049c1f7ef499b693dade78dbef1cb795e82b63a4d790967944a1d468db87bcfd2039bdc360b13781ad8d4082926b2f8b084594fbbe64403ceb0b3142bcd0af6b
   languageName: node
   linkType: hard
 
@@ -4229,7 +4264,7 @@ __metadata:
     eslint-config-prettier: ^9.0.0
     eslint-plugin-prettier: ^5.0.0
     hono: ^3.4.3
-    miniflare: ^3.20230807.0
+    miniflare: ^3.20230814.1
     prettier: ^3.0.2
     typescript: ^5.1.6
     vitest: ^0.33.0
@@ -4538,7 +4573,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"workerd@npm:1.20230807.0, workerd@npm:^1.20230801.0":
+"workerd@npm:1.20230814.1":
+  version: 1.20230814.1
+  resolution: "workerd@npm:1.20230814.1"
+  dependencies:
+    "@cloudflare/workerd-darwin-64": 1.20230814.1
+    "@cloudflare/workerd-darwin-arm64": 1.20230814.1
+    "@cloudflare/workerd-linux-64": 1.20230814.1
+    "@cloudflare/workerd-linux-arm64": 1.20230814.1
+    "@cloudflare/workerd-windows-64": 1.20230814.1
+  dependenciesMeta:
+    "@cloudflare/workerd-darwin-64":
+      optional: true
+    "@cloudflare/workerd-darwin-arm64":
+      optional: true
+    "@cloudflare/workerd-linux-64":
+      optional: true
+    "@cloudflare/workerd-linux-arm64":
+      optional: true
+    "@cloudflare/workerd-windows-64":
+      optional: true
+  bin:
+    workerd: bin/workerd
+  checksum: aac580ae6a1a3d054b2114604fe0eaae59bfc96fcf79df5b8de73525cbbb9689b4df99bea07c46c3095d51dde80eedea8027fb539fd771b6f2d2f24f5432a571
+  languageName: node
+  linkType: hard
+
+"workerd@npm:^1.20230801.0":
   version: 1.20230807.0
   resolution: "workerd@npm:1.20230807.0"
   dependencies:
