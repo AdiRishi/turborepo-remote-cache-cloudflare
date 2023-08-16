@@ -24,6 +24,6 @@ jobs:
           wranglerVersion: 'latest'
           preCommands: |
             echo "*** post commands ***"
-            wrangler r2 bucket create turborepo-cache
+            wrangler r2 bucket create turborepo-cache || true
             echo "******"
           command: 'deploy'
