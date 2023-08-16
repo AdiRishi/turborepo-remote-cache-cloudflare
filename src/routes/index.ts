@@ -26,7 +26,7 @@ app.get('/throw-exception', () => {
 app.post('/latency-test', async (c) => {
   const artifactId = 'UNIQUE-artifactId-' + Math.random();
   const artifactTag = 'UNIQUE-artifactTag-' + Math.random();
-  const teamId = 'UNIQUE-teamId-' + Math.random();
+  const teamId = 'arishi-performance-testing';
   const artifactContent = '🎉😄😇🎉😄😇🎉😄😇🎉😄😇';
   // store and get back content to simulate latency
   await c.env.R2_STORE.put(`${teamId}/existing-${artifactId}`, artifactContent, {
