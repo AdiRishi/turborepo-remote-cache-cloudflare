@@ -56,5 +56,5 @@
     "hono": "^3.4.3",
     "zod": "^3.22.1"
   },
-  "packageManager": "yarn@3.6.1"
+  "packageManager": "yarn@3.6.2"
 }
