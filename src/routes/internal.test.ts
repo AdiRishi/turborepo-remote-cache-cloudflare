@@ -35,10 +35,29 @@ describe('/internal Routes', () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
         },
+        body: JSON.stringify({}),
       });
       const response = await app.fetch(request, workerEnv, ctx);
       expect(response.status).toBe(200);
       expect(deleteOldCacheMock).toHaveBeenCalledOnce();
+    });
+
+    test('should pass through custom expiration hours to deleteOldCache', async () => {
+      const request = new Request('http://localhost/internal/delete-expired-objects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
+        },
+        body: JSON.stringify({ expireInHours: 100 }),
+      });
+      const response = await app.fetch(request, workerEnv, ctx);
+      expect(response.status).toBe(200);
+      console.log(await response.text());
+      expect(deleteOldCacheMock).toHaveBeenCalledWith({
+        ...workerEnv,
+        BUCKET_OBJECT_EXPIRATION_HOURS: 100,
+      });
     });
 
     test('should return 401 if no auth token is provided', async () => {
@@ -47,6 +66,7 @@ describe('/internal Routes', () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({}),
       });
       const response = await app.fetch(request, workerEnv, ctx);
       expect(response.status).toBe(401);

@@ -4,7 +4,8 @@ import { Env } from '..';
 export const performanceTestingRouter = new Hono<{ Bindings: Env }>();
 
 performanceTestingRouter.post('/r2-round-trip', async (c) => {
-  const artifactId = 'UNIQUE-artifactId-' + Math.random();
+  const requestLocation = c.req.raw?.cf?.colo as string | undefined;
+  const artifactId = `pref-${requestLocation ?? 'unknown-colo'}-${crypto.randomUUID()}`;
   const artifactTag = 'UNIQUE-artifactTag-' + Math.random();
   const teamId = 'performance-testing';
   const artifactContent = '🎉😄😇🎉😄😇🎉😄😇🎉😄😇';

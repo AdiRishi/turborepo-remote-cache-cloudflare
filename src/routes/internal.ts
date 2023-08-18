@@ -12,10 +12,18 @@ internalRouter.use('*', async (c, next) => {
   await middleware(c, next);
 });
 
-internalRouter.post('/delete-expired-objects', async (c) => {
-  await deleteOldCache(c.env);
-  return c.json({ success: true });
-});
+internalRouter.post(
+  '/delete-expired-objects',
+  zValidator('json', z.object({ expireInHours: z.number().optional() })),
+  async (c) => {
+    const { expireInHours } = c.req.valid('json');
+    await deleteOldCache({
+      ...c.env,
+      BUCKET_OBJECT_EXPIRATION_HOURS: expireInHours ?? c.env.BUCKET_OBJECT_EXPIRATION_HOURS,
+    });
+    return c.json({ success: true });
+  }
+);
 
 internalRouter.post(
   '/populate-random-objects',
