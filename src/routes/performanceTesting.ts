@@ -19,3 +19,7 @@ performanceTestingRouter.post('/r2-round-trip', async (c) => {
   const r2Text = await r2Object.text();
   return c.json({ content: r2Text });
 });
+
+performanceTestingRouter.post('/ping', (c) => {
+  return c.text('pong');
+});
