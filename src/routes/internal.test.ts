@@ -53,7 +53,6 @@ describe('/internal Routes', () => {
       });
       const response = await app.fetch(request, workerEnv, ctx);
       expect(response.status).toBe(200);
-      console.log(await response.text());
       expect(deleteOldCacheMock).toHaveBeenCalledWith({
         ...workerEnv,
         BUCKET_OBJECT_EXPIRATION_HOURS: 100,
