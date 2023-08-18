@@ -14,41 +14,83 @@ const deleteOldCacheMock = deleteOldCache as MockedFunction<typeof deleteOldCach
 
 const describe = setupMiniflareIsolatedStorage();
 
-describe('/internal/delete-old-cache route', () => {
+describe('/internal Routes', () => {
   let workerEnv: Env;
   let ctx: ExecutionContext;
 
-  beforeEach(() => {
-    workerEnv = getMiniflareBindings();
-    ctx = new ExecutionContext();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  test('should invoke the deleteOldCache method', async () => {
-    const request = new Request('http://localhost/internal/delete-expired-objects', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
-      },
+  describe('/internal/delete-old-cache route', () => {
+    beforeEach(() => {
+      workerEnv = getMiniflareBindings();
+      ctx = new ExecutionContext();
     });
-    const response = await app.fetch(request, workerEnv, ctx);
-    expect(response.status).toBe(200);
-    expect(deleteOldCacheMock).toHaveBeenCalledOnce();
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    test('should invoke the deleteOldCache method', async () => {
+      const request = new Request('http://localhost/internal/delete-expired-objects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
+        },
+      });
+      const response = await app.fetch(request, workerEnv, ctx);
+      expect(response.status).toBe(200);
+      expect(deleteOldCacheMock).toHaveBeenCalledOnce();
+    });
+
+    test('should return 401 if no auth token is provided', async () => {
+      const request = new Request('http://localhost/internal/delete-expired-objects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const response = await app.fetch(request, workerEnv, ctx);
+      expect(response.status).toBe(401);
+      expect(deleteOldCacheMock).not.toHaveBeenCalled();
+    });
   });
 
-  test('should return 401 if no auth token is provided', async () => {
-    const request = new Request('http://localhost/internal/delete-expired-objects', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+  describe('/internal/populate-random-objects route', () => {
+    beforeEach(() => {
+      workerEnv = getMiniflareBindings();
+      ctx = new ExecutionContext();
     });
-    const response = await app.fetch(request, workerEnv, ctx);
-    expect(response.status).toBe(401);
-    expect(deleteOldCacheMock).not.toHaveBeenCalled();
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    test('should invoke the deleteOldCache method', async () => {
+      const request = new Request('http://localhost/internal/populate-random-objects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
+        },
+        body: JSON.stringify({ count: 10 }),
+      });
+      const response = await app.fetch(request, workerEnv, ctx);
+      expect(response.status).toBe(200);
+
+      const list = await workerEnv.R2_STORE.list();
+      expect(list.objects.length).toBe(10);
+    });
+
+    test('should return 401 if no auth token is provided', async () => {
+      const request = new Request('http://localhost/internal/populate-random-objects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ count: 10 }),
+      });
+      const response = await app.fetch(request, workerEnv, ctx);
+      expect(response.status).toBe(401);
+      expect(deleteOldCacheMock).not.toHaveBeenCalled();
+    });
   });
 });
