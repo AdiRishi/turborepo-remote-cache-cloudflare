@@ -3,7 +3,7 @@ import { HTTPException } from 'hono/http-exception';
 import { cors } from 'hono/cors';
 import { Env } from '..';
 import { v8App } from './v8';
-import { commandCentralRouter } from './commandCentral';
+import { internalRouter } from './internal';
 import { performanceTestingRouter } from './performanceTesting';
 
 export const app = new Hono<{ Bindings: Env }>();
@@ -24,5 +24,5 @@ app.get('/throw-exception', () => {
 });
 
 app.route('/v8', v8App);
-app.route('/commandCentral', commandCentralRouter);
+app.route('/internal', internalRouter);
 app.route('/performance-testing', performanceTestingRouter);

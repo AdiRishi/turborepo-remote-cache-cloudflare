@@ -1,6 +1,6 @@
 import { MockedFunction, afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { app } from '.';
-import { Env } from '../';
+import { Env } from '..';
 import { deleteOldCache } from '../crons/deleteOldCache';
 
 vi.mock('../crons/deleteOldCache', async (importActual) => {
@@ -14,7 +14,7 @@ const deleteOldCacheMock = deleteOldCache as MockedFunction<typeof deleteOldCach
 
 const describe = setupMiniflareIsolatedStorage();
 
-describe('Command central /delete-old-cache route', () => {
+describe('/internal/delete-old-cache route', () => {
   let workerEnv: Env;
   let ctx: ExecutionContext;
 
@@ -28,7 +28,7 @@ describe('Command central /delete-old-cache route', () => {
   });
 
   test('should invoke the deleteOldCache method', async () => {
-    const request = new Request('http://localhost/commandCentral/delete-expired-objects', {
+    const request = new Request('http://localhost/internal/delete-expired-objects', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ describe('Command central /delete-old-cache route', () => {
   });
 
   test('should return 401 if no auth token is provided', async () => {
-    const request = new Request('http://localhost/commandCentral/delete-expired-objects', {
+    const request = new Request('http://localhost/internal/delete-expired-objects', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
