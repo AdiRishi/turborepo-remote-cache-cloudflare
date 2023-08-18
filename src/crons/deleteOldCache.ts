@@ -1,31 +1,46 @@
 import { Env } from '..';
 import { isDateOlderThan } from '../utils/date';
 
-const CURSOR_SIZE = 500;
+// Cursor size should be kept below 1000 to avoid limits on bulk operations
+export const CURSOR_SIZE = 500;
 
-export async function deleteOldCache(env: Env) {
+class R2KeysForDeletion {
+  keys: string[] = [];
+  add(key: string) {
+    this.keys.push(key);
+  }
+}
+
+export async function deleteOldCache(env: Env): Promise<void> {
   const BUCKET_CUTOFF_HOURS = env.BUCKET_OBJECT_EXPIRATION_HOURS;
   let truncated = false;
   let cursor: string | undefined;
   let list: R2Objects;
-  const keysMarkedForDeletion: string[] = [];
+  const keysMarkedForDeletion: R2KeysForDeletion[] = [];
 
   do {
     list = await env.R2_STORE.list({ limit: CURSOR_SIZE, cursor });
     truncated = list.truncated;
     cursor = list.truncated ? list.cursor : undefined;
 
+    /**
+     * Deleting keys while iterating over the list can sometimes cause the list to be truncated.
+     * So we mark the keys for deletion and delete after at least one additional iteration.
+     */
+    const keysAvailableForDeletion = keysMarkedForDeletion.shift();
+    if (keysAvailableForDeletion) {
+      await env.R2_STORE.delete(keysAvailableForDeletion.keys);
+    }
+
+    const keysForDeletion = new R2KeysForDeletion();
     for (const object of list.objects) {
       if (isDateOlderThan(object.uploaded, BUCKET_CUTOFF_HOURS)) {
-        keysMarkedForDeletion.push(object.key);
+        keysForDeletion.add(object.key);
       }
     }
+    keysMarkedForDeletion.push(keysForDeletion);
   } while (truncated);
-
-  if (keysMarkedForDeletion.length > 0) {
-    // if (env.ENVIRONMENT === 'development') {
-    //   console.log(`Deleting ${keysMarkedForDeletion.length} keys`, keysMarkedForDeletion);
-    // }
-    await env.R2_STORE.delete(keysMarkedForDeletion);
+  for (const keysForDeletion of keysMarkedForDeletion) {
+    await env.R2_STORE.delete(keysForDeletion.keys);
   }
 }

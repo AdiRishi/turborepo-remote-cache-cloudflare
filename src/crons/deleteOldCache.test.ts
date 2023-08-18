@@ -1,7 +1,7 @@
 import { MockedFunction, afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { Env } from '../';
 import { isDateOlderThan } from '../utils/date';
-import { deleteOldCache } from './deleteOldCache';
+import { CURSOR_SIZE, deleteOldCache } from './deleteOldCache';
 
 vi.mock('../utils/date', async (importActual) => {
   const actual = await importActual<typeof import('../utils/date')>();
@@ -48,7 +48,21 @@ describe('R2 delete cron', () => {
 
   test('should delete all artifacts when there are more than CURSOR_SIZE', async () => {
     isDateOlderThanMock.mockReturnValue(true);
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < Math.round(CURSOR_SIZE * 1.5); i++) {
+      await workerEnv.R2_STORE.put(`${teamId}/${artifactId}-${i}`, artifactContent, {
+        customMetadata: { artifactTag },
+      });
+    }
+
+    await deleteOldCache(workerEnv);
+
+    const artifacts = await workerEnv.R2_STORE.list();
+    expect(artifacts.objects.length).toEqual(0);
+  });
+
+  test('should delete all artifacts when there are over 1000 items ready for deletion', async () => {
+    isDateOlderThanMock.mockReturnValue(true);
+    for (let i = 0; i < 1001; i++) {
       await workerEnv.R2_STORE.put(`${teamId}/${artifactId}-${i}`, artifactContent, {
         customMetadata: { artifactTag },
       });
