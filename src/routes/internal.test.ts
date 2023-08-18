@@ -113,4 +113,53 @@ describe('/internal Routes', () => {
       expect(list.objects.length).toBe(0);
     });
   });
+
+  describe('/internal/count-objects route', () => {
+    beforeEach(() => {
+      workerEnv = getMiniflareBindings();
+      ctx = new ExecutionContext();
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    test('should return the number of objects in R2 when bucket is empty', async () => {
+      const request = new Request('http://localhost/internal/count-objects', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
+        },
+      });
+      const response = await app.fetch(request, workerEnv, ctx);
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ count: 0 });
+    });
+
+    test('should return the number of objects in R2 when bucket is not empty', async () => {
+      await workerEnv.R2_STORE.put('key', 'value');
+      const request = new Request('http://localhost/internal/count-objects', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
+        },
+      });
+      const response = await app.fetch(request, workerEnv, ctx);
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ count: 1 });
+    });
+
+    test('should return 401 if no auth token is provided', async () => {
+      const request = new Request('http://localhost/internal/count-objects', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const response = await app.fetch(request, workerEnv, ctx);
+      expect(response.status).toBe(401);
+    });
+  });
 });
