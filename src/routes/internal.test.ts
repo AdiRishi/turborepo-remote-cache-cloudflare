@@ -64,7 +64,7 @@ describe('/internal Routes', () => {
       vi.restoreAllMocks();
     });
 
-    test('should invoke the deleteOldCache method', async () => {
+    test('should successfully add random objects to R2', async () => {
       const request = new Request('http://localhost/internal/populate-random-objects', {
         method: 'POST',
         headers: {
@@ -90,7 +90,8 @@ describe('/internal Routes', () => {
       });
       const response = await app.fetch(request, workerEnv, ctx);
       expect(response.status).toBe(401);
-      expect(deleteOldCacheMock).not.toHaveBeenCalled();
+      const list = await workerEnv.R2_STORE.list();
+      expect(list.objects.length).toBe(0);
     });
   });
 });
