@@ -48,3 +48,18 @@ internalRouter.post(
     return c.json({ success: true });
   }
 );
+
+internalRouter.get('/count-objects', async (c) => {
+  let truncated = false;
+  let cursor: string | undefined;
+  let list: R2Objects;
+  let count = 0;
+  do {
+    list = await c.env.R2_STORE.list({ limit: 999, cursor });
+    truncated = list.truncated;
+    cursor = list.truncated ? list.cursor : undefined;
+    count += list.objects.length;
+  } while (truncated);
+
+  return c.json({ count });
+});
