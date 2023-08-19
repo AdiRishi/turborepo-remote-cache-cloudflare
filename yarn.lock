@@ -451,13 +451,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hono/zod-validator@npm:^0.1.7":
-  version: 0.1.7
-  resolution: "@hono/zod-validator@npm:0.1.7"
+"@hono/zod-validator@npm:^0.1.8":
+  version: 0.1.8
+  resolution: "@hono/zod-validator@npm:0.1.8"
   peerDependencies:
     hono: 3.*
     zod: ^3.19.1
-  checksum: 0fd8b6e3c339b66cb4810be32d289016e60045ec59ea0a63d57da367887f0ca504c1c0c4e93478e16d71728b0fba59009faef33e167d21ab48ac76cba195cb94
+  checksum: dd1b28307c9b890939ffbb9a0052f08424aae6a96e3074248f3f6e4c787949d3681663c1eebf8ba9ba296e10f59c432075aebe45bdea38572f42ca1bb3259055
   languageName: node
   linkType: hard
 
@@ -4167,7 +4167,7 @@ __metadata:
   resolution: "turborepo-remote-cache-cf@workspace:."
   dependencies:
     "@cloudflare/workers-types": ^4.20230814.0
-    "@hono/zod-validator": ^0.1.7
+    "@hono/zod-validator": ^0.1.8
     "@typescript-eslint/eslint-plugin": ^6.4.0
     "@typescript-eslint/parser": ^6.4.0
     "@vitest/coverage-v8": 0.33.0
