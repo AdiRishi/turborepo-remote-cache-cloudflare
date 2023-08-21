@@ -2435,10 +2435,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hono@npm:^3.4.3":
-  version: 3.4.3
-  resolution: "hono@npm:3.4.3"
-  checksum: 027842b71ed8f0dbd1203f9f440bebcb8a1d8508c2b4aabf5a22c8764429979dfd8bd6ef0cc05c776fcfdaf2f228e93711590fbd7e734976a2bca0fc76c7c07f
+"hono@npm:^3.5.0":
+  version: 3.5.0
+  resolution: "hono@npm:3.5.0"
+  checksum: 950bc5724dbb3a52cce17f277a00be9d08fdb78a76b7c1f840a9033e8edecbd5664b6326caa3f34fc9308c92983ac9c654b7052e234c4c2e323a019042a2ce27
   languageName: node
   linkType: hard
 
@@ -4174,7 +4174,7 @@ __metadata:
     eslint: ^8.47.0
     eslint-config-prettier: ^9.0.0
     eslint-plugin-prettier: ^5.0.0
-    hono: ^3.4.3
+    hono: ^3.5.0
     miniflare: ^3.20230814.1
     prettier: ^3.0.2
     typescript: ^5.1.6
