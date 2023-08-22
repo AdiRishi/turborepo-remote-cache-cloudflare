@@ -73,4 +73,13 @@ describe('R2 delete cron', () => {
     const artifacts = await workerEnv.R2_STORE.list();
     expect(artifacts.objects.length).toEqual(0);
   });
+
+  test('should not call R2Bucket.delete with no keys', async () => {
+    const spy = vi.spyOn(workerEnv.R2_STORE, 'delete');
+    isDateOlderThanMock.mockReturnValue(false); // Make sure no objects are marked for deletion
+
+    await deleteOldCache(workerEnv);
+
+    expect(spy).not.toHaveBeenCalledWith([]);
+  });
 });
