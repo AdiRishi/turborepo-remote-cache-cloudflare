@@ -38,7 +38,11 @@ export async function deleteOldCache(env: Env): Promise<void> {
         keysForDeletion.add(object.key);
       }
     }
-    keysMarkedForDeletion.push(keysForDeletion);
+
+    // Only append if there's keys to delete from this page
+    if (keysForDeletion.keys.length > 0) {
+      keysMarkedForDeletion.push(keysForDeletion);
+    }
   } while (truncated);
   for (const keysForDeletion of keysMarkedForDeletion) {
     await env.R2_STORE.delete(keysForDeletion.keys);
