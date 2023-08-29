@@ -12,13 +12,13 @@ To set up the repository on your local machine, follow these steps:
 
 1. Clone the repository using `git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git`.
 2. Move into the project directory with `cd turborepo-remote-cache-cf`.
-3. Install the project dependencies by running `yarn install`.
+3. Install the project dependencies by running `pnpm install`.
 
 ## Making a Pull Request
 
 Before submitting a pull request, ensure you adhere to the following:
 
-1. Run lint and test commands to check for any errors. You can do this by running `yarn lint` and `yarn test`.
+1. Run lint and test commands to check for any errors. You can do this by running `pnpm lint` and `pnpm test`.
 2. Write unit tests for any changes you make. This helps maintain the quality of the code and ensures that your changes don't accidentally break anything.
 3. Always sign your commits. This confirms that the changes come from a trusted source. Read [this documentation](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification) to learn how to sign commits.
 

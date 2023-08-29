@@ -26,6 +26,20 @@
   "license": "MIT",
   "readme": "README.md",
   "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=16",
+    "pnpm": ">=8"
+  },
+  "scripts": {
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "dev": "wrangler dev --test-scheduled",
+    "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 vitest run --coverage",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 vitest",
+    "lint": "eslint . --ext .ts,.js,.cjs,.mjs --fix",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230821.0",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
@@ -41,20 +55,9 @@
     "vitest-environment-miniflare": "^2.14.1",
     "wrangler": "^3.6.0"
   },
-  "private": true,
-  "scripts": {
-    "build": "wrangler deploy --dry-run --outdir dist",
-    "dev": "wrangler dev --test-scheduled",
-    "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 vitest run --coverage",
-    "test:watch": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 vitest",
-    "lint": "eslint . --ext .ts,.js,.cjs,.mjs --fix",
-    "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
-  },
   "dependencies": {
     "@hono/zod-validator": "^0.1.8",
     "hono": "^3.5.5",
     "zod": "^3.22.2"
-  },
-  "packageManager": "yarn@3.6.3"
+  }
 }
