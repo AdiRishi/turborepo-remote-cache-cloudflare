@@ -94,6 +94,15 @@ describe('v8 Artifacts API', () => {
       expect(res.headers.get('Content-Type')).toBe('application/octet-stream');
       expect(res.headers.get('x-artifact-tag')).toBe(artifactTag);
     });
+
+    test('should return cache headers on every request', async () => {
+      const request = createArtifactGetRequest(
+        `http://localhost/v8/artifacts/existing-${artifactId}?teamId=${teamId}`
+      );
+      const res = await app.fetch(request, workerEnv, ctx);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('Cache-Control')).toBe('max-age=86400, stale-while-revalidate=3600');
+    });
   });
 
   describe('PUT artifact endpoint', () => {
