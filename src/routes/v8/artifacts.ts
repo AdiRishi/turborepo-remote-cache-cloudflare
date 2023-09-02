@@ -1,5 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import { cache } from 'hono/cache';
 import { z } from 'zod';
 import { Env } from '../..';
 
@@ -42,6 +43,11 @@ artifactRouter.put(
 // Hono router .get() method captures both GET and HEAD requests
 artifactRouter.get(
   '/:artifactId/:teamId?',
+  cache({
+    cacheName: 'r2-artifacts',
+    wait: false,
+    cacheControl: 'max-age=86400, stale-while-revalidate=3600',
+  }),
   zValidator('param', z.object({ artifactId: z.string() })),
   zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
   async (c) => {
