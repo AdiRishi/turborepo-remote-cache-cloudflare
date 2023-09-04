@@ -28,8 +28,8 @@
   "type": "module",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230821.0",
-    "@typescript-eslint/eslint-plugin": "^6.5.0",
-    "@typescript-eslint/parser": "^6.5.0",
+    "@typescript-eslint/eslint-plugin": "^6.6.0",
+    "@typescript-eslint/parser": "^6.6.0",
     "@vitest/coverage-v8": "^0.34.3",
     "eslint": "^8.48.0",
     "eslint-config-prettier": "^9.0.0",
