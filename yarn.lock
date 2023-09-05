@@ -108,10 +108,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cloudflare/workers-types@npm:^4.20221111.1, @cloudflare/workers-types@npm:^4.20230821.0":
+"@cloudflare/workers-types@npm:^4.20221111.1":
   version: 4.20230821.0
   resolution: "@cloudflare/workers-types@npm:4.20230821.0"
   checksum: d2fa03fe17c591dbb5a8711c77eef7c79e9a130221f603c51cc41089187294eb4d6cbb8a5584e21e30c4364dd6b13f16ddac176a819c37b85396a9a756347742
+  languageName: node
+  linkType: hard
+
+"@cloudflare/workers-types@npm:^4.20230904.0":
+  version: 4.20230904.0
+  resolution: "@cloudflare/workers-types@npm:4.20230904.0"
+  checksum: 4cfe7dd7419716233dad0937766d7b33ee709b12578d0def7cee8b005e79142f22f8675a40119957448073aff416e8376a768115af420b7f54d11635a6cb38a2
   languageName: node
   linkType: hard
 
@@ -4241,7 +4248,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "turborepo-remote-cache-cf@workspace:."
   dependencies:
-    "@cloudflare/workers-types": ^4.20230821.0
+    "@cloudflare/workers-types": ^4.20230904.0
     "@hono/zod-validator": ^0.1.8
     "@typescript-eslint/eslint-plugin": ^6.6.0
     "@typescript-eslint/parser": ^6.6.0
