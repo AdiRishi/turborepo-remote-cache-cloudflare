@@ -2988,7 +2988,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"miniflare@npm:3.20230904.0, miniflare@npm:^3.20230904.0":
+"miniflare@npm:3.20230904.0":
   version: 3.20230904.0
   resolution: "miniflare@npm:3.20230904.0"
   dependencies:
@@ -3008,6 +3008,26 @@ __metadata:
     youch: ^3.2.2
     zod: ^3.20.6
   checksum: 2011a5d684abe4f420c199ee87a94584a3a1dedf874ad54f46101c0d282a29fbc16fc25798ea9972183ec0335d790402c7f30e1b006de7a9bc9e846225a9d7cb
+  languageName: node
+  linkType: hard
+
+"miniflare@npm:^3.20230918.0":
+  version: 3.20230918.0
+  resolution: "miniflare@npm:3.20230918.0"
+  dependencies:
+    acorn: ^8.8.0
+    acorn-walk: ^8.2.0
+    capnp-ts: ^0.7.0
+    exit-hook: ^2.2.1
+    glob-to-regexp: ^0.4.1
+    source-map-support: 0.5.21
+    stoppable: ^1.1.0
+    undici: ^5.22.1
+    workerd: 1.20230904.0
+    ws: ^8.11.0
+    youch: ^3.2.2
+    zod: ^3.20.6
+  checksum: d43e1cd8a7d030bd73e364042ebb64314037341c088818cefd7e72d2c9f4db710c0d23d1320c5ffe25c1d6970277b8b57210df2aebaf2237edcf413566a47f3d
   languageName: node
   linkType: hard
 
@@ -4198,7 +4218,7 @@ __metadata:
     eslint-config-prettier: ^9.0.0
     eslint-plugin-prettier: ^5.0.0
     hono: ^3.7.1
-    miniflare: ^3.20230904.0
+    miniflare: ^3.20230918.0
     prettier: ^3.0.3
     typescript: ^5.2.2
     vitest: ^0.34.5
