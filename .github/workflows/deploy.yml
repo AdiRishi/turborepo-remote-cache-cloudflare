@@ -18,6 +18,8 @@ jobs:
       - run: yarn install
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
+        env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
         with:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           apiToken: ${{ secrets.CF_API_TOKEN }}
@@ -26,4 +28,6 @@ jobs:
             echo "*** post commands ***"
             wrangler r2 bucket create turborepo-cache || true
             echo "******"
+          secrets: |
+            TURBO_TOKEN
           command: 'deploy'
