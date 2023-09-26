@@ -27,7 +27,7 @@
   "readme": "README.md",
   "type": "module",
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20230914.0",
+    "@cloudflare/workers-types": "^4.20230922.0",
     "@typescript-eslint/eslint-plugin": "^6.7.3",
     "@typescript-eslint/parser": "^6.7.3",
     "@vitest/coverage-v8": "^0.34.5",
