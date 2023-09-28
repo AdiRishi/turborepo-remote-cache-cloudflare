@@ -3917,7 +3917,7 @@ __metadata:
     typescript: ^5.2.2
     vitest: ^0.34.5
     vitest-environment-miniflare: ^2.14.1
-    wrangler: ^3.10.0
+    wrangler: ^3.10.1
     zod: ^3.22.2
   languageName: unknown
   linkType: soft
@@ -4247,9 +4247,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wrangler@npm:^3.10.0":
-  version: 3.10.0
-  resolution: "wrangler@npm:3.10.0"
+"wrangler@npm:^3.10.1":
+  version: 3.10.1
+  resolution: "wrangler@npm:3.10.1"
   dependencies:
     "@cloudflare/kv-asset-handler": ^0.2.0
     "@esbuild-plugins/node-globals-polyfill": ^0.2.3
@@ -4271,7 +4271,7 @@ __metadata:
   bin:
     wrangler: bin/wrangler.js
     wrangler2: bin/wrangler.js
-  checksum: 44778b0f2c5706d1328b2af20da8b5e28b73563c1e9da8044d8ded6cfb48a0482fe1aaa781a9b50e8421dfcc6fffce892393132c2dd7c6a48c21abeeffd02636
+  checksum: 6231dbf4caf83c00b9e7bea3ecd1183f50fb57f4e09f3589a979fe678572578d4a4057ccc55022011580ee2c04fb0b0ce9a197bee9e55c240f6bdd4fa5420bc1
   languageName: node
   linkType: hard
 
