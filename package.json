@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.1.9",
-    "hono": "^3.7.2",
+    "hono": "^3.7.3",
     "zod": "^3.22.2"
   },
   "packageManager": "yarn@3.6.3"
