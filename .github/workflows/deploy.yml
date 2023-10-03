@@ -11,11 +11,14 @@ jobs:
     name: Build & Deploy
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'yarn'
-      - run: yarn install
+          cache: 'pnpm'
+      - run: pnpm install
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         env:

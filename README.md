@@ -29,7 +29,7 @@ For a more hands-on deployment using the CLI, follow the steps below:
 git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git custom-cache
 
 # 2. Install packages
-yarn install
+pnpm install
 
 # 3. Create the R2 bucket for storage
 wrangler r2 bucket create turborepo-cache
@@ -79,7 +79,7 @@ Install the `dotenv-cli` npm package:
 
 ```sh
 # You may have to add -W if you are installing this on your workspace root
-yarn add --dev dotenv-cli
+pnpm add -D dotenv-cli
 ```
 
 ### Step 3: Create a `.env` File
@@ -122,8 +122,8 @@ And that's it 🎉🎉
 Whenever you run a turbo command you will see `Remote cache enabled` in it's log output
 
 ```
-yarn lint
-yarn run v1.22.19
+pnpm lint
+
 $ dotenv -- turbo run lint
 • Packages in scope: turborepo-project, webapp, docs
 • Running lint in 3 packages
