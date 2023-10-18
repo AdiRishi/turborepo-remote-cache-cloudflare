@@ -48,7 +48,7 @@
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "miniflare": "^3.20231010.0",
+    "miniflare": "^3.20231016.0",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6",
