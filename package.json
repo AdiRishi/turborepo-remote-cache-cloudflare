@@ -29,7 +29,7 @@
   "private": true,
   "engines": {
     "node": ">=18",
-    "pnpm": ">=8"
+    "pnpm": ">=8.9.2"
   },
   "scripts": {
     "build": "wrangler deploy --dry-run --outdir dist",
