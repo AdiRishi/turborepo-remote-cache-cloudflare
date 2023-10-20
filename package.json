@@ -28,7 +28,7 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": ">=18",
+    "node": ">=18.18.2",
     "pnpm": ">=8"
   },
   "scripts": {
