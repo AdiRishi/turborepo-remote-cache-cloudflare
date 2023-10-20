@@ -10,7 +10,7 @@
       "automerge": true
     },
     {
-      "matchPackagePatterns": ["^engines$"],
+      "matchDepTypes": ["engines"],
       "enabled": false
     }
   ]
