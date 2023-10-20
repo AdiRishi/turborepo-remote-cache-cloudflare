@@ -8,6 +8,10 @@
       "matchUpdateTypes": ["minor", "patch"],
       "matchCurrentVersion": "!/^0/",
       "automerge": true
+    },
+    {
+      "matchPackagePatterns": ["^engines$"],
+      "enabled": false
     }
   ]
 }
