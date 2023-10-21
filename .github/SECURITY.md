@@ -2,11 +2,12 @@
 
 ## Supported Versions
 
-We're currently providing security updates for the following versions of our remote cache server for monorepo projects:
+We're currently providing security updates for the following versions of our remote cache server:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
+| 2.x     | :white_check_mark: |
+| 1.x     | :x: |
 | < 1.0   | :x:                |
 
 > Please note, only the latest version receives security updates. We highly recommend using the latest version of our product.
