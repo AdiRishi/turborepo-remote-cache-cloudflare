@@ -11,3 +11,4 @@
 .wrangler/*
 **/coverage
 .yarn
+pnpm-lock.yaml
