@@ -87,7 +87,7 @@ pnpm add -D dotenv-cli
 Create a `.env` file at your project root with the following content:
 
 ```dotenv
-TURBO_API=YOUR_API_URL
+TURBO_API=YOUR_API_URL # Remember to remove the trailing slash
 TURBO_TEAM=team_my_team_name
 TURBO_TOKEN=SECRET # The turbo token must be a valid Bearer auth token
 TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
@@ -96,6 +96,7 @@ TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
 Keep the following in mind
 
 -   Replace `SECRET` and `YOUR_API_URL` with your chosen values.
+-   Turborepo requires that the `TURBO_API` value must not end with a trailing slash
 -   The `TURBO_TEAM` value must begin with `team_`
 -   Remember to add the `.env` file to `.gitignore`
 -   If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
