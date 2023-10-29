@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@hono/zod-validator':
-    specifier: ^0.1.10
-    version: 0.1.10(hono@3.9.0)(zod@3.22.4)
+    specifier: ^0.1.11
+    version: 0.1.11(hono@3.9.0)(zod@3.22.4)
   hono:
     specifier: ^3.9.0
     version: 3.9.0
@@ -586,10 +586,10 @@ packages:
     engines: {node: '>=14'}
     dev: true
 
-  /@hono/zod-validator@0.1.10(hono@3.9.0)(zod@3.22.4):
-    resolution: {integrity: sha512-jLO2w++X2qy7VQe9/4uZG7UvgUiR5DLRdDXUkQM726hqbO18YgB6umF2k/Fr/hOrv9kShBJGTmaSPBjA5r7ksg==}
+  /@hono/zod-validator@0.1.11(hono@3.9.0)(zod@3.22.4):
+    resolution: {integrity: sha512-PQXeHUP0+36qpRt8yfeD7N2jbK3ETlGvSN6dMof/HwUC/APRokQRjpXZm4rrlG71Ft0aWE01+Bm4XejqPie5Uw==}
     peerDependencies:
-      hono: 3.*
+      hono: '>=3.9.0'
       zod: ^3.19.1
     dependencies:
       hono: 3.9.0
