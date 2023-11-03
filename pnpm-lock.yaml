@@ -7,10 +7,10 @@ settings:
 dependencies:
   '@hono/zod-validator':
     specifier: ^0.1.11
-    version: 0.1.11(hono@3.9.1)(zod@3.22.4)
+    version: 0.1.11(hono@3.9.2)(zod@3.22.4)
   hono:
-    specifier: ^3.9.1
-    version: 3.9.1
+    specifier: ^3.9.2
+    version: 3.9.2
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -586,13 +586,13 @@ packages:
     engines: {node: '>=14'}
     dev: true
 
-  /@hono/zod-validator@0.1.11(hono@3.9.1)(zod@3.22.4):
+  /@hono/zod-validator@0.1.11(hono@3.9.2)(zod@3.22.4):
     resolution: {integrity: sha512-PQXeHUP0+36qpRt8yfeD7N2jbK3ETlGvSN6dMof/HwUC/APRokQRjpXZm4rrlG71Ft0aWE01+Bm4XejqPie5Uw==}
     peerDependencies:
       hono: '>=3.9.0'
       zod: ^3.19.1
     dependencies:
-      hono: 3.9.1
+      hono: 3.9.2
       zod: 3.22.4
     dev: false
 
@@ -1783,8 +1783,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /hono@3.9.1:
-    resolution: {integrity: sha512-z3nM9CjNZ8PRAH6NNntk4ESKW2POEbGanhK1QpYdQ1MOYRzZPSEE8B5mqw8bYEPa7qIQxX0vtlv7XOxtwFbosg==}
+  /hono@3.9.2:
+    resolution: {integrity: sha512-180NOiMadqU3lGmN6ajPDZvZPWus3a9mtVaAUR9uG0SImngBwRLA8vbnV0oUfUAgFT4nX55sGV9dVA06OuikHA==}
     engines: {node: '>=16.0.0'}
     dev: false
 
