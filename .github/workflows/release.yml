@@ -39,6 +39,6 @@ jobs:
           commit: "chore(release): Release latest changesets"
           title: "chore(release): Release latest changesets"
           createGithubReleases: true
-          publish: echo 'noop'
+          publish: pnpm changeset tag
         env:
           GITHUB_TOKEN: ${{ steps.create_token.outputs.token }}
