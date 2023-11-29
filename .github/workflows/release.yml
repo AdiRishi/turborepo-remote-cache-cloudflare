@@ -35,5 +35,9 @@ jobs:
 
       - name: Create Release Pull Request
         uses: changesets/action@v1
+        with:
+          commit: "chore(release): Release latest changesets"
+          createGithubReleases: true
+          publish: echo 'noop'
         env:
           GITHUB_TOKEN: ${{ steps.create_token.outputs.token }}
