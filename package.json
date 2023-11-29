@@ -9,7 +9,7 @@
     "turborepo",
     "cloudflare-r2"
   ],
-  "version": "1.0.0",
+  "version": "2.5.0",
   "author": {
     "email": "adiswa123@gmail.com",
     "name": "Adishwar Rishi",
@@ -41,6 +41,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.1",
     "@cloudflare/workers-types": "^4.20231121.0",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
