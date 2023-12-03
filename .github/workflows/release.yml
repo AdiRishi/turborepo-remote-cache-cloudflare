@@ -12,8 +12,25 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
+      - name: Create Github Token as Changesets-Bot
+        id: create_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.CHANGESETS_RELEASE_APP_ID }}
+          private_key: ${{ secrets.CHANGESETS_RELEASE_PRIVATE_KEY }}
+
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.create_token.outputs.token }}
+          fetch-depth: 1
+          fetch-tags: true
+
+      - name: Setup git user as Changesets Bot
+        # The bot id is taken from https://api.github.com/users/changesets-release-app[bot]
+        run: |
+          git config --global user.name "changesets-release-app[bot]"
+          git config --global user.email "152388490+changesets-release-app[bot]@users.noreply.github.com"
 
       - name: Setup pnpm and node
         uses: pnpm/action-setup@v2
@@ -26,18 +43,15 @@ jobs:
 
       - name: Install Dependencies
         run: pnpm install
+      - name: Build package
+        run: pnpm build
 
-      - id: create_token
-        uses: tibdex/github-app-token@v2
-        with:
-          app_id: ${{ secrets.CHANGESETS_RELEASE_APP_ID }}
-          private_key: ${{ secrets.CHANGESETS_RELEASE_PRIVATE_KEY }}
-
-      - name: Create Release Pull Request
+      - name: Changesets Release
         uses: changesets/action@v1
         with:
-          commit: "chore(release): Release latest changesets"
-          title: "chore(release): Release latest changesets"
+          commit: 'chore(release): Release latest changesets'
+          title: 'chore(release): Release latest changesets'
+          setupGitUser: false
           createGithubReleases: true
           publish: pnpm changeset tag
         env:
