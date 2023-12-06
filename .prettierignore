@@ -12,3 +12,4 @@
 **/coverage
 .yarn
 pnpm-lock.yaml
+CHANGELOG.md

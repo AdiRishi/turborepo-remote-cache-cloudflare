@@ -150,3 +150,11 @@ Cached:    3 cached, 3 total
 
 ✨  Done in 3.54s.
 ```
+
+---
+
+<div align="center">
+
+Made with ❤️
+
+</div>
