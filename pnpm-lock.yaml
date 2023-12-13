@@ -44,8 +44,8 @@ devDependencies:
     specifier: ^5.0.1
     version: 5.0.1(eslint-config-prettier@9.1.0)(eslint@8.55.0)(prettier@3.1.1)
   miniflare:
-    specifier: ^3.20231030.3
-    version: 3.20231030.3
+    specifier: ^3.20231030.4
+    version: 3.20231030.4
   prettier:
     specifier: ^3.1.1
     version: 3.1.1
@@ -3210,8 +3210,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /miniflare@3.20231030.3:
-    resolution: {integrity: sha512-lquHSh0XiO8uoWDujOLHtDS9mkUTJTc5C5amiQ6A++5y0f+DWiMqbDBvvwjlYf4Dvqk6ChFya9dztk7fg2ZVxA==}
+  /miniflare@3.20231030.4:
+    resolution: {integrity: sha512-7MBz0ArLuDop1WJGZC6tFgN6c5MRyDOIlxbm3yp0TRBpvDS/KsTuWCQcCjsxN4QQ5zvL3JTkuIZbQzRRw/j6ow==}
     engines: {node: '>=16.13'}
     hasBin: true
     dependencies:
