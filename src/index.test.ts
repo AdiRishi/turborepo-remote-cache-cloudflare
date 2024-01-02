@@ -14,7 +14,6 @@ describe('remote-cache worker', () => {
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
       ip: '0.0.0.0',
-      port: 8787,
       experimental: { disableExperimentalWarning: true },
     });
     workerEnv = getMiniflareBindings();
