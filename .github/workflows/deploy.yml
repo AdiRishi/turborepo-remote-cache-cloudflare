@@ -27,10 +27,10 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           wranglerVersion: 'latest'
-          # preCommands: |
-          #   echo "*** post commands ***"
-          #   wrangler r2 bucket create turborepo-cache || true
-          #   echo "******"
+          preCommands: |
+            echo "*** post commands ***"
+            wrangler r2 bucket create turborepo-cache || true
+            echo "******"
           secrets: |
             TURBO_TOKEN
           command: 'deploy'
