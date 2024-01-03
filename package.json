@@ -49,12 +49,12 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.2",
-    "miniflare": "^3.20231030.4",
+    "miniflare": "^3.20231218.0",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3",
     "vitest": "^1.1.1",
     "vitest-environment-miniflare": "^2.14.1",
-    "wrangler": "^3.22.1"
+    "wrangler": "^3.22.2"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.1.11",
