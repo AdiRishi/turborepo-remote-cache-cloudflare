@@ -36,9 +36,12 @@
     "dev": "wrangler dev --test-scheduled",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 vitest run --coverage",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 vitest",
-    "lint": "eslint . --ext .ts,.js,.cjs,.mjs --fix",
+    "lint": "eslint . --ext .ts,.js,.cjs,.mjs --fix && prettier --check .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
@@ -52,6 +55,7 @@
     "miniflare": "^3.20231218.2",
     "prettier": "^3.2.4",
     "typescript": "^5.3.3",
+    "vitepress": "1.0.0-rc.39",
     "vitest": "^1.2.1",
     "vitest-environment-miniflare": "^2.14.2",
     "wrangler": "^3.23.0"
