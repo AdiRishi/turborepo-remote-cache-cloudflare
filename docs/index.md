@@ -3,22 +3,28 @@
 layout: home
 
 hero:
-    name: 'Turborepo Remote Cache Cloudflare'
-    text: 'An implementation of the turborepo-remote-cache server custom made for Cloudflare Workers'
-    tagline: My great project tagline
+    name: Turbo Remote Cache
+    text: For Cloudflare
+    tagline: Highly performant remote cache for Cloudflare Workers. Completely free and open source.
     actions:
         - theme: brand
-          text: Markdown Examples
-          link: /markdown-examples
+          text: Get Started
+          link: /introduction/getting-started
         - theme: alt
-          text: API Examples
-          link: /api-examples
+          text: View on GitHub
+          link: https://github.com/AdiRishi/turborepo-remote-cache-cloudflare
 
 features:
-    - title: Feature A
-      details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-    - title: Feature B
-      details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-    - title: Feature C
-      details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+    - icon: 🚀
+      title: Faster Builds
+      details: Harness the power of remote caching to significantly speed up your builds
+    - icon: 🌐
+      title: Independence from Vercel
+      details: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
+    - icon: 🌍
+      title: Global Deployment
+      details: Code deploys instantly across the globe in over 300 countries, ensuring unmatched performance and reliability.
+    - icon: 👛
+      title: Affordable Start
+      details: With Cloudflare Workers' generous free tier, you can make up to 100,000 requests every day at no cost. It's a cost-effective way to get started and scale your application.
 ---

@@ -1,36 +1,35 @@
-name: Deploy to Cloudflare Workers
+name: Deploy Docs
 
 on:
-  repository_dispatch:
-  push:
-    branches: ['master']
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
 
 jobs:
-  build-and-deploy:
+  check:
+    name: Build and deploy Docs
     runs-on: ubuntu-latest
-    name: Build & Deploy
+    if: github.event.workflow_run.conclusion == 'success'
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v2
         with:
           version: 8
+
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
+
       - run: pnpm install
-      - name: Deploy
+      - run: pnpm docs:build
+
+      - name: Deploy arishi-website-webapp
         uses: cloudflare/wrangler-action@v3
-        env:
-          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
         with:
           accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           wranglerVersion: '3.23.0'
-          preCommands: |
-            echo "*** post commands ***"
-            wrangler r2 bucket create turborepo-cache || true
-            echo "******"
-          secrets: |
-            TURBO_TOKEN
-          command: 'deploy'
+          packageManager: 'pnpm'
+          command: pages deploy docs/.vitepress/dist/ --project-name=cloudflare-turbo-cache-docs
