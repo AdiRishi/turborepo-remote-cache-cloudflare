@@ -20,6 +20,7 @@ export default defineConfig({
     },
     // @ts-expect-error - Bug in type definition
     lastUpdated: true,
+    logo: 'https://public-assets.turborepo-remote-cache.dev/images/logo.png',
     nav: [{ text: 'Docs', link: '/introduction/getting-started' }],
     sidebar: [
       {
