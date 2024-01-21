@@ -8,11 +8,18 @@ export default defineConfig({
   sitemap: {
     hostname: 'https://turborepo-remote-cache.dev',
   },
+  cleanUrls: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     search: {
       provider: 'local',
     },
+    editLink: {
+      pattern:
+        'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/edit/master/docs/:path',
+    },
+    // @ts-expect-error - Bug in type definition
+    lastUpdated: true,
     nav: [{ text: 'Docs', link: '/introduction/getting-started' }],
     sidebar: [
       {
@@ -20,14 +27,6 @@ export default defineConfig({
         items: [
           { text: 'Getting Started', link: '/introduction/getting-started' },
           { text: 'Project Configuration', link: '/introduction/configuration' },
-          { text: 'Turborepo setup', link: '/introduction/turborepo-setup' },
-        ],
-      },
-      {
-        text: 'Examples',
-        items: [
-          { text: 'Markdown Examples', link: '/examples/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/examples/api-examples' },
         ],
       },
     ],
