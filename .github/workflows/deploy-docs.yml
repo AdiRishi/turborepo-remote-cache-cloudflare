@@ -45,14 +45,14 @@ jobs:
           script: |
             const deploymentUrl = process.env.DEPLOYMENT_URL;
             const commitHash = context.payload.pull_request.head.sha;
-            const status = 'Success'; // Assuming the status is always 'Success' when this runs, otherwise you need to set this dynamically
+            const status = '✅  Deploy successful!'
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `
-              # Deploying with Cloudflare Pages
+              # 🌩 Deploying with Cloudflare Pages
               | Name                    | Result |
               | ----------------------- | ------ |
               | **Last commit:**        | \`${commitHash.substring(0, 7)}\` |
