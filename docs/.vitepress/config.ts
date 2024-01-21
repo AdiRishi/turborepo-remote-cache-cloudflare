@@ -35,4 +35,18 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare' },
     ],
   },
+  head: [
+    ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-4FKXFQBLZR' }],
+    [
+      'script',
+      {},
+      `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-4FKXFQBLZR');
+      `,
+    ],
+  ],
 });
