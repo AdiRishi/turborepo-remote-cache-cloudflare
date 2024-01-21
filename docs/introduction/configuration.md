@@ -84,7 +84,6 @@ Cached:    3 cached, 3 total
 ✨  Done in 3.54s.
 ```
 
-
 ## Automatic deletion of old cache files
 
 This project sets up a [cron trigger](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for Cloudflare workers, which automatically deletes old cache files within the bound R2 bucket. This behavior can be customized:
