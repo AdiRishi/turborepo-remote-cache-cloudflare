@@ -6,7 +6,7 @@ export default defineConfig({
   description:
     'An implementation of the turborepo-remote-cache server custom made for Cloudflare Workers',
   sitemap: {
-    hostname: 'https://turborepo-remote-cache.dev',
+    hostname: 'https://cloudflare.turborepo-remote-cache.dev/',
   },
   cleanUrls: true,
   themeConfig: {
