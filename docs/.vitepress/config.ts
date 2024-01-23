@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress';
+import projectPackageJson from '../../package.json';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -21,7 +22,22 @@ export default defineConfig({
     // @ts-expect-error - Bug in type definition
     lastUpdated: true,
     logo: 'https://public-assets.turborepo-remote-cache.dev/images/logo.png',
-    nav: [{ text: 'Docs', link: '/introduction/getting-started' }],
+    nav: [
+      { text: 'Docs', link: '/introduction/getting-started' },
+      {
+        text: projectPackageJson.version,
+        items: [
+          {
+            text: 'Changelog',
+            link: 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/CHANGELOG.md',
+          },
+          {
+            text: 'Contributing',
+            link: 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/CONTRIBUTING.md',
+          },
+        ],
+      },
+    ],
     sidebar: [
       {
         text: 'Introduction',
@@ -34,6 +50,9 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare' },
     ],
+    footer: {
+      message: 'Made with ❤️',
+    },
   },
   head: [
     ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-4FKXFQBLZR' }],
