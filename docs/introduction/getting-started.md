@@ -4,25 +4,15 @@ layout: doc
 
 # ⚡️ Getting Started
 
-## One-click Deploy
+## Deploy with Wrangler
 
-To deploy this repository quickly, click the following link:
+The fastest and easiest way to deploy this project is with [wrangler](https://developers.cloudflare.com/workers/wrangler/) (cloudflare's CLI tool for managing workers).
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
-
-Clicking the button will open a new webpage with a guided deployment process build by Cloudflare. During this process, Cloudflare will fork this repository and use the wrangler github action to deploy this project to your Cloudflare account.
-
-Here is a preview of the deployment process:
-
-![Workers One Click Deployment](https://public-assets.turborepo-remote-cache.dev/images/cloudflare-one-click-demo.jpg)
-
-## Deploy Using the CLI
-
-For a more hands-on deployment using the CLI, follow the steps below:
+This project already comes with wrangler installed and configured, so all you need to do is clone this repository and run `pnpm run deploy`.
 
 ```sh
 # 1. Clone the repository
-git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git custom-cache
+git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
 
 # 2. Install packages
 pnpm install
@@ -31,11 +21,32 @@ pnpm install
 wrangler r2 bucket create turborepo-cache
 
 # 4. Publish the project
-wrangler deploy
+pnpm run deploy
 
 # 5. Set a Bearer auth token
 echo "SECRET" | wrangler secret put TURBO_TOKEN
 ```
+
+## One-click Deploy
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
+
+Cloudflare has a one-click deploy feature that guides new users through the process of deploying a worker. If you have never used Cloudflare workers before, this will take you through a general guide on
+
+1. How to create a Cloudflare account and link it to GitHub
+2. Creating a Cloudflare workers API token for use in CI
+3. Forking this repository into your own GitHub account
+4. Deploying this project to your Cloudflare account
+
+### Gotchas with One-click Deploy
+
+The one click deploy does not go through the steps of **setting up workflow secrets** and how to **enable R2 storage** on your account.
+
+**If you have never used R2 before on your account, you will need enable before clicking "Deploy" at step 3 (see image below)**.
+
+![One Click Deployment Step 3](https://public-assets.turborepo-remote-cache.dev/images/one-click-deploy-preview-step-3.png)
+
+**Note** that you will need to enter your credit card details, but will not be charged. Cloudflare R2 has 10GB of free storage, and you will not be charged unless you exceed this limit.
 
 ## GitHub Actions Setup
 
@@ -45,5 +56,6 @@ In order to successfully run the [deploy](https://github.com/AdiRishi/turborepo-
 
 -   `CLOUDFLARE_API_TOKEN`
 -   `CLOUDFLARE_ACCOUNT_ID`
+-   `TURBO_TOKEN`
 
 _Note: These will be automatically set for you if you use the "Deploy with Workers" button._

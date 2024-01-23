@@ -34,6 +34,7 @@
   "scripts": {
     "build": "wrangler deploy --dry-run --outdir dist",
     "dev": "wrangler dev --test-scheduled",
+    "deploy": "wrangler deploy",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 vitest run --coverage",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 vitest",
     "lint": "eslint . --ext .ts,.js,.cjs,.mjs --fix && prettier --check .",

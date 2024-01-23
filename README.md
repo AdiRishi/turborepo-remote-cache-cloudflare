@@ -28,19 +28,15 @@ If you're a Turborepo user, this project offers compelling advantages:
 
 ## ⚡️ Quick start
 
-### Deploy using Cloudflare's deploy button
-
-To deploy this repository quickly, click the following link:
-
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
-
 ### Deploy Using the CLI
 
-For a more hands-on deployment using the CLI, follow the steps below:
+The fastest and easiest way to deploy this project is with [wrangler](https://developers.cloudflare.com/workers/wrangler/) (cloudflare's CLI tool for managing workers).
+
+This project already comes with wrangler installed and configured, so all you need to do is clone this repository and run `pnpm run deploy`.
 
 ```sh
 # 1. Clone the repository
-git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git custom-cache
+git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
 
 # 2. Install packages
 pnpm install
@@ -49,11 +45,17 @@ pnpm install
 wrangler r2 bucket create turborepo-cache
 
 # 4. Publish the project
-wrangler deploy
+pnpm run deploy
 
 # 5. Set a Bearer auth token
 echo "SECRET" | wrangler secret put TURBO_TOKEN
 ```
+
+### Deploy using Cloudflare's deploy button
+
+To deploy this repository quickly, click the following link:
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
 
 ## ⚙️ Configuration
 
