@@ -58,4 +58,4 @@ In order to successfully run the [deploy](https://github.com/AdiRishi/turborepo-
 -   `CLOUDFLARE_ACCOUNT_ID`
 -   `TURBO_TOKEN`
 
-_Note: These will be automatically set for you if you use the "Deploy with Workers" button._
+For those who have forked this repository, feel free to delete the [release.yml](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/release.yml) workflow file. This is only used to automatically publish new releases of this repository to GitHub releases.
