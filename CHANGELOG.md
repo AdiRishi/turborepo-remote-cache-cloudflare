@@ -1,5 +1,11 @@
 # turborepo-remote-cache-cf
 
+## 2.6.2
+
+### Patch Changes
+
+- 6455295: Use a default value for secrets.TURBO_TOKEN to prevent one-click deployment (fork) failures
+
 ## 2.6.1
 
 ### Patch Changes
