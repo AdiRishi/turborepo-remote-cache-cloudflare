@@ -53,7 +53,7 @@ echo "SECRET" | pnpm wrangler secret put TURBO_TOKEN
 
 ### Deploy using Cloudflare's deploy button
 
-To deploy this repository quickly, click the following link:
+This project also supports one-click deploy via Cloudflare's deploy button. Use this option only if you already have a Cloudflare account and have used R2 buckets before.
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
 
