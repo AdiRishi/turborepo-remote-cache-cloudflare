@@ -42,13 +42,13 @@ git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
 pnpm install
 
 # 3. Create the R2 bucket for storage
-wrangler r2 bucket create turborepo-cache
+pnpm wrangler r2 bucket create turborepo-cache
 
 # 4. Publish the project
 pnpm run deploy
 
 # 5. Set a Bearer auth token
-echo "SECRET" | wrangler secret put TURBO_TOKEN
+echo "SECRET" | pnpm wrangler secret put TURBO_TOKEN
 ```
 
 ### Deploy using Cloudflare's deploy button
