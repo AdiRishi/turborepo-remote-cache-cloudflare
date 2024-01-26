@@ -59,7 +59,7 @@
     "vitepress": "1.0.0-rc.40",
     "vitest": "^1.2.2",
     "vitest-environment-miniflare": "^2.14.2",
-    "wrangler": "^3.24.0"
+    "wrangler": "^3.25.0"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.1.11",
