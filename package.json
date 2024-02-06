@@ -56,7 +56,7 @@
     "miniflare": "^3.20240129.1",
     "prettier": "^3.2.5",
     "typescript": "^5.3.3",
-    "vitepress": "1.0.0-rc.41",
+    "vitepress": "1.0.0-rc.42",
     "vitest": "^1.2.2",
     "vitest-environment-miniflare": "^2.14.2",
     "wrangler": "^3.26.0"
