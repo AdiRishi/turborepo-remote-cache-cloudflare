@@ -62,8 +62,8 @@ devDependencies:
     specifier: ^2.14.2
     version: 2.14.2(vitest@1.2.2)
   wrangler:
-    specifier: ^3.26.0
-    version: 3.26.0
+    specifier: ^3.27.0
+    version: 3.27.0
 
 packages:
 
@@ -3556,29 +3556,6 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /miniflare@3.20240129.0:
-    resolution: {integrity: sha512-27pDhlP2G/4gXmvnSt6LjMQ8KrkmbJElIQmn+BLjdiyIx+zXY4E8MSPJmi9flgf0dn3wtjuHO2ASenuopqqxrw==}
-    engines: {node: '>=16.13'}
-    hasBin: true
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      acorn: 8.11.3
-      acorn-walk: 8.3.2
-      capnp-ts: 0.7.0
-      exit-hook: 2.2.1
-      glob-to-regexp: 0.4.1
-      stoppable: 1.1.0
-      undici: 5.28.2
-      workerd: 1.20240129.0
-      ws: 8.16.0
-      youch: 3.3.3
-      zod: 3.22.4
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-    dev: true
-
   /miniflare@3.20240129.1:
     resolution: {integrity: sha512-GfqclPxbTnam4S8GKHRkFyr+s+szELK/ORtQ3ZFUiGBO4HNJsaeA6RhBMKBH7iHqn5ng035cyPsLZvH35lwtsA==}
     engines: {node: '>=16.13'}
@@ -4975,8 +4952,8 @@ packages:
       '@cloudflare/workerd-windows-64': 1.20240129.0
     dev: true
 
-  /wrangler@3.26.0:
-    resolution: {integrity: sha512-2FKDyL0wV6ws+9AHkQl5/Yzn17kG9jlpgyT7wqCDkhb5q+TCL/I8N5IKVwXe8tRrTluBI1QQZRRymoA5nu0pHw==}
+  /wrangler@3.27.0:
+    resolution: {integrity: sha512-VV2QXH+4OfNwWRR2cgMw5Xh6WQXec8h1cPjgKMWuUTR1q0Ha8TiEhU1rBOraRYTZbUuM4tqqO4GYeOE0AX7oVQ==}
     engines: {node: '>=16.17.0'}
     hasBin: true
     dependencies:
@@ -4986,7 +4963,7 @@ packages:
       blake3-wasm: 2.1.5
       chokidar: 3.5.3
       esbuild: 0.17.19
-      miniflare: 3.20240129.0
+      miniflare: 3.20240129.1
       nanoid: 3.3.7
       path-to-regexp: 6.2.1
       resolve: 1.22.8
