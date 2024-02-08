@@ -23,8 +23,8 @@ devDependencies:
     specifier: ^2.27.1
     version: 2.27.1
   '@cloudflare/workers-types':
-    specifier: ^4.20240129.0
-    version: 4.20240129.0
+    specifier: ^4.20240208.0
+    version: 4.20240208.0
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.21.0
     version: 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.56.0)(typescript@5.3.3)
@@ -503,8 +503,8 @@ packages:
     dev: true
     optional: true
 
-  /@cloudflare/workers-types@4.20240129.0:
-    resolution: {integrity: sha512-VyHbih/bqh/RN2FRxnXznG0bpBIg9RfSP1ldbAVnCXFinjOdv0zm2P/RWqOVN9+FgU5sanRltwwT7jGngxZy8w==}
+  /@cloudflare/workers-types@4.20240208.0:
+    resolution: {integrity: sha512-MVGTTjZpJu4kJONvai5SdJzWIhOJbuweVZ3goI7FNyG+JdoQH41OoB+nMhLsX626vPLZVWGPIWsiSo/WZHzgQw==}
     dev: true
 
   /@cspotcode/source-map-support@0.8.1:
@@ -1213,7 +1213,7 @@ packages:
     resolution: {integrity: sha512-97y/95EzDC86jM2bKYacKk4n59miFC+WXueRdW5TeVzBw2UTL2Alvy36AZuyMUgBqxZdJSv88/q0jHTw7LvyMA==}
     engines: {node: '>=16.13'}
     dependencies:
-      '@cloudflare/workers-types': 4.20240129.0
+      '@cloudflare/workers-types': 4.20240208.0
       '@miniflare/cache': 2.14.2
       '@miniflare/core': 2.14.2
       '@miniflare/d1': 2.14.2
