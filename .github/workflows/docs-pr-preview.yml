@@ -1,4 +1,4 @@
-name: Deploy Docs
+name: Deploy Docs Preview
 
 on:
   workflow_run:
@@ -7,6 +7,10 @@ on:
     types: [completed]
   pull_request:
     branches: [master]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  DOCS_CLOUDFLARE_DEPLOYMENT: true
 
 jobs:
   check:

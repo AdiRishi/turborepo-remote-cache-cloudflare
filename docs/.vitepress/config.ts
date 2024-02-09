@@ -1,14 +1,19 @@
 import { defineConfig } from 'vitepress';
 import projectPackageJson from '../../package.json';
 
+const isCloudflareDeployment = process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true';
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'Turborepo Remote Cache',
   description:
     'An implementation of the turborepo-remote-cache server custom made for Cloudflare Workers',
   sitemap: {
-    hostname: 'https://cloudflare.turborepo-remote-cache.dev/',
+    hostname: isCloudflareDeployment
+      ? 'https://cloudflare.turborepo-remote-cache.dev/'
+      : 'https://adirishi.github.io/turborepo-remote-cache-cloudflare/',
   },
+  base: isCloudflareDeployment ? undefined : '/turborepo-remote-cache-cloudflare/',
   cleanUrls: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
