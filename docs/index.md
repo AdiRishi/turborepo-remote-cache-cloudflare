@@ -6,7 +6,7 @@ hero:
     name: Turbo Remote Cache
     text: For Cloudflare
     tagline: Highly performant remote cache for Cloudflare Workers. Completely free and open source.
-    image: https://public-assets.turborepo-remote-cache.dev/images/logo.png
+    image: https://public-assets.turborepo-remote-cache.dev/cdn-cgi/image/width=320,quality=80,format=auto/images/logo.png
     actions:
         - theme: brand
           text: Get Started

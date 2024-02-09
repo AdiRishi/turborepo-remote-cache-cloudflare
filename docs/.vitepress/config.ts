@@ -26,7 +26,7 @@ export default defineConfig({
     },
     // @ts-expect-error - Bug in type definition
     lastUpdated: true,
-    logo: 'https://public-assets.turborepo-remote-cache.dev/images/logo.png',
+    logo: 'https://public-assets.turborepo-remote-cache.dev/cdn-cgi/image/width=32,quality=80,format=auto/images/logo.png',
     nav: [
       { text: 'Docs', link: '/introduction/getting-started' },
       {
@@ -60,6 +60,7 @@ export default defineConfig({
     },
   },
   head: [
+    ['link', { rel: 'icon', href: '/turborepo-remote-cache-cloudflare/favicon.ico' }],
     ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-4FKXFQBLZR' }],
     [
       'script',

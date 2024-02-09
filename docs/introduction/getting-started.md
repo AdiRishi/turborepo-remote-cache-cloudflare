@@ -44,7 +44,7 @@ The one click deploy does not go through the steps of **setting up workflow secr
 
 **If you have never used R2 before on your account, you will need enable before clicking "Deploy" at step 3 (see image below)**.
 
-![One Click Deployment Step 3](https://public-assets.turborepo-remote-cache.dev/images/one-click-deploy-preview-step-3.png)
+![One Click Deployment Step 3](https://public-assets.turborepo-remote-cache.dev/cdn-cgi/image/width=960,quality=80,format=auto/images/one-click-deploy-preview-step-3.png)
 
 **Note** that you will need to enter your credit card details, but will not be charged. Cloudflare R2 has 10GB of free storage, and you will not be charged unless you exceed this limit.
 
