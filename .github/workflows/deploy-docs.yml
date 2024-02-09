@@ -1,18 +1,21 @@
 name: Deploy Docs
 
 on:
-  workflow_run:
-    workflows: ['CI']
-    branches: [master]
-    types: [completed]
-  pull_request:
-    branches: [master]
+  push:
+    branches: ['master']
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
 
 jobs:
-  check:
-    name: Build and deploy Docs
+  build:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
 
@@ -25,40 +28,28 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
       - run: pnpm install
-      - run: pnpm docs:build
 
-      - name: Deploy vitepress docs
-        id: deploy-docs
-        uses: cloudflare/wrangler-action@v3
+      - name: Build with VitePress
+        run: |
+          pnpm docs:build
+          touch docs/.vitepress/dist/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
-          apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
-          wranglerVersion: '3.23.0'
-          packageManager: 'pnpm'
-          command: pages deploy docs/.vitepress/dist/ --project-name=cloudflare-turbo-cache-docs
+          path: docs/.vitepress/dist
 
-      - name: Comment with deploy link
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const deploymentUrl = process.env.DEPLOYMENT_URL;
-            const commitHash = context.payload.pull_request.head.sha;
-            const status = '✅  Deploy successful!'
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `
-              # 🌩 Deploying with Cloudflare Pages
-              | Name                    | Result |
-              | ----------------------- | ------ |
-              | **Last commit:**        | \`${commitHash.substring(0, 7)}\` |
-              | **Status**:             | ${status} |
-              | **Preview URL**:        | ${deploymentUrl} |
-              `
-            });
-        env:
-          DEPLOYMENT_URL: ${{ steps.deploy-docs.outputs.deployment-url }}
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
