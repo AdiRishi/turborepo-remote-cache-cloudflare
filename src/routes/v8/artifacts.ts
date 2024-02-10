@@ -27,16 +27,16 @@ artifactRouter.put(
 
     // if present the turborepo client has signed the artifact body
     const artifactTag = c.req.raw.headers.get('x-artifact-tag');
+    const storage = c.env.STORAGE_MANAGER.getActiveStorage();
+    const objectKey = `${teamId}/${artifactId}`;
 
-    const r2Metadata: Record<string, string> = {};
+    const storageMetadata: Record<string, string> = {};
     if (artifactTag) {
-      r2Metadata.artifactTag = artifactTag;
+      storageMetadata.artifactTag = artifactTag;
     }
-    const r2Object = await c.env.R2_STORE.put(`${teamId}/${artifactId}`, c.req.raw.body, {
-      customMetadata: r2Metadata,
-    });
+    await storage.write(`${teamId}/${artifactId}`, c.req.raw.body!, storageMetadata);
 
-    return c.json({ teamId, artifactId, storagePath: r2Object.key, size: r2Object.size }, 201);
+    return c.json({ teamId, artifactId, storagePath: objectKey }, 201);
   }
 );
 
@@ -46,7 +46,7 @@ artifactRouter.get(
   cache({
     cacheName: 'r2-artifacts',
     wait: false,
-    cacheControl: 'max-age=86400, stale-while-revalidate=3600',
+    cacheControl: 'max-age=300, stale-while-revalidate=300',
   }),
   zValidator('param', z.object({ artifactId: z.string() })),
   zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
@@ -58,18 +58,20 @@ artifactRouter.get(
     if (!teamId) {
       return c.json({ error: 'MISSING_TEAM_ID' }, 400);
     }
+    const storage = c.env.STORAGE_MANAGER.getActiveStorage();
+    const objectKey = `${teamId}/${artifactId}`;
 
-    const r2Object = await c.env.R2_STORE.get(`${teamId}/${artifactId}`);
-    if (!r2Object) {
+    const storedObject = await storage.readWithMetadata(objectKey);
+    if (!storedObject.data) {
       return c.json({ error: 'NOT_FOUND' }, 404);
     }
 
     c.header('Content-Type', 'application/octet-stream');
-    if (r2Object.customMetadata?.artifactTag) {
-      c.header('x-artifact-tag', r2Object.customMetadata.artifactTag);
+    if (storedObject.metadata?.artifactTag) {
+      c.header('x-artifact-tag', storedObject.metadata.artifactTag);
     }
     c.status(200);
-    return c.body(r2Object.body);
+    return c.body(storedObject.data);
   }
 );
 
