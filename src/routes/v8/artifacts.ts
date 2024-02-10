@@ -20,19 +20,19 @@ artifactRouter.put(
       return c.json({ error: 'MISSING_TEAM_ID' }, 400);
     }
 
-    const contentType = c.req.headers.get('Content-Type');
+    const contentType = c.req.raw.headers.get('Content-Type');
     if (contentType !== 'application/octet-stream') {
       return c.json({ error: 'EXPECTED_CONTENT_TYPE_OCTET_STREAM' }, 400);
     }
 
     // if present the turborepo client has signed the artifact body
-    const artifactTag = c.req.headers.get('x-artifact-tag');
+    const artifactTag = c.req.raw.headers.get('x-artifact-tag');
 
     const r2Metadata: Record<string, string> = {};
     if (artifactTag) {
       r2Metadata.artifactTag = artifactTag;
     }
-    const r2Object = await c.env.R2_STORE.put(`${teamId}/${artifactId}`, c.req.body, {
+    const r2Object = await c.env.R2_STORE.put(`${teamId}/${artifactId}`, c.req.raw.body, {
       customMetadata: r2Metadata,
     });
 
