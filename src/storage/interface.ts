@@ -3,10 +3,13 @@ export interface StorageInterface {
   list: (options?: ListFilterOptions) => Promise<ListResult>;
   readWithMetadata: (
     key: string
-  ) => Promise<{ data: ReadableStream | undefined; metadata: Record<string, string> | undefined }>;
+  ) => Promise<{ data: ReadableStream | undefined; metadata: Metadata | undefined }>;
   read: (key: string) => Promise<ReadableStream | undefined>;
-  write: (key: string, data: ReadableStream, metadata?: Record<string, string>) => Promise<void>;
+  write: (key: string, data: WritableValue, metadata?: Record<string, string>) => Promise<void>;
+  delete: (key: string | string[]) => Promise<void>;
 }
+
+export type WritableValue = string | ReadableStream | ArrayBuffer;
 
 export type ListFilterOptions = {
   limit?: number;
@@ -21,7 +24,12 @@ export type ListResult = {
 };
 
 export type ListResultWithMetadata = {
-  keys: { key: string; metadata: Record<string, string> | undefined }[];
+  keys: { key: string; metadata: Metadata }[];
   cursor?: string;
   truncated: boolean;
+};
+
+export type Metadata = {
+  createdAtEpochMillisecondsStr: string;
+  [key: string]: string | undefined;
 };

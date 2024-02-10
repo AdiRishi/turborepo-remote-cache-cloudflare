@@ -9,15 +9,14 @@ performanceTestingRouter.post('/r2-round-trip', async (c) => {
   const artifactTag = 'UNIQUE-artifactTag-' + Math.random();
   const teamId = 'performance-testing';
   const artifactContent = '🎉😄😇🎉😄😇🎉😄😇🎉😄😇';
+  const storage = c.env.STORAGE_MANAGER.getActiveStorage();
   // store and get back content to simulate latency
-  await c.env.R2_STORE.put(`${teamId}/existing-${artifactId}`, artifactContent, {
-    customMetadata: { artifactTag },
-  });
-  const r2Object = await c.env.R2_STORE.get(`${teamId}/existing-${artifactId}`);
-  if (!r2Object) {
+  await storage.write(`${teamId}/existing-${artifactId}`, artifactContent, { artifactTag });
+  const dataStream = await storage.read(`${teamId}/existing-${artifactId}`);
+  if (!dataStream) {
     throw new Error('r2Object not found');
   }
-  const r2Text = await r2Object.text();
+  const r2Text = await new Response(dataStream).text();
   return c.json({ content: r2Text });
 });
 

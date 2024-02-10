@@ -24,6 +24,8 @@ export default {
     }
   },
   async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext) {
+    const storageManager = new StorageManager(env);
+    env.STORAGE_MANAGER = storageManager;
     await deleteOldCache(env);
   },
 };

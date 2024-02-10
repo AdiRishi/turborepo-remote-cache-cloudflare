@@ -1,7 +1,7 @@
-import { StorageInterface, ListFilterOptions } from './interface';
+import { StorageInterface, ListFilterOptions, Metadata, WritableValue } from './interface';
 
 export class R2Storage implements StorageInterface {
-  R2_STORE: R2Bucket;
+  private R2_STORE: R2Bucket;
 
   constructor(r2Bucket: R2Bucket) {
     this.R2_STORE = r2Bucket;
@@ -21,7 +21,7 @@ export class R2Storage implements StorageInterface {
     return {
       keys: listResult.objects.map((object) => ({
         key: object.key,
-        metadata: object.customMetadata,
+        metadata: this.transformMetadata(object),
       })),
       // @ts-expect-error - truncated property is hidden behind a conditional
       cursor: listResult.cursor as string,
@@ -48,13 +48,32 @@ export class R2Storage implements StorageInterface {
   }
   async readWithMetadata(key: string) {
     const r2Object = await this.R2_STORE.get(key);
-    return { data: r2Object?.body, metadata: r2Object?.customMetadata };
+    if (!r2Object) return { data: undefined, metadata: undefined };
+    return { data: r2Object?.body, metadata: this.transformMetadata(r2Object) };
   }
   async read(key: string) {
     const r2Object = await this.R2_STORE.get(key);
     return r2Object?.body;
   }
-  async write(key: string, data: ReadableStream, metadata?: Record<string, string>) {
-    await this.R2_STORE.put(key, data, { customMetadata: metadata });
+  async write(key: string, data: WritableValue, metadata?: Record<string, string>) {
+    await this.R2_STORE.put(key, data, {
+      customMetadata: {
+        createdAtEpochMillisecondsStr: Date.now().toString(),
+        ...metadata,
+      },
+    });
+  }
+  async delete(key: string | string[]) {
+    await this.R2_STORE.delete(key);
+  }
+
+  private transformMetadata(r2Object: R2Object): Metadata {
+    const metadata = r2Object.customMetadata;
+
+    return {
+      createdAtEpochMillisecondsStr:
+        metadata?.createdAtEpochMillisecondsStr ?? r2Object.uploaded.getTime().toString(),
+      ...metadata,
+    };
   }
 }
