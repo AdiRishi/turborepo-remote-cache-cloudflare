@@ -67,11 +67,11 @@ export class R2Storage implements StorageInterface {
   }
 
   private transformMetadata(r2Object: R2Object): Metadata {
-    const metadata = r2Object.customMetadata;
-
     return {
-      createdAtEpochMillisecondsStr: r2Object.uploaded.getTime().toString(),
-      ...metadata,
+      staticMetadata: {
+        createdAt: r2Object.uploaded,
+      },
+      customMetadata: r2Object.customMetadata ?? {},
     };
   }
 }

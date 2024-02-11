@@ -32,7 +32,7 @@
     "pnpm": ">=8"
   },
   "scripts": {
-    "build": "wrangler deploy --dry-run --outdir dist",
+    "build": "wrangler deploy --dry-run --minify --outdir dist",
     "dev": "wrangler dev --test-scheduled",
     "deploy": "wrangler deploy",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 vitest run --coverage",

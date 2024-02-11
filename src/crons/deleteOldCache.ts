@@ -36,8 +36,8 @@ export async function deleteOldCache(env: Env): Promise<void> {
 
     const keysForDeletion = new R2KeysForDeletion();
     for (const keyWithMeta of list.keys) {
-      const createdAt = new Date(Number(keyWithMeta.metadata.createdAtEpochMillisecondsStr));
-      if (isDateOlderThan(createdAt, BUCKET_CUTOFF_HOURS)) {
+      const createdAt = keyWithMeta.metadata?.staticMetadata.createdAt;
+      if (!createdAt || isDateOlderThan(createdAt, BUCKET_CUTOFF_HOURS)) {
         keysForDeletion.add(keyWithMeta.key);
       }
     }

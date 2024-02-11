@@ -1,4 +1,5 @@
 import { zValidator } from '@hono/zod-validator';
+import { bearerAuth } from 'hono/bearer-auth';
 import { Hono } from 'hono';
 import { cache } from 'hono/cache';
 import { z } from 'zod';
@@ -6,6 +7,11 @@ import { Env } from '../..';
 
 // Route - /v8/artifacts
 export const artifactRouter = new Hono<{ Bindings: Env }>();
+
+artifactRouter.use('*', async (c, next) => {
+  const middleware = bearerAuth({ token: c.env.TURBO_TOKEN });
+  await middleware(c, next);
+});
 
 artifactRouter.put(
   '/:artifactId',
@@ -34,7 +40,7 @@ artifactRouter.put(
     if (artifactTag) {
       storageMetadata.artifactTag = artifactTag;
     }
-    await storage.write(`${teamId}/${artifactId}`, c.req.raw.body!, storageMetadata);
+    await storage.write(objectKey, c.req.raw.body!, storageMetadata);
 
     return c.json({ teamId, artifactId, storagePath: objectKey }, 201);
   }
@@ -67,8 +73,8 @@ artifactRouter.get(
     }
 
     c.header('Content-Type', 'application/octet-stream');
-    if (storedObject.metadata?.artifactTag) {
-      c.header('x-artifact-tag', storedObject.metadata.artifactTag);
+    if (storedObject.metadata?.customMetadata.artifactTag) {
+      c.header('x-artifact-tag', storedObject.metadata.customMetadata.artifactTag);
     }
     c.status(200);
     return c.body(storedObject.data);
