@@ -18,7 +18,6 @@ export const workerHandler = {
       env.STORAGE_MANAGER = storageManager;
       return app.fetch(request, env, ctx);
     } catch (e: unknown) {
-      console.error('Storage options not configured correctly:', e);
       return new Response(`Storage options not configured correctly: ${String(e)}`, {
         status: 500,
       });
