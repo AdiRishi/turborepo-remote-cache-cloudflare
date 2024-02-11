@@ -1,11 +1,11 @@
 import { beforeEach, expect, test } from 'vitest';
-import { Env } from '~/index';
-import { app } from '~/routes';
+import { Env, workerHandler } from '~/index';
 import { StorageManager } from '~/storage';
 
 const describe = setupMiniflareIsolatedStorage();
 
 describe('v8 Artifacts API', () => {
+  const app = workerHandler;
   let workerEnv: Env;
   let ctx: ExecutionContext;
   const artifactId = 'UNIQUE-artifactId-' + Math.random();

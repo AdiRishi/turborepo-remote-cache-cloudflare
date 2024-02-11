@@ -1,7 +1,6 @@
 import { beforeEach, test, expect } from 'vitest';
 import { Env } from '~/index';
 import { app } from '~/routes';
-import { StorageManager } from '~/storage';
 
 const describe = setupMiniflareIsolatedStorage();
 
@@ -11,7 +10,6 @@ describe('Homepage route', () => {
 
   beforeEach(() => {
     workerEnv = getMiniflareBindings();
-    workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
     ctx = new ExecutionContext();
   });
 
