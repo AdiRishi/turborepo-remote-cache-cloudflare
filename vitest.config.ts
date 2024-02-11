@@ -9,6 +9,8 @@ export default defineConfig({
       envPath: './.dev.vars',
       modules: true,
       scriptPath: './dist/index.js',
+      wranglerConfigPath: './wrangler.vitest.toml',
+      bindings: { ENVIRONMENT: 'testing' },
     },
     reporters: ['verbose'],
     coverage: {

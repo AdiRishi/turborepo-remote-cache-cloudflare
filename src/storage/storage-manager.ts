@@ -7,7 +7,7 @@ export class StorageManager {
   private r2Storage?: StorageInterface;
   private kvStorage?: StorageInterface;
 
-  storageToUse: StorageInterface;
+  private storageToUse: StorageInterface;
 
   constructor(env: Env) {
     if (env.R2_STORE) {
