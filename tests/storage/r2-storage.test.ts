@@ -1,18 +1,18 @@
 import { beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { Env } from '~/index';
-import { KvStorage } from '~/storage/kv-storage';
+import { R2Storage } from '~/storage/r2-storage';
 import { StorageManager } from '~/storage';
 
 const describe = setupMiniflareIsolatedStorage();
 
-describe('kv-storage', () => {
+describe('r2-storage', () => {
   let workerEnv: Required<Env>;
-  let storage: KvStorage;
+  let storage: R2Storage;
   let startTime: number;
 
   beforeEach(() => {
     workerEnv = getMiniflareBindings();
-    storage = new KvStorage(workerEnv.KV_STORE);
+    storage = new R2Storage(workerEnv.R2_STORE);
     startTime = Date.now();
     vi.useFakeTimers();
     vi.setSystemTime(startTime);
@@ -160,23 +160,17 @@ describe('kv-storage', () => {
   });
 
   describe('transformMetadata()', () => {
-    test('transforms KV metadata to storage metadata', () => {
-      const kvMetadata = {
-        createdAtEpochMilliseconds: startTime,
+    test('transforms R2 metadata to storage metadata', () => {
+      const r2Metadata = {
+        uploaded: new Date(startTime),
         customMetadata: { foo: 'bar' },
       };
       // @ts-expect-error - private method
-      const result = storage.transformMetadata(kvMetadata);
+      const result = storage.transformMetadata(r2Metadata);
       expect(result).toEqual({
         staticMetadata: { createdAt: new Date(startTime) },
         customMetadata: { foo: 'bar' },
       });
-    });
-
-    test('returns undefined if KV metadata is undefined', () => {
-      // @ts-expect-error - private method
-      const result = storage.transformMetadata(undefined);
-      expect(result).toBeUndefined();
     });
   });
 });

@@ -12,6 +12,7 @@ export class R2Storage implements StorageInterface {
       limit: options?.limit,
       cursor: options?.cursor,
       prefix: options?.prefix,
+      include: ['customMetadata'],
     });
 
     if (listResult.truncated) {
