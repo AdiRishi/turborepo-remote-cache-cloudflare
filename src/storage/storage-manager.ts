@@ -31,9 +31,11 @@ export class StorageManager {
     return this.storageToUse;
   }
 
-  public async readableStreamToText(stream: ReadableStream): Promise<string> {
-    // Seems like a hacky but simple way to convert a ReadableStream to a string
+  public static async readableStreamToText(stream: ReadableStream): Promise<string> {
     return await new Response(stream).text();
+  }
+  public static async readableStreamToBuffer(stream: ReadableStream): Promise<ArrayBuffer> {
+    return await new Response(stream).arrayBuffer();
   }
 }
 

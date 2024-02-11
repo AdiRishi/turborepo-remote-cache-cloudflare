@@ -51,7 +51,12 @@ export class KvStorage implements StorageInterface {
   }
 
   async write(key: string, data: WritableValue, metadata?: Record<string, string>): Promise<void> {
-    await this.KV_STORE.put(key, data, { metadata });
+    await this.KV_STORE.put(key, data, {
+      metadata: {
+        createdAtEpochMilliseconds: Date.now(),
+        customMetadata: metadata,
+      },
+    });
   }
 
   async delete(key: string | string[]): Promise<void> {

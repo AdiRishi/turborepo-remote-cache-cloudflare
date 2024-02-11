@@ -18,6 +18,9 @@ app.use('*', cors());
 
 // minimal health check routes
 app.get('/ping', (c) => c.text('pong'));
+app.get('/throw-exception', () => {
+  throw new Error('Expected error');
+});
 
 app.route('/v8', v8App);
 app.route('/internal', internalRouter);

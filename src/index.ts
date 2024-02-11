@@ -11,7 +11,7 @@ export type Env = {
   STORAGE_MANAGER: StorageManager;
 };
 
-export default {
+export const workerHandler = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     try {
       const storageManager = new StorageManager(env);
@@ -30,3 +30,5 @@ export default {
     await deleteOldCache(env);
   },
 };
+
+export default workerHandler;

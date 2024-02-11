@@ -14,10 +14,10 @@ binding = 'R2_STORE'
 bucket_name = 'turborepo-cache'
 preview_bucket_name = 'turborepo-cache-preview'
 
-# [[kv_namespaces]]
-# binding = "KV_STORE"
-# id = "ea20b0eb60f44b13b8d013eeace98ca2"
-# preview_id = "ea20b0eb60f44b13b8d013eeace98ca2"
+[[kv_namespaces]]
+binding = "KV_STORE"
+id = "ea20b0eb60f44b13b8d013eeace98ca2"
+preview_id = "ea20b0eb60f44b13b8d013eeace98ca2"
 
 [triggers]
 crons = ["0 3 * * *"]
