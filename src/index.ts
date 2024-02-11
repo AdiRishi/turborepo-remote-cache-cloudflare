@@ -5,6 +5,7 @@ import { StorageManager } from './storage';
 export type Env = {
   ENVIRONMENT: 'development' | 'production';
   R2_STORE?: R2Bucket;
+  KV_STORE?: KVNamespace;
   TURBO_TOKEN: string;
   BUCKET_OBJECT_EXPIRATION_HOURS: number;
   STORAGE_MANAGER: StorageManager;

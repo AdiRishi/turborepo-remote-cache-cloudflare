@@ -58,7 +58,6 @@ export class R2Storage implements StorageInterface {
   async write(key: string, data: WritableValue, metadata?: Record<string, string>) {
     await this.R2_STORE.put(key, data, {
       customMetadata: {
-        createdAtEpochMillisecondsStr: Date.now().toString(),
         ...metadata,
       },
     });
@@ -71,8 +70,7 @@ export class R2Storage implements StorageInterface {
     const metadata = r2Object.customMetadata;
 
     return {
-      createdAtEpochMillisecondsStr:
-        metadata?.createdAtEpochMillisecondsStr ?? r2Object.uploaded.getTime().toString(),
+      createdAtEpochMillisecondsStr: r2Object.uploaded.getTime().toString(),
       ...metadata,
     };
   }

@@ -24,12 +24,14 @@ export type ListResult = {
 };
 
 export type ListResultWithMetadata = {
-  keys: { key: string; metadata: Metadata }[];
+  keys: { key: string; metadata: Metadata | undefined }[];
   cursor?: string;
   truncated: boolean;
 };
 
 export type Metadata = {
-  createdAtEpochMillisecondsStr: string;
-  [key: string]: string | undefined;
+  staticMetadata: {
+    createdAt: Date;
+  };
+  customMetadata: Record<string, string>;
 };
