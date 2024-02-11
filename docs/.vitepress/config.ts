@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitepress';
 import projectPackageJson from '../../package.json';
+import { defineConfig } from 'vitepress';
 
 const isCloudflareDeployment = process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true';
 

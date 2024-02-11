@@ -1,9 +1,9 @@
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
-import { cors } from 'hono/cors';
 import { Env } from '..';
-import { v8App } from './v8';
 import { internalRouter } from './internal';
+import { v8App } from './v8';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { HTTPException } from 'hono/http-exception';
 
 export const app = new Hono<{ Bindings: Env }>();
 

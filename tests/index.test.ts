@@ -1,9 +1,9 @@
+import { expect, it, beforeAll, afterAll, vi, type MockedFunction } from 'vitest';
 import { unstable_dev } from 'wrangler';
 import type { UnstableDevWorker } from 'wrangler';
-import { expect, it, beforeAll, afterAll, vi, type MockedFunction } from 'vitest';
-import { app } from '~/routes';
-import { Env, workerHandler } from '~/index';
 import { deleteOldCache } from '~/crons/deleteOldCache';
+import { Env, workerHandler } from '~/index';
+import { app } from '~/routes';
 
 const describe = setupMiniflareIsolatedStorage();
 

@@ -1,9 +1,9 @@
+import { Env } from '../..';
 import { zValidator } from '@hono/zod-validator';
-import { bearerAuth } from 'hono/bearer-auth';
 import { Hono } from 'hono';
+import { bearerAuth } from 'hono/bearer-auth';
 import { cache } from 'hono/cache';
 import { z } from 'zod';
-import { Env } from '../..';
 
 // Route - /v8/artifacts
 export const artifactRouter = new Hono<{ Bindings: Env }>();

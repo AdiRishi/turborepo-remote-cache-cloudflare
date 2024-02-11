@@ -1,7 +1,7 @@
 import { beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { Env } from '~/index';
-import { KvStorage } from '~/storage/kv-storage';
 import { StorageManager } from '~/storage';
+import { KvStorage } from '~/storage/kv-storage';
 
 const describe = setupMiniflareIsolatedStorage();
 

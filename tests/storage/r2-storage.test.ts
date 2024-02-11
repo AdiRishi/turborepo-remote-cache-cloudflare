@@ -1,7 +1,7 @@
 import { beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { Env } from '~/index';
-import { R2Storage } from '~/storage/r2-storage';
 import { StorageManager } from '~/storage';
+import { R2Storage } from '~/storage/r2-storage';
 
 const describe = setupMiniflareIsolatedStorage();
 
