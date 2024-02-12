@@ -48,7 +48,15 @@ export default defineConfig({
         text: 'Introduction',
         items: [
           { text: 'Getting Started', link: '/introduction/getting-started' },
-          { text: 'Project Configuration', link: '/introduction/configuration' },
+          { text: 'Setup Turborepo', link: '/introduction/setup-turborepo' },
+        ],
+      },
+      {
+        text: 'Configuration',
+        items: [
+          { text: 'Project Configuration', link: '/configuration/project-configuration' },
+          { text: 'R2 Storage', link: '/configuration/r2-storage' },
+          { text: 'KV Storage', link: '/configuration/kv-storage' },
         ],
       },
     ],

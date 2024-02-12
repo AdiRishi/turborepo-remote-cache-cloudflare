@@ -18,17 +18,20 @@
 
 This project offers an open source implementation of the [Turborepo custom remote cache server](https://turbo.build/repo/docs/core-concepts/remote-caching) **purpose-built from the ground up for [Cloudflare Workers](https://developers.cloudflare.com/workers/)**
 
-📚 _For detailed documentation, please refer to our [official website](https://cloudflare.turborepo-remote-cache.dev/)._
+📚 For detailed documentation, please refer to our [official website](https://adirishi.github.io/turborepo-remote-cache-cloudflare)
+
+> [!NOTE]
+> You can now store your build artifacts in either Cloudflare 🪣 R2 or 🔑 KV storage. Find out how in our [official documentation](https://adirishi.github.io/turborepo-remote-cache-cloudflare/).
 
 ## 🤔 Why should I use this?
 
 If you're a Turborepo user, this project offers compelling advantages:
 
+-   💿 **Storage Options**: Choose between 🪣 [R2](https://developers.cloudflare.com/r2/) or 🔑 [KV](https://developers.cloudflare.com/kv/) storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
 -   🚀 **Faster Builds**: Harness the power of remote caching to significantly speed up your builds
 -   🌐 **Independence from Vercel**: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
--   💰 **Cost Savings**: Say goodbye to surprise egress costs when downloading artifacts. This means fewer unexpected charges on your cloud bill.
 -   🌍 **Global Deployment**: Code deploys instantly across the globe in over 300 countries, ensuring unmatched performance and reliability.
--   👛 **Affordable Start**: With Cloudflare Workers' [generous free tier](https://developers.cloudflare.com/workers/platform/pricing), you can make up to 100,000 requests every day at no cost. It's a cost-effective way to get started and scale your application.
+-   💰 **Affordable Start**: With Cloudflare Workers' [generous free tier](https://developers.cloudflare.com/workers/platform/pricing), you can make up to 100,000 requests every day at no cost. Even better Cloudflare has [zero egress fees](https://www.cloudflare.com/en-au/learning/cloud/what-are-data-egress-fees/) on it's platform, meaning you only pay for what you use.
 
 ## ⚡️ Quick start
 
@@ -60,6 +63,9 @@ echo "SECRET" | pnpm wrangler secret put TURBO_TOKEN
 This project also supports one-click deploy via Cloudflare's deploy button. Use this option only if you already have a Cloudflare account and have used R2 buckets before.
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
+
+> [!WARNING]
+> The deploy button workflow has some bug gotchas that may catch people new to Cloudflare's ecosystem off guard (see https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/issues/258). It's recommended to use the CLI method if you're new to Cloudflare.
 
 ## ⚙️ Configuration
 
