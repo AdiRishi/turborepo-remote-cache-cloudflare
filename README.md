@@ -20,14 +20,14 @@ This project offers an open source implementation of the [Turborepo custom remot
 
 📚 For detailed documentation, please refer to our [official website](https://adirishi.github.io/turborepo-remote-cache-cloudflare)
 
-> [!NOTE]
-> You can now store your build artifacts in either Cloudflare 🪣 R2 or 🔑 KV storage. Find out how in our [official documentation](https://adirishi.github.io/turborepo-remote-cache-cloudflare/).
+> [!IMPORTANT]
+> You can now store your build artifacts in either Cloudflare 🪣 R2 or 🔑 KV storage. Find out how in our [official documentation](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/kv-storage)
 
 ## 🤔 Why should I use this?
 
 If you're a Turborepo user, this project offers compelling advantages:
 
--   💿 **Storage Options**: Choose between 🪣 [R2](https://developers.cloudflare.com/r2/) or 🔑 [KV](https://developers.cloudflare.com/kv/) storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
+-   💿 **Storage Options**: Choose between 🪣 [R2](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/r2-storage) or 🔑 [KV](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/kv-storage) storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
 -   🚀 **Faster Builds**: Harness the power of remote caching to significantly speed up your builds
 -   🌐 **Independence from Vercel**: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
 -   🌍 **Global Deployment**: Code deploys instantly across the globe in over 300 countries, ensuring unmatched performance and reliability.
@@ -65,7 +65,7 @@ This project also supports one-click deploy via Cloudflare's deploy button. Use 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
 
 > [!WARNING]
-> The deploy button workflow has some bug gotchas that may catch people new to Cloudflare's ecosystem off guard (see https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/issues/258). It's recommended to use the CLI method if you're new to Cloudflare.
+> The deploy button workflow has some bugs/gotchas that may catch people new to Cloudflare's ecosystem off guard (see https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/issues/258 or [our docs](https://adirishi.github.io/turborepo-remote-cache-cloudflare/introduction/getting-started#one-click-deploy)). It's recommended to use the CLI method if you're new to Cloudflare.
 
 ## ⚙️ Configuration
 
