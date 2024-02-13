@@ -1,10 +1,9 @@
 import { MockedFunction, afterEach, beforeEach, expect, test, vi } from 'vitest';
-import { app } from '.';
-import { Env } from '..';
-import { deleteOldCache } from '../crons/deleteOldCache';
+import { deleteOldCache } from '~/crons/deleteOldCache';
+import { Env, workerHandler } from '~/index';
 
-vi.mock('../crons/deleteOldCache', async (importActual) => {
-  const actual = await importActual<typeof import('../crons/deleteOldCache')>();
+vi.mock('~/crons/deleteOldCache', async (importActual) => {
+  const actual = await importActual<typeof import('~/crons/deleteOldCache')>();
   return {
     ...actual,
     deleteOldCache: vi.fn(),
@@ -17,6 +16,7 @@ const describe = setupMiniflareIsolatedStorage();
 describe('/internal Routes', () => {
   let workerEnv: Env;
   let ctx: ExecutionContext;
+  const app = workerHandler;
 
   describe('/internal/delete-old-cache route', () => {
     beforeEach(() => {
@@ -95,8 +95,8 @@ describe('/internal Routes', () => {
       const response = await app.fetch(request, workerEnv, ctx);
       expect(response.status).toBe(200);
 
-      const list = await workerEnv.R2_STORE.list();
-      expect(list.objects.length).toBe(10);
+      const list = await workerEnv.STORAGE_MANAGER.getActiveStorage().list();
+      expect(list.keys.length).toBe(10);
     });
 
     test('should return 401 if no auth token is provided', async () => {
@@ -109,8 +109,8 @@ describe('/internal Routes', () => {
       });
       const response = await app.fetch(request, workerEnv, ctx);
       expect(response.status).toBe(401);
-      const list = await workerEnv.R2_STORE.list();
-      expect(list.objects.length).toBe(0);
+      const list = await workerEnv.STORAGE_MANAGER.getActiveStorage().list();
+      expect(list.keys.length).toBe(0);
     });
   });
 
@@ -138,7 +138,7 @@ describe('/internal Routes', () => {
     });
 
     test('should return the number of objects in R2 when bucket is not empty', async () => {
-      await workerEnv.R2_STORE.put('key', 'value');
+      await workerEnv.STORAGE_MANAGER.getActiveStorage().write('key', 'value');
       const request = new Request('http://localhost/internal/count-objects', {
         method: 'GET',
         headers: {

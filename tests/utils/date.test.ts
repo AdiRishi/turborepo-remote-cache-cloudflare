@@ -1,5 +1,5 @@
 import { expect, test, describe } from 'vitest';
-import { isDateOlderThan } from './date';
+import { isDateOlderThan } from '~/utils/date';
 
 describe('isDateOlderThan', () => {
   const millisecondsInHour = 1000 * 60 * 60;

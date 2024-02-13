@@ -1,10 +1,20 @@
+import { expect, it, beforeAll, afterAll, vi, type MockedFunction } from 'vitest';
 import { unstable_dev } from 'wrangler';
 import type { UnstableDevWorker } from 'wrangler';
-import { expect, it, beforeAll, afterAll } from 'vitest';
-import { app } from './routes';
-import { Env } from '.';
+import { deleteOldCache } from '~/crons/deleteOldCache';
+import { Env, workerHandler } from '~/index';
+import { app } from '~/routes';
 
 const describe = setupMiniflareIsolatedStorage();
+
+vi.mock('~/crons/deleteOldCache', async (importActual) => {
+  const actual = await importActual<typeof import('~/crons/deleteOldCache')>();
+  return {
+    ...actual,
+    deleteOldCache: vi.fn(),
+  };
+});
+const deleteOldCacheMock = deleteOldCache as MockedFunction<typeof deleteOldCache>;
 
 describe('remote-cache worker', () => {
   let worker: UnstableDevWorker;
@@ -49,5 +59,28 @@ describe('remote-cache worker', () => {
     expect(await res.json()).toEqual({
       error: 'Expected error',
     });
+  });
+
+  it('should throw a 500 error when the storage manager is not configured correctly', async () => {
+    const badEnv = { ...workerEnv, R2_STORE: undefined, KV_STORE: undefined };
+    const res = await workerHandler.fetch(new Request('http://localhost/ping'), badEnv, ctx);
+    expect(res.status).toBe(500);
+    expect((await res.text()).includes('Storage options not configured correctly')).toBe(true);
+  });
+});
+
+describe('remote-cache scheduled event', () => {
+  let workerEnv: Env;
+  let ctx: ExecutionContext;
+
+  beforeAll(() => {
+    workerEnv = getMiniflareBindings();
+    ctx = new ExecutionContext();
+  });
+
+  it('should call deleteOldCache', async () => {
+    // @ts-expect-error - missing properties for the scheduled event
+    await workerHandler.scheduled({ scheduledTime: Date.now() }, workerEnv, ctx);
+    expect(deleteOldCacheMock).toHaveBeenCalled();
   });
 });

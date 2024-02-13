@@ -2,13 +2,11 @@
 layout: doc
 ---
 
-# ⚙️ Project Configuration
-
-## Setting up remote caching in your Turborepo project
+# ▲ Setting up remote caching in your Turborepo project
 
 Here's my recommended approach for setting up remote caching in your Turborepo project. You can read more about this topic in the [official Turborepo documentation](https://turbo.build/repo/docs/core-concepts/remote-caching).
 
-### Step 1: Update `turbo.json`
+## Step 1: Update `turbo.json`
 
 Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)
 
@@ -18,7 +16,7 @@ Modify the `turbo.json` file at your project root to include [signature validati
 }
 ```
 
-### Step 2: Install `dotenv-cli`
+## Step 2: Install `dotenv-cli`
 
 Install the `dotenv-cli` npm package:
 
@@ -27,7 +25,7 @@ Install the `dotenv-cli` npm package:
 pnpm add -D dotenv-cli
 ```
 
-### Step 3: Create a `.env` File
+## Step 3: Create a `.env` File
 
 Create a `.env` file at your project root with the following content:
 
@@ -46,7 +44,7 @@ Keep the following in mind
 -   Remember to add the `.env` file to `.gitignore`
 -   If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
 
-### Step 4: Modify Turbo Commands
+## Step 4: Modify Turbo Commands
 
 Load the `.env` file prior to execution. Instead of running a command like `turbo run build` directly, use `dotenv -- turbo run build`. This loads everything in our `.env` file into the process's environment variables.
 
@@ -83,10 +81,3 @@ Cached:    3 cached, 3 total
 
 ✨  Done in 3.54s.
 ```
-
-## Automatic deletion of old cache files
-
-This project sets up a [cron trigger](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for Cloudflare workers, which automatically deletes old cache files within the bound R2 bucket. This behavior can be customized:
-
--   To disable the automatic deletion, remove the [triggers] configuration in [wrangler.toml](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/wrangler.toml)
--   To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.toml](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/wrangler.toml) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)

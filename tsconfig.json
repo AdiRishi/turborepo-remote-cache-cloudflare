@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es2021",
-    "lib": ["es2021"],
-    "jsx": "react",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "jsx": "react-jsx",
     "module": "es2022",
-    "moduleResolution": "node",
-    "types": ["@cloudflare/workers-types", "vitest-environment-miniflare/globals", "vitest"],
+    "moduleResolution": "Bundler",
+    "types": ["@cloudflare/workers-types/2023-07-01", "vitest-environment-miniflare/globals"],
     "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": false,
@@ -14,6 +14,11 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    }
   }
 }

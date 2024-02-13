@@ -1,9 +1,10 @@
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { bearerAuth } from 'hono/bearer-auth';
-import { z } from 'zod';
 import { Env } from '..';
 import { deleteOldCache } from '../crons/deleteOldCache';
+import { ListResult } from '../storage';
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
+import { bearerAuth } from 'hono/bearer-auth';
+import { z } from 'zod';
 
 export const internalRouter = new Hono<{ Bindings: Env }>();
 
@@ -35,13 +36,13 @@ internalRouter.post(
   ),
   async (c) => {
     const { count } = c.req.valid('json');
-    const { R2_STORE } = c.env;
+    const storage = c.env.STORAGE_MANAGER.getActiveStorage();
 
     const emojis: string[] = ['🤪', '🤬', '😄', '🥶', '😆', '😅', '😂', '🤣', '😊', '😇'];
     const promises = [];
     for (let i = 0; i < count; i++) {
       const key = `random-data/${crypto.randomUUID()}`;
-      promises.push(R2_STORE.put(key, emojis[Math.floor(Math.random() * emojis.length)]));
+      promises.push(storage.write(key, emojis[Math.floor(Math.random() * emojis.length)]));
     }
     await Promise.all(promises);
 
@@ -52,13 +53,14 @@ internalRouter.post(
 internalRouter.get('/count-objects', async (c) => {
   let truncated = false;
   let cursor: string | undefined;
-  let list: R2Objects;
+  let list: ListResult;
   let count = 0;
+  const storage = c.env.STORAGE_MANAGER.getActiveStorage();
   do {
-    list = await c.env.R2_STORE.list({ limit: 999, cursor });
+    list = await storage.list({ limit: 999, cursor });
     truncated = list.truncated;
     cursor = list.truncated ? list.cursor : undefined;
-    count += list.objects.length;
+    count += list.keys.length;
   } while (truncated);
 
   return c.json({ count });

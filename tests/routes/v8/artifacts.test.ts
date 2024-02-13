@@ -1,10 +1,11 @@
 import { beforeEach, expect, test } from 'vitest';
-import { app } from '../../routes/';
-import { Env } from '../..';
+import { Env, workerHandler } from '~/index';
+import { StorageManager } from '~/storage';
 
 const describe = setupMiniflareIsolatedStorage();
 
 describe('v8 Artifacts API', () => {
+  const app = workerHandler;
   let workerEnv: Env;
   let ctx: ExecutionContext;
   const artifactId = 'UNIQUE-artifactId-' + Math.random();
@@ -15,10 +16,13 @@ describe('v8 Artifacts API', () => {
   describe('GET artifact endpoint', () => {
     beforeEach(async () => {
       workerEnv = getMiniflareBindings();
+      workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
       ctx = new ExecutionContext();
-      await workerEnv.R2_STORE.put(`${teamId}/existing-${artifactId}`, artifactContent, {
-        customMetadata: { artifactTag },
-      });
+      await workerEnv.STORAGE_MANAGER.getActiveStorage().write(
+        `${teamId}/existing-${artifactId}`,
+        artifactContent,
+        { artifactTag }
+      );
     });
 
     function createArtifactGetRequest(url: string) {
@@ -101,13 +105,14 @@ describe('v8 Artifacts API', () => {
       );
       const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(200);
-      expect(res.headers.get('Cache-Control')).toBe('max-age=86400, stale-while-revalidate=3600');
+      expect(res.headers.get('Cache-Control')).toBe('max-age=300, stale-while-revalidate=300');
     });
   });
 
   describe('PUT artifact endpoint', () => {
     beforeEach(() => {
       workerEnv = getMiniflareBindings();
+      workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
       ctx = new ExecutionContext();
     });
 
@@ -139,8 +144,11 @@ describe('v8 Artifacts API', () => {
       const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(201);
 
-      const artifact = await workerEnv.R2_STORE.get(`${teamId}/${artifactId}`);
-      expect(await artifact?.text()).toEqual(artifactContent);
+      const artifactStream = await workerEnv.STORAGE_MANAGER.getActiveStorage().read(
+        `${teamId}/${artifactId}`
+      );
+      const artifact = await StorageManager.readableStreamToText(artifactStream!);
+      expect(artifact).toEqual(artifactContent);
     });
 
     test('should accept both teamId and slug as query params', async () => {
@@ -165,9 +173,12 @@ describe('v8 Artifacts API', () => {
       const res = await app.fetch(request, workerEnv, ctx);
       expect(res.status).toBe(201);
 
-      const artifact = await workerEnv.R2_STORE.get(`${teamId}/${artifactId}`);
-      expect(await artifact?.text()).toEqual(artifactContent);
-      expect(artifact?.customMetadata?.artifactTag).toEqual(artifactTag);
+      const artifactWithMeta = await workerEnv.STORAGE_MANAGER.getActiveStorage().readWithMetadata(
+        `${teamId}/${artifactId}`
+      );
+      const artifact = await StorageManager.readableStreamToText(artifactWithMeta.data!);
+      expect(artifact).toEqual(artifactContent);
+      expect(artifactWithMeta?.metadata?.customMetadata?.artifactTag).toEqual(artifactTag);
     });
 
     test('should return 400 when content type is not application/octet-stream', async () => {
@@ -184,10 +195,13 @@ describe('v8 Artifacts API', () => {
   describe('HEAD artifact endpoint', () => {
     beforeEach(async () => {
       workerEnv = getMiniflareBindings();
+      workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
       ctx = new ExecutionContext();
-      await workerEnv.R2_STORE.put(`${teamId}/existing-${artifactId}`, artifactContent, {
-        customMetadata: { artifactTag },
-      });
+      await workerEnv.STORAGE_MANAGER.getActiveStorage().write(
+        `${teamId}/existing-${artifactId}`,
+        artifactContent,
+        { artifactTag }
+      );
     });
 
     function createArtifactHeadRequest(url: string) {
@@ -237,6 +251,7 @@ describe('v8 Artifacts API', () => {
   describe('Artifact events endpoint', () => {
     beforeEach(() => {
       workerEnv = getMiniflareBindings();
+      workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
       ctx = new ExecutionContext();
     });
 

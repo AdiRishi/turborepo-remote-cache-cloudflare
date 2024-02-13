@@ -22,10 +22,10 @@ features:
     - icon: 🌐
       title: Independence from Vercel
       details: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
-    - icon: 🌍
-      title: Global Deployment
-      details: Code deploys instantly across the globe in over 300 countries, ensuring unmatched performance and reliability.
-    - icon: 👛
+    - icon: 🪣
+      title: Multiple Storage Options
+      details: Choose between R2 or KV storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
+    - icon: 💰
       title: Affordable Start
-      details: With Cloudflare Workers' generous free tier, you can make up to 100,000 requests every day at no cost. It's a cost-effective way to get started and scale your application.
+      details: With Cloudflare Workers' generous free tier and zero egress fees, you can make up to 100,000 requests every day at no cost.
 ---

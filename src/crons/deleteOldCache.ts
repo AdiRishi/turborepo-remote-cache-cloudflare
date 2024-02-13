@@ -1,4 +1,5 @@
 import { Env } from '..';
+import { ListResultWithMetadata } from '../storage';
 import { isDateOlderThan } from '../utils/date';
 
 // Cursor size should be kept below 1000 to avoid limits on bulk operations
@@ -13,15 +14,16 @@ class R2KeysForDeletion {
 
 export async function deleteOldCache(env: Env): Promise<void> {
   const BUCKET_CUTOFF_HOURS = env.BUCKET_OBJECT_EXPIRATION_HOURS;
+  const storage = env.STORAGE_MANAGER.getActiveStorage();
   let truncated = false;
   let cursor: string | undefined;
-  let list: R2Objects;
+  let list: ListResultWithMetadata;
   const keysMarkedForDeletion: R2KeysForDeletion[] = [];
 
   do {
-    list = await env.R2_STORE.list({ limit: CURSOR_SIZE, cursor });
+    list = await storage.listWithMetadata({ limit: CURSOR_SIZE, cursor });
     truncated = list.truncated;
-    cursor = list.truncated ? list.cursor : undefined;
+    cursor = list.cursor;
 
     /**
      * Deleting keys while iterating over the list can sometimes cause the list to be truncated.
@@ -29,13 +31,14 @@ export async function deleteOldCache(env: Env): Promise<void> {
      */
     const keysAvailableForDeletion = keysMarkedForDeletion.shift();
     if (keysAvailableForDeletion) {
-      await env.R2_STORE.delete(keysAvailableForDeletion.keys);
+      await storage.delete(keysAvailableForDeletion.keys);
     }
 
     const keysForDeletion = new R2KeysForDeletion();
-    for (const object of list.objects) {
-      if (isDateOlderThan(object.uploaded, BUCKET_CUTOFF_HOURS)) {
-        keysForDeletion.add(object.key);
+    for (const keyWithMeta of list.keys) {
+      const createdAt = keyWithMeta.metadata?.staticMetadata.createdAt;
+      if (!createdAt || isDateOlderThan(createdAt, BUCKET_CUTOFF_HOURS)) {
+        keysForDeletion.add(keyWithMeta.key);
       }
     }
 
@@ -45,6 +48,6 @@ export async function deleteOldCache(env: Env): Promise<void> {
     }
   } while (truncated);
   for (const keysForDeletion of keysMarkedForDeletion) {
-    await env.R2_STORE.delete(keysForDeletion.keys);
+    await storage.delete(keysForDeletion.keys);
   }
 }
