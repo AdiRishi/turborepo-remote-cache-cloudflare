@@ -1,5 +1,13 @@
 # turborepo-remote-cache-cf
 
+## 3.0.0
+
+### Major Changes
+
+- [#287](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/287) [`7851729`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/78517294d281182c7f6e7e27b69d7f22ea5115cc) Thanks [@AdiRishi](https://github.com/AdiRishi)! - This project now has brand new web documentation powered by VitePress. You can visit these docs at https://adirishi.github.io/turborepo-remote-cache-cloudflare
+
+- [#287](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/287) [`7851729`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/78517294d281182c7f6e7e27b69d7f22ea5115cc) Thanks [@AdiRishi](https://github.com/AdiRishi)! - You can now store your build artifacts in either Cloudflare 🪣 R2 or 🔑 KV storage. Find out how in our [official documentation](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/kv-storage)
+
 ## 2.6.2
 
 ### Patch Changes
