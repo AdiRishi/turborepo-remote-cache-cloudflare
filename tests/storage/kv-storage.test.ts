@@ -1,9 +1,8 @@
-import { beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { env } from 'cloudflare:test';
+import { beforeEach, afterEach, describe, test, expect, vi } from 'vitest';
 import { Env } from '~/index';
 import { StorageManager } from '~/storage';
 import { KvStorage } from '~/storage/kv-storage';
-
-const describe = setupMiniflareIsolatedStorage();
 
 describe('kv-storage', () => {
   let workerEnv: Required<Env>;
@@ -11,7 +10,7 @@ describe('kv-storage', () => {
   let startTime: number;
 
   beforeEach(() => {
-    workerEnv = getMiniflareBindings();
+    workerEnv = env as Required<Env>;
     storage = new KvStorage(workerEnv.KV_STORE);
     startTime = Date.now();
     vi.useFakeTimers();
@@ -111,12 +110,7 @@ describe('kv-storage', () => {
     });
 
     test('can write stream value', async () => {
-      const stream = new ReadableStream({
-        start: (controller) => {
-          controller.enqueue('value1');
-          controller.close();
-        },
-      });
+      const stream = StorageManager.textToReadableStream('value1');
       await storage.write('key1', stream);
       const result = await storage.read('key1');
       const dataAsText = await StorageManager.readableStreamToText(result!);

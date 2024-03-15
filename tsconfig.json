@@ -5,7 +5,7 @@
     "jsx": "react-jsx",
     "module": "es2022",
     "moduleResolution": "Bundler",
-    "types": ["@cloudflare/workers-types/2023-07-01", "vitest-environment-miniflare/globals"],
+    "types": ["@cloudflare/workers-types/experimental", "@cloudflare/vitest-pool-workers"],
     "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": false,
