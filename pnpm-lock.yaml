@@ -26,8 +26,8 @@ devDependencies:
     specifier: ^2.27.1
     version: 2.27.1
   '@cloudflare/workers-types':
-    specifier: ^4.20240314.0
-    version: 4.20240314.0
+    specifier: ^4.20240320.1
+    version: 4.20240320.1
   '@trivago/prettier-plugin-sort-imports':
     specifier: ^4.3.0
     version: 4.3.0(prettier@3.2.5)
@@ -75,7 +75,7 @@ devDependencies:
     version: 2.14.2(vitest@1.4.0)
   wrangler:
     specifier: ^3.35.0
-    version: 3.35.0(@cloudflare/workers-types@4.20240314.0)
+    version: 3.35.0(@cloudflare/workers-types@4.20240320.1)
 
 packages:
 
@@ -615,8 +615,8 @@ packages:
     dev: true
     optional: true
 
-  /@cloudflare/workers-types@4.20240314.0:
-    resolution: {integrity: sha512-eg2dK/tYSiFvQu3sexjB32WEGi3GEmY6pLRF4nrV9Rwi2F2965o6f6604jQY8whhrmNdEoWErSjhuuUld6xgKQ==}
+  /@cloudflare/workers-types@4.20240320.1:
+    resolution: {integrity: sha512-CiYtVpQURPgQqtBKkmOAnfPElVZuD7Xyf1IxKtKp2B4aB9gnooapwJhzeY8c4Ls4u17SgMS0MprOkrgYwzZ6xg==}
     dev: true
 
   /@cspotcode/source-map-support@0.8.1:
@@ -1325,7 +1325,7 @@ packages:
     resolution: {integrity: sha512-97y/95EzDC86jM2bKYacKk4n59miFC+WXueRdW5TeVzBw2UTL2Alvy36AZuyMUgBqxZdJSv88/q0jHTw7LvyMA==}
     engines: {node: '>=16.13'}
     dependencies:
-      '@cloudflare/workers-types': 4.20240314.0
+      '@cloudflare/workers-types': 4.20240320.1
       '@miniflare/cache': 2.14.2
       '@miniflare/core': 2.14.2
       '@miniflare/d1': 2.14.2
@@ -5265,7 +5265,7 @@ packages:
       '@cloudflare/workerd-windows-64': 1.20240314.0
     dev: true
 
-  /wrangler@3.35.0(@cloudflare/workers-types@4.20240314.0):
+  /wrangler@3.35.0(@cloudflare/workers-types@4.20240320.1):
     resolution: {integrity: sha512-8k0BZQTq5wkLvkvrwMMiilAqemllDN9ro/Vstz83S5kVPeIRqjlvCpoEypGDjH9BGZEeRcDyqZKM3mgI/x6/gw==}
     engines: {node: '>=16.17.0'}
     hasBin: true
@@ -5276,7 +5276,7 @@ packages:
         optional: true
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.1
-      '@cloudflare/workers-types': 4.20240314.0
+      '@cloudflare/workers-types': 4.20240320.1
       '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
       '@esbuild-plugins/node-modules-polyfill': 0.2.2(esbuild@0.17.19)
       blake3-wasm: 2.1.5
