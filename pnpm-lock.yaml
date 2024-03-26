@@ -9,8 +9,8 @@ overrides:
 
 dependencies:
   '@hono/zod-validator':
-    specifier: ^0.2.0
-    version: 0.2.0(hono@4.1.4)(zod@3.22.4)
+    specifier: ^0.2.1
+    version: 0.2.1(hono@4.1.4)(zod@3.22.4)
   hono:
     specifier: ^4.1.4
     version: 4.1.4
@@ -1134,8 +1134,8 @@ packages:
     engines: {node: '>=14'}
     dev: true
 
-  /@hono/zod-validator@0.2.0(hono@4.1.4)(zod@3.22.4):
-    resolution: {integrity: sha512-PC7akbA/DCFY406BL3+ogjYb+7Fgfs/6XPvyURBYMczo0M7kYsTUMnF8hA9mez1RORNCWPqXuFGfKrkoUVPvrQ==}
+  /@hono/zod-validator@0.2.1(hono@4.1.4)(zod@3.22.4):
+    resolution: {integrity: sha512-HFoxln7Q6JsE64qz2WBS28SD33UB2alp3aRKmcWnNLDzEL1BLsWfbdX6e1HIiUprHYTIXf5y7ax8eYidKUwyaA==}
     peerDependencies:
       hono: '>=3.9.0'
       zod: ^3.19.1
