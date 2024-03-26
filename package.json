@@ -61,13 +61,13 @@
     "prettier": "^3.2.5",
     "typescript": "^5.4.3",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitepress": "1.0.0-rc.45",
+    "vitepress": "1.0.1",
     "vitest": "^1.4.0",
     "vitest-environment-miniflare": "^2.14.2",
     "wrangler": "^3.37.0"
   },
   "dependencies": {
-    "@hono/zod-validator": "^0.2.0",
+    "@hono/zod-validator": "^0.2.1",
     "hono": "^4.1.4",
     "zod": "^3.22.4"
   },
@@ -75,5 +75,6 @@
     "overrides": {
       "@types/node": "20.8.3"
     }
-  }
+  },
+  "packageManager": "pnpm@8.15.5"
 }
