@@ -74,8 +74,8 @@ devDependencies:
     specifier: ^2.14.2
     version: 2.14.2(vitest@1.4.0)
   wrangler:
-    specifier: ^3.40.0
-    version: 3.40.0(@cloudflare/workers-types@4.20240320.1)
+    specifier: ^3.41.0
+    version: 3.41.0(@cloudflare/workers-types@4.20240320.1)
 
 packages:
 
@@ -5314,8 +5314,8 @@ packages:
       '@cloudflare/workerd-windows-64': 1.20240320.1
     dev: true
 
-  /wrangler@3.40.0(@cloudflare/workers-types@4.20240320.1):
-    resolution: {integrity: sha512-2LLqnWJu6HSATidUYFg4LRmm497CI+Pmpu2eH20kYs8CtSY+FWY0g97PrsvT4QLzuUA0aDEUjqek6eGvuz92HA==}
+  /wrangler@3.41.0(@cloudflare/workers-types@4.20240320.1):
+    resolution: {integrity: sha512-iPFHF+88ZchnoZaQnq69Qkcpt0/LwkD44FzTxHWGzuBiNFwWwaNZ5zJ1G7Ga4nyipwcgtj+ykGlB/Amdgmut7w==}
     engines: {node: '>=16.17.0'}
     hasBin: true
     peerDependencies:
