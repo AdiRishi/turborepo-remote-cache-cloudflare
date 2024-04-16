@@ -1,5 +1,13 @@
 # turborepo-remote-cache-cf
 
+## 3.1.0
+
+### Minor Changes
+
+- [#394](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/394) [`2005a64`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/2005a64d7c661cafb1c3f651a9248a206db032c3) Thanks [@AdiRishi](https://github.com/AdiRishi)! - Update routes to conform to the new Turborepo OpenAPI spec.
+
+  Overall this is not a breaking change as most additions are optional.
+
 ## 3.0.0
 
 ### Major Changes
