@@ -13,42 +13,69 @@ artifactRouter.use('*', async (c, next) => {
   await middleware(c, next);
 });
 
+artifactRouter.post(
+  '/',
+  zValidator(
+    'json',
+    z.object({
+      hashes: z.array(z.string()), // artifactIds
+    })
+  ),
+  zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
+  (c) => {
+    const data = c.req.valid('json');
+    const { teamId: teamIdQuery, slug } = c.req.valid('query');
+    const teamId = teamIdQuery ?? slug ?? 'default_team';
+    void data;
+    void teamId;
+    // TODO: figure out what this route actually does, the OpenAPI spec is unclear
+    return c.json({});
+  }
+);
+
+artifactRouter.get('/status', (c) => {
+  const status: 'disabled' | 'enabled' | 'over_limit' | 'paused' = 'enabled';
+  return c.json({ status }, 200);
+});
+
 artifactRouter.put(
   '/:artifactId',
   zValidator('param', z.object({ artifactId: z.string() })),
   zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
+  zValidator(
+    'header',
+    z.object({
+      'content-type': z.literal('application/octet-stream'),
+      'content-length': z.coerce.number().optional(),
+      'x-artifact-duration': z.coerce.number().optional(),
+      'x-artifact-client-ci': z.string().optional(),
+      'x-artifact-client-interactive': z.coerce.number().min(0).max(1).optional(),
+      'x-artifact-tag': z.string().optional(),
+    })
+  ),
   async (c) => {
     const { artifactId } = c.req.valid('param');
     const { teamId: teamIdQuery, slug } = c.req.valid('query');
-    const teamId = teamIdQuery ?? slug;
+    const teamId = teamIdQuery ?? slug ?? 'default_team';
+    const validatedHeaders = c.req.valid('header');
 
-    if (!teamId) {
-      return c.json({ error: 'MISSING_TEAM_ID' }, 400);
-    }
-
-    const contentType = c.req.raw.headers.get('Content-Type');
-    if (contentType !== 'application/octet-stream') {
-      return c.json({ error: 'EXPECTED_CONTENT_TYPE_OCTET_STREAM' }, 400);
-    }
-
-    // if present the turborepo client has signed the artifact body
-    const artifactTag = c.req.raw.headers.get('x-artifact-tag');
     const storage = c.env.STORAGE_MANAGER.getActiveStorage();
     const objectKey = `${teamId}/${artifactId}`;
 
     const storageMetadata: Record<string, string> = {};
-    if (artifactTag) {
-      storageMetadata.artifactTag = artifactTag;
+    if (validatedHeaders['x-artifact-tag']) {
+      storageMetadata.artifactTag = validatedHeaders['x-artifact-tag'];
     }
     await storage.write(objectKey, c.req.raw.body!, storageMetadata);
 
-    return c.json({ teamId, artifactId, storagePath: objectKey }, 201);
+    const uploadUrl = new URL(`${artifactId}?teamId=${teamId}`, c.req.raw.url).toString();
+    return c.json({ urls: [uploadUrl] }, 202);
   }
 );
 
 // Hono router .get() method captures both GET and HEAD requests
 artifactRouter.get(
-  '/:artifactId/:teamId?',
+  '/:artifactId',
   cache({
     cacheName: 'r2-artifacts',
     wait: false,
@@ -56,10 +83,17 @@ artifactRouter.get(
   }),
   zValidator('param', z.object({ artifactId: z.string() })),
   zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
+  zValidator(
+    'header',
+    z.object({
+      'x-artifact-client-ci': z.string().optional(),
+      'x-artifact-client-interactive': z.coerce.number().min(0).max(1).optional(),
+    })
+  ),
   async (c) => {
     const { artifactId } = c.req.valid('param');
     const { teamId: teamIdQuery, slug } = c.req.valid('query');
-    const teamId = teamIdQuery ?? slug;
+    const teamId = teamIdQuery ?? slug ?? 'default_team';
 
     if (!teamId) {
       return c.json({ error: 'MISSING_TEAM_ID' }, 400);
@@ -69,7 +103,7 @@ artifactRouter.get(
 
     const storedObject = await storage.readWithMetadata(objectKey);
     if (!storedObject.data) {
-      return c.json({ error: 'NOT_FOUND' }, 404);
+      return c.json({}, 404);
     }
 
     c.header('Content-Type', 'application/octet-stream');
@@ -81,6 +115,35 @@ artifactRouter.get(
   }
 );
 
-artifactRouter.post('/events', (c) => {
-  return c.json({});
-});
+artifactRouter.post(
+  '/events',
+  zValidator(
+    'json',
+    z.array(
+      z.object({
+        sessionId: z.string().uuid(),
+        source: z.union([z.literal('LOCAL'), z.literal('REMOTE')]),
+        event: z.union([z.literal('HIT'), z.literal('MISS')]),
+        hash: z.string(), // artifactId
+        duration: z.coerce.number().optional(),
+      })
+    )
+  ),
+  zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
+  zValidator(
+    'header',
+    z.object({
+      'x-artifact-client-ci': z.string().optional(),
+      'x-artifact-client-interactive': z.coerce.number().min(0).max(1).optional(),
+    })
+  ),
+  (c) => {
+    const data = c.req.valid('json');
+    const { teamId: teamIdQuery, slug } = c.req.valid('query');
+    const teamId = teamIdQuery ?? slug ?? 'default_team';
+    // TODO: track these events and store them to query later
+    void data;
+    void teamId;
+    return c.json({});
+  }
+);
