@@ -5,6 +5,8 @@ import { bearerAuth } from 'hono/bearer-auth';
 import { cache } from 'hono/cache';
 import { z } from 'zod';
 
+export const DEFAULT_TEAM_ID = 'team_default_team';
+
 // Route - /v8/artifacts
 export const artifactRouter = new Hono<{ Bindings: Env }>();
 
@@ -25,7 +27,7 @@ artifactRouter.post(
   (c) => {
     const data = c.req.valid('json');
     const { teamId: teamIdQuery, slug } = c.req.valid('query');
-    const teamId = teamIdQuery ?? slug ?? 'default_team';
+    const teamId = teamIdQuery ?? slug ?? DEFAULT_TEAM_ID;
     void data;
     void teamId;
     // TODO: figure out what this route actually does, the OpenAPI spec is unclear
@@ -56,7 +58,7 @@ artifactRouter.put(
   async (c) => {
     const { artifactId } = c.req.valid('param');
     const { teamId: teamIdQuery, slug } = c.req.valid('query');
-    const teamId = teamIdQuery ?? slug ?? 'default_team';
+    const teamId = teamIdQuery ?? slug ?? DEFAULT_TEAM_ID;
     const validatedHeaders = c.req.valid('header');
 
     const storage = c.env.STORAGE_MANAGER.getActiveStorage();
@@ -93,11 +95,8 @@ artifactRouter.get(
   async (c) => {
     const { artifactId } = c.req.valid('param');
     const { teamId: teamIdQuery, slug } = c.req.valid('query');
-    const teamId = teamIdQuery ?? slug ?? 'default_team';
+    const teamId = teamIdQuery ?? slug ?? DEFAULT_TEAM_ID;
 
-    if (!teamId) {
-      return c.json({ error: 'MISSING_TEAM_ID' }, 400);
-    }
     const storage = c.env.STORAGE_MANAGER.getActiveStorage();
     const objectKey = `${teamId}/${artifactId}`;
 
@@ -140,7 +139,7 @@ artifactRouter.post(
   (c) => {
     const data = c.req.valid('json');
     const { teamId: teamIdQuery, slug } = c.req.valid('query');
-    const teamId = teamIdQuery ?? slug ?? 'default_team';
+    const teamId = teamIdQuery ?? slug ?? DEFAULT_TEAM_ID;
     // TODO: track these events and store them to query later
     void data;
     void teamId;
