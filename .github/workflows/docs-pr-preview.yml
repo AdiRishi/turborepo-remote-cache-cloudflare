@@ -38,7 +38,7 @@ jobs:
         with:
           accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
-          wranglerVersion: '3.31.0'
+          wranglerVersion: '3.50.0'
           packageManager: 'pnpm'
           command: pages deploy docs/.vitepress/dist/ --project-name=cloudflare-turbo-cache-docs
 
