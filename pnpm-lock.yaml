@@ -13,13 +13,13 @@ importers:
     dependencies:
       '@hono/zod-validator':
         specifier: ^0.2.1
-        version: 0.2.1(hono@4.2.9)(zod@3.23.4)
+        version: 0.2.1(hono@4.2.9)(zod@3.23.5)
       hono:
         specifier: ^4.2.9
         version: 4.2.9
       zod:
-        specifier: ^3.23.4
-        version: 3.23.4
+        specifier: ^3.23.5
+        version: 3.23.5
     devDependencies:
       '@changesets/changelog-github':
         specifier: ^0.5.0
@@ -2992,8 +2992,8 @@ packages:
   youch@3.3.3:
     resolution: {integrity: sha512-qSFXUk3UZBLfggAW3dJKg0BMblG5biqSF8M34E06o5CSsZtH92u9Hqmj2RzGiHDi64fhe83+4tENFP2DB6t6ZA==}
 
-  zod@3.23.4:
-    resolution: {integrity: sha512-/AtWOKbBgjzEYYQRNfoGKHObgfAZag6qUJX1VbHo2PRBgS+wfWagEY2mizjfyAPcGesrJOcx/wcl0L9WnVrHFw==}
+  zod@3.23.5:
+    resolution: {integrity: sha512-fkwiq0VIQTksNNA131rDOsVJcns0pfVUjHzLrNBiF/O/Xxb5lQyEXkhZWcJ7npWsYlvs+h0jFWXXy4X46Em1JA==}
 
 snapshots:
 
@@ -3576,10 +3576,10 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/zod-validator@0.2.1(hono@4.2.9)(zod@3.23.4)':
+  '@hono/zod-validator@0.2.1(hono@4.2.9)(zod@3.23.5)':
     dependencies:
       hono: 4.2.9
-      zod: 3.23.4
+      zod: 3.23.5
 
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
@@ -5221,7 +5221,7 @@ snapshots:
       workerd: 1.20240419.0
       ws: 8.16.0
       youch: 3.3.3
-      zod: 3.23.4
+      zod: 3.23.5
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -6180,4 +6180,4 @@ snapshots:
       mustache: 4.2.0
       stacktracey: 2.1.8
 
-  zod@3.23.4: {}
+  zod@3.23.5: {}
