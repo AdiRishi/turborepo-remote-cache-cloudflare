@@ -40,11 +40,11 @@ importers:
         specifier: ^7.8.0
         version: 7.8.0(eslint@8.57.0)(typescript@5.4.5)
       '@vitest/coverage-v8':
-        specifier: ^1.5.3
-        version: 1.5.3(vitest@1.6.0(@types/node@20.12.8)(@vitest/ui@1.5.3))
+        specifier: ^1.6.0
+        version: 1.6.0(vitest@1.6.0(@types/node@20.12.8)(@vitest/ui@1.6.0))
       '@vitest/ui':
-        specifier: ^1.5.3
-        version: 1.5.3(vitest@1.6.0)
+        specifier: ^1.6.0
+        version: 1.6.0(vitest@1.6.0)
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -71,10 +71,10 @@ importers:
         version: 1.1.4(@algolia/client-search@4.23.3)(@types/node@20.12.8)(postcss@8.4.38)(search-insights@2.13.0)(typescript@5.4.5)
       vitest:
         specifier: ^1.6.0
-        version: 1.6.0(@types/node@20.12.8)(@vitest/ui@1.5.3)
+        version: 1.6.0(@types/node@20.12.8)(@vitest/ui@1.6.0)
       vitest-environment-miniflare:
         specifier: ^2.14.2
-        version: 2.14.2(vitest@1.6.0(@types/node@20.12.8)(@vitest/ui@1.5.3))
+        version: 2.14.2(vitest@1.6.0(@types/node@20.12.8)(@vitest/ui@1.6.0))
       wrangler:
         specifier: ^3.53.1
         version: 3.53.1(@cloudflare/workers-types@4.20240502.0)
@@ -986,10 +986,10 @@ packages:
       vite: ^5.0.0
       vue: ^3.2.25
 
-  '@vitest/coverage-v8@1.5.3':
-    resolution: {integrity: sha512-DPyGSu/fPHOJuPxzFSQoT4N/Fu/2aJfZRtEpEp8GI7NHsXBGE94CQ+pbEGBUMFjatsHPDJw/+TAF9r4ens2CNw==}
+  '@vitest/coverage-v8@1.6.0':
+    resolution: {integrity: sha512-KvapcbMY/8GYIG0rlwwOKCVNRc0OL20rrhFkg/CHNzncV03TE2XWvO5w9uZYoxNiMEBacAJt3unSOiZ7svePew==}
     peerDependencies:
-      vitest: 1.5.3
+      vitest: 1.6.0
 
   '@vitest/expect@1.6.0':
     resolution: {integrity: sha512-ixEvFVQjycy/oNgHjqsL6AZCDduC+tflRluaHIzKIsdbzkLn2U/iBnVeJwB6HsIjQBdfMR8Z0tRxKUsvFJEeWQ==}
@@ -1003,13 +1003,10 @@ packages:
   '@vitest/spy@1.6.0':
     resolution: {integrity: sha512-leUTap6B/cqi/bQkXUu6bQV5TZPx7pmMBKBQiI0rJA8c3pB56ZsaTbREnF7CJfmvAS4V2cXIBAh/3rVwrrCYgw==}
 
-  '@vitest/ui@1.5.3':
-    resolution: {integrity: sha512-DoSA5YxcUmeBEK7kJHzXiL2I0d9AijWI33arnUrwiWFDxgZPDxTjvSVsiXhe8qfqhloIHkwazl5E2rhlDd/ErA==}
+  '@vitest/ui@1.6.0':
+    resolution: {integrity: sha512-k3Lyo+ONLOgylctiGovRKy7V4+dIN2yxstX3eY5cWFXH6WP+ooVX79YSyi0GagdTQzLmT43BF27T0s6dOIPBXA==}
     peerDependencies:
-      vitest: 1.5.3
-
-  '@vitest/utils@1.5.3':
-    resolution: {integrity: sha512-rE9DTN1BRhzkzqNQO+kw8ZgfeEBCLXiHJwetk668shmNBpSagQxneT5eSqEBLP+cqSiAeecvQmbpFfdMyLcIQA==}
+      vitest: 1.6.0
 
   '@vitest/utils@1.6.0':
     resolution: {integrity: sha512-21cPiuGMoMZwiOHa2i4LXkMkMkCGzA+MVFV70jRwHo95dL4x/ts5GZhML1QWuy7yfp3WzK3lRvZi3JnXTYqrBw==}
@@ -3937,7 +3934,7 @@ snapshots:
       vite: 5.2.10(@types/node@20.12.8)
       vue: 3.4.25(typescript@5.4.5)
 
-  '@vitest/coverage-v8@1.5.3(vitest@1.6.0(@types/node@20.12.8)(@vitest/ui@1.5.3))':
+  '@vitest/coverage-v8@1.6.0(vitest@1.6.0(@types/node@20.12.8)(@vitest/ui@1.6.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -3952,7 +3949,7 @@ snapshots:
       std-env: 3.7.0
       strip-literal: 2.1.0
       test-exclude: 6.0.0
-      vitest: 1.6.0(@types/node@20.12.8)(@vitest/ui@1.5.3)
+      vitest: 1.6.0(@types/node@20.12.8)(@vitest/ui@1.6.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -3978,23 +3975,16 @@ snapshots:
     dependencies:
       tinyspy: 2.2.1
 
-  '@vitest/ui@1.5.3(vitest@1.6.0)':
+  '@vitest/ui@1.6.0(vitest@1.6.0)':
     dependencies:
-      '@vitest/utils': 1.5.3
+      '@vitest/utils': 1.6.0
       fast-glob: 3.3.2
       fflate: 0.8.2
       flatted: 3.3.1
       pathe: 1.1.2
       picocolors: 1.0.0
       sirv: 2.0.4
-      vitest: 1.6.0(@types/node@20.12.8)(@vitest/ui@1.5.3)
-
-  '@vitest/utils@1.5.3':
-    dependencies:
-      diff-sequences: 29.6.3
-      estree-walker: 3.0.3
-      loupe: 2.3.7
-      pretty-format: 29.7.0
+      vitest: 1.6.0(@types/node@20.12.8)(@vitest/ui@1.6.0)
 
   '@vitest/utils@1.6.0':
     dependencies:
@@ -5946,19 +5936,19 @@ snapshots:
       - typescript
       - universal-cookie
 
-  vitest-environment-miniflare@2.14.2(vitest@1.6.0(@types/node@20.12.8)(@vitest/ui@1.5.3)):
+  vitest-environment-miniflare@2.14.2(vitest@1.6.0(@types/node@20.12.8)(@vitest/ui@1.6.0)):
     dependencies:
       '@miniflare/queues': 2.14.2
       '@miniflare/runner-vm': 2.14.2
       '@miniflare/shared': 2.14.2
       '@miniflare/shared-test-environment': 2.14.2
       undici: 5.28.2
-      vitest: 1.6.0(@types/node@20.12.8)(@vitest/ui@1.5.3)
+      vitest: 1.6.0(@types/node@20.12.8)(@vitest/ui@1.6.0)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  vitest@1.6.0(@types/node@20.12.8)(@vitest/ui@1.5.3):
+  vitest@1.6.0(@types/node@20.12.8)(@vitest/ui@1.6.0):
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0
@@ -5982,7 +5972,7 @@ snapshots:
       why-is-node-running: 2.2.2
     optionalDependencies:
       '@types/node': 20.12.8
-      '@vitest/ui': 1.5.3(vitest@1.6.0)
+      '@vitest/ui': 1.6.0(vitest@1.6.0)
     transitivePeerDependencies:
       - less
       - lightningcss
