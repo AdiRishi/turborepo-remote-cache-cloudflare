@@ -14,7 +14,7 @@ export class StorageManager {
       this.r2Storage = new R2Storage(env.R2_STORE);
     }
     if (env.KV_STORE) {
-      this.kvStorage = new KvStorage(env.KV_STORE);
+      this.kvStorage = new KvStorage(env.KV_STORE, env.BUCKET_OBJECT_EXPIRATION_HOURS);
     }
     if (!this.r2Storage && !this.kvStorage) {
       throw new InvalidStorageError('No storage provided');

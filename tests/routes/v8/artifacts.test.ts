@@ -297,7 +297,6 @@ describe('v8 Artifacts API', () => {
         ]),
       });
       const res = await app.fetch(request, workerEnv, ctx);
-      console.log(await res.text());
       expect(res.status).toBe(200);
     });
   });

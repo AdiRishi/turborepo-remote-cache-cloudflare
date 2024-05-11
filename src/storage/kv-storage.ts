@@ -9,9 +9,11 @@ import {
 
 export class KvStorage implements StorageInterface {
   private KV_STORE: KVNamespace;
+  private EXPIRATION_IN_SECONDS?: number;
 
-  constructor(kvNamespace: KVNamespace) {
+  constructor(kvNamespace: KVNamespace, expirationInHours?: number) {
     this.KV_STORE = kvNamespace;
+    this.EXPIRATION_IN_SECONDS = expirationInHours ? expirationInHours * 60 * 60 : undefined;
   }
 
   async listWithMetadata(options?: ListFilterOptions): Promise<ListResultWithMetadata> {
@@ -56,6 +58,7 @@ export class KvStorage implements StorageInterface {
         createdAtEpochMilliseconds: Date.now(),
         customMetadata: metadata,
       },
+      expirationTtl: this.EXPIRATION_IN_SECONDS,
     });
   }
 

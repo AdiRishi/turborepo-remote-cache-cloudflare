@@ -131,6 +131,14 @@ describe('kv-storage', () => {
       const bufferView = new Uint8Array(dataAsBuffer);
       expect(bufferView).toEqual(new Uint8Array(buffer));
     });
+
+    test('sets expiration TTL when available', async () => {
+      storage = new KvStorage(workerEnv.KV_STORE, 1);
+      await storage.write('key1', 'value1');
+      const result = await storage.read('key1');
+      const dataAsText = await StorageManager.readableStreamToText(result!);
+      expect(dataAsText).toBe('value1');
+    });
   });
 
   describe('delete()', () => {
