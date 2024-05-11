@@ -1,5 +1,11 @@
 # turborepo-remote-cache-cf
 
+## 3.2.0
+
+### Minor Changes
+
+- [#449](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/449) [`b765ed4`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/b765ed4de8d3bdd2c55942ca722895d9b6f6506e) Thanks [@AdiRishi](https://github.com/AdiRishi)! - Use KV key expiry to cost effectively remove cache keys
+
 ## 3.1.0
 
 ### Minor Changes
