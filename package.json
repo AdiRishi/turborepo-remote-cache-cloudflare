@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.2.1",
-    "hono": "^4.3.5",
+    "hono": "^4.3.6",
     "zod": "^3.23.8"
   },
   "pnpm": {
