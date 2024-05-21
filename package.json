@@ -76,7 +76,7 @@
       "@types/node": "20.12.12"
     }
   },
-  "packageManager": "pnpm@9.1.1",
+  "packageManager": "pnpm@9.1.2",
   "volta": {
     "node": "20.13.1"
   }
