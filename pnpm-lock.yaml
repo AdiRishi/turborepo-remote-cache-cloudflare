@@ -28,8 +28,8 @@ importers:
         specifier: ^2.27.3
         version: 2.27.3
       '@cloudflare/workers-types':
-        specifier: ^4.20240512.0
-        version: 4.20240512.0
+        specifier: ^4.20240524.0
+        version: 4.20240524.0
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^4.3.0
         version: 4.3.0(@vue/compiler-sfc@3.4.27)(prettier@3.2.5)
@@ -77,7 +77,7 @@ importers:
         version: 2.14.2(vitest@1.6.0(@types/node@20.12.12)(@vitest/ui@1.6.0))
       wrangler:
         specifier: ^3.57.1
-        version: 3.57.1(@cloudflare/workers-types@4.20240512.0)
+        version: 3.57.1(@cloudflare/workers-types@4.20240524.0)
 
 packages:
 
@@ -314,8 +314,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@cloudflare/workers-types@4.20240512.0':
-    resolution: {integrity: sha512-o2yTEWg+YK/I1t/Me+dA0oarO0aCbjibp6wSeaw52DSE9tDyKJ7S+Qdyw/XsMrKn4t8kF6f/YOba+9O4MJfW9w==}
+  '@cloudflare/workers-types@4.20240524.0':
+    resolution: {integrity: sha512-GpSr4uE7y39DU9f0+wmrL76xd03wn0jy1ClITaa3ZZltKjirAV8TW1GzHrvvKyVGx6u3lekrFnB1HzVHsCYHDQ==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -3375,7 +3375,7 @@ snapshots:
   '@cloudflare/workerd-windows-64@1.20240512.0':
     optional: true
 
-  '@cloudflare/workers-types@4.20240512.0': {}
+  '@cloudflare/workers-types@4.20240524.0': {}
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -3697,7 +3697,7 @@ snapshots:
 
   '@miniflare/shared-test-environment@2.14.2':
     dependencies:
-      '@cloudflare/workers-types': 4.20240512.0
+      '@cloudflare/workers-types': 4.20240524.0
       '@miniflare/cache': 2.14.2
       '@miniflare/core': 2.14.2
       '@miniflare/d1': 2.14.2
@@ -6082,7 +6082,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20240512.0
       '@cloudflare/workerd-windows-64': 1.20240512.0
 
-  wrangler@3.57.1(@cloudflare/workers-types@4.20240512.0):
+  wrangler@3.57.1(@cloudflare/workers-types@4.20240524.0):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.2
       '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
@@ -6099,7 +6099,7 @@ snapshots:
       source-map: 0.6.1
       xxhash-wasm: 1.0.2
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20240512.0
+      '@cloudflare/workers-types': 4.20240524.0
       fsevents: 2.3.3
     transitivePeerDependencies:
       - bufferutil
