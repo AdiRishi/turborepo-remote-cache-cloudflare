@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@hono/zod-validator':
-        specifier: ^0.2.1
-        version: 0.2.1(hono@4.4.2)(zod@3.23.8)
+        specifier: ^0.2.2
+        version: 0.2.2(hono@4.4.2)(zod@3.23.8)
       hono:
         specifier: ^4.4.2
         version: 4.4.2
@@ -649,8 +649,8 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@hono/zod-validator@0.2.1':
-    resolution: {integrity: sha512-HFoxln7Q6JsE64qz2WBS28SD33UB2alp3aRKmcWnNLDzEL1BLsWfbdX6e1HIiUprHYTIXf5y7ax8eYidKUwyaA==}
+  '@hono/zod-validator@0.2.2':
+    resolution: {integrity: sha512-dSDxaPV70Py8wuIU2QNpoVEIOSzSXZ/6/B/h4xA7eOMz7+AarKTSGV8E6QwrdcCbBLkpqfJ4Q2TmBO0eP1tCBQ==}
     peerDependencies:
       hono: '>=3.9.0'
       zod: ^3.19.1
@@ -3587,7 +3587,7 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/zod-validator@0.2.1(hono@4.4.2)(zod@3.23.8)':
+  '@hono/zod-validator@0.2.2(hono@4.4.2)(zod@3.23.8)':
     dependencies:
       hono: 4.4.2
       zod: 3.23.8
