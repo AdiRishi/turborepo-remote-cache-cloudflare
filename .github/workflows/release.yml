@@ -33,9 +33,7 @@ jobs:
           git config --global user.email "152388490+changesets-release-app[bot]@users.noreply.github.com"
 
       - name: Setup pnpm and node
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+        uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
