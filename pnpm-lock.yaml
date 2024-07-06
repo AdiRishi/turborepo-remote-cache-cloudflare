@@ -13,10 +13,10 @@ importers:
     dependencies:
       '@hono/zod-validator':
         specifier: ^0.2.2
-        version: 0.2.2(hono@4.4.11)(zod@3.23.8)
+        version: 0.2.2(hono@4.4.12)(zod@3.23.8)
       hono:
-        specifier: ^4.4.11
-        version: 4.4.11
+        specifier: ^4.4.12
+        version: 4.4.12
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -1559,8 +1559,8 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hono@4.4.11:
-    resolution: {integrity: sha512-R5RADpjoRsR3/VsnFovpsYNLPnC1f+FgdfsePk3qIgjb4D41Sg7uW5QCj41kzEOwXCjBg0sVvOZMvUNZ0DKB7g==}
+  hono@4.4.12:
+    resolution: {integrity: sha512-Lx4Vwbws0IqFfXIVYychxUW0A4EE+7dn/jsjVeM34OXSA2Xs45MkDDP14Mzznp7LlDemUNHQG2uv2N5jQld0hA==}
     engines: {node: '>=16.0.0'}
 
   hookable@5.5.3:
@@ -3085,9 +3085,9 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/zod-validator@0.2.2(hono@4.4.11)(zod@3.23.8)':
+  '@hono/zod-validator@0.2.2(hono@4.4.12)(zod@3.23.8)':
     dependencies:
-      hono: 4.4.11
+      hono: 4.4.12
       zod: 3.23.8
 
   '@humanwhocodes/config-array@0.11.14':
@@ -4169,7 +4169,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.4.11: {}
+  hono@4.4.12: {}
 
   hookable@5.5.3: {}
 
