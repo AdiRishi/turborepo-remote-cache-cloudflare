@@ -28,8 +28,7 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": ">=18",
-    "pnpm": ">=8"
+    "node": ">=20"
   },
   "scripts": {
     "build": "wrangler deploy --dry-run --minify --outdir dist",
@@ -76,8 +75,5 @@
       "@types/node": "20.14.11"
     }
   },
-  "packageManager": "pnpm@9.5.0",
-  "volta": {
-    "node": "20.15.1"
-  }
+  "packageManager": "pnpm@9.5.0"
 }
