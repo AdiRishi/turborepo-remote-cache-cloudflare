@@ -1,9 +1,9 @@
-import { beforeEach, expect, test } from 'vitest';
+import { createExecutionContext } from 'cloudflare:test';
+import { env } from 'cloudflare:test';
+import { describe, beforeEach, expect, test } from 'vitest';
 import { Env, workerHandler } from '~/index';
 import { DEFAULT_TEAM_ID } from '~/routes/v8/artifacts';
 import { StorageManager } from '~/storage';
-
-const describe = setupMiniflareIsolatedStorage();
 
 describe('v8 Artifacts API', () => {
   const app = workerHandler;
@@ -16,9 +16,9 @@ describe('v8 Artifacts API', () => {
 
   describe('GET artifact endpoint', () => {
     beforeEach(async () => {
-      workerEnv = getMiniflareBindings();
+      workerEnv = env;
       workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
-      ctx = new ExecutionContext();
+      ctx = createExecutionContext();
       await workerEnv.STORAGE_MANAGER.getActiveStorage().write(
         `${teamId}/${artifactId}`,
         artifactContent,
@@ -121,9 +121,9 @@ describe('v8 Artifacts API', () => {
 
   describe('PUT artifact endpoint', () => {
     beforeEach(() => {
-      workerEnv = getMiniflareBindings();
+      workerEnv = env;
       workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
-      ctx = new ExecutionContext();
+      ctx = createExecutionContext();
     });
 
     function createArtifactPutRequest(url: string, includeTag = false) {
@@ -209,9 +209,9 @@ describe('v8 Artifacts API', () => {
 
   describe('HEAD artifact endpoint', () => {
     beforeEach(async () => {
-      workerEnv = getMiniflareBindings();
+      workerEnv = env;
       workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
-      ctx = new ExecutionContext();
+      ctx = createExecutionContext();
       await workerEnv.STORAGE_MANAGER.getActiveStorage().write(
         `${teamId}/${artifactId}`,
         artifactContent,
@@ -274,9 +274,9 @@ describe('v8 Artifacts API', () => {
 
   describe('Artifact events endpoint', () => {
     beforeEach(() => {
-      workerEnv = getMiniflareBindings();
+      workerEnv = env;
       workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
-      ctx = new ExecutionContext();
+      ctx = createExecutionContext();
     });
 
     test('it should return 200', async () => {
