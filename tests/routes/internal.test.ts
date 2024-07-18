@@ -1,4 +1,5 @@
-import { MockedFunction, afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { env, createExecutionContext } from 'cloudflare:test';
+import { describe, MockedFunction, afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { deleteOldCache } from '~/crons/deleteOldCache';
 import { Env, workerHandler } from '~/index';
 
@@ -11,8 +12,6 @@ vi.mock('~/crons/deleteOldCache', async (importActual) => {
 });
 const deleteOldCacheMock = deleteOldCache as MockedFunction<typeof deleteOldCache>;
 
-const describe = setupMiniflareIsolatedStorage();
-
 describe('/internal Routes', () => {
   let workerEnv: Env;
   let ctx: ExecutionContext;
@@ -20,8 +19,8 @@ describe('/internal Routes', () => {
 
   describe('/internal/delete-old-cache route', () => {
     beforeEach(() => {
-      workerEnv = getMiniflareBindings();
-      ctx = new ExecutionContext();
+      workerEnv = env;
+      ctx = createExecutionContext();
     });
 
     afterEach(() => {
@@ -75,8 +74,8 @@ describe('/internal Routes', () => {
 
   describe('/internal/populate-random-objects route', () => {
     beforeEach(() => {
-      workerEnv = getMiniflareBindings();
-      ctx = new ExecutionContext();
+      workerEnv = env;
+      ctx = createExecutionContext();
     });
 
     afterEach(() => {
@@ -116,8 +115,8 @@ describe('/internal Routes', () => {
 
   describe('/internal/count-objects route', () => {
     beforeEach(() => {
-      workerEnv = getMiniflareBindings();
-      ctx = new ExecutionContext();
+      workerEnv = env;
+      ctx = createExecutionContext();
     });
 
     afterEach(() => {

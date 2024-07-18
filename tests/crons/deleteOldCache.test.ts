@@ -1,10 +1,9 @@
-import { type MockedFunction, test, expect, afterEach, beforeEach, vi } from 'vitest';
+import { env } from 'cloudflare:test';
+import { type MockedFunction, describe, test, expect, afterEach, beforeEach, vi } from 'vitest';
 import { CURSOR_SIZE, deleteOldCache } from '~/crons/deleteOldCache';
 import { Env } from '~/index';
 import { KvStorage, R2Storage, StorageInterface, StorageManager } from '~/storage';
 import { isDateOlderThan } from '~/utils/date';
-
-const describe = setupMiniflareIsolatedStorage();
 
 vi.mock('~/utils/date', async (importActual) => {
   const actual = await importActual<typeof import('~/utils/date')>();
@@ -24,7 +23,7 @@ describe('deleteOldCache', () => {
   const artifactContent = '🎉😄😇';
 
   beforeEach(() => {
-    workerEnv = getMiniflareBindings();
+    workerEnv = env;
   });
 
   describe('r2 storage', () => {

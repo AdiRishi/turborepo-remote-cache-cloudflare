@@ -1,11 +1,10 @@
-import { expect, it, beforeAll, afterAll, vi, type MockedFunction } from 'vitest';
-import { unstable_dev } from 'wrangler';
-import type { UnstableDevWorker } from 'wrangler';
+import '../src';
+import { env, createExecutionContext } from 'cloudflare:test';
+import { SELF } from 'cloudflare:test';
+import { expect, it, describe, vi, type MockedFunction, beforeEach } from 'vitest';
 import { deleteOldCache } from '~/crons/deleteOldCache';
 import { Env, workerHandler } from '~/index';
 import { app } from '~/routes';
-
-const describe = setupMiniflareIsolatedStorage();
 
 vi.mock('~/crons/deleteOldCache', async (importActual) => {
   const actual = await importActual<typeof import('~/crons/deleteOldCache')>();
@@ -17,29 +16,16 @@ vi.mock('~/crons/deleteOldCache', async (importActual) => {
 const deleteOldCacheMock = deleteOldCache as MockedFunction<typeof deleteOldCache>;
 
 describe('remote-cache worker', () => {
-  let worker: UnstableDevWorker;
   let workerEnv: Env;
   let ctx: ExecutionContext;
 
-  beforeAll(async () => {
-    worker = await unstable_dev('src/index.ts', {
-      ip: '0.0.0.0',
-      experimental: { disableExperimentalWarning: true },
-    });
-    workerEnv = getMiniflareBindings();
-    ctx = new ExecutionContext();
-  });
-
-  afterAll(async () => {
-    await worker.stop();
-  });
-
-  it('Worker should be able to boot successfully', () => {
-    expect(worker.address).toBeTruthy();
+  beforeEach(() => {
+    workerEnv = env;
+    ctx = createExecutionContext();
   });
 
   it('should respond to the ping route by simulating the worker', async () => {
-    const response = await worker.fetch('/ping');
+    const response = await SELF.fetch('https://iso-util.com/ping');
     expect(response).toBeTruthy();
     expect(response.status).toBe(200);
     const text = await response.text();
@@ -73,9 +59,9 @@ describe('remote-cache scheduled event', () => {
   let workerEnv: Env;
   let ctx: ExecutionContext;
 
-  beforeAll(() => {
-    workerEnv = getMiniflareBindings();
-    ctx = new ExecutionContext();
+  beforeEach(() => {
+    workerEnv = env;
+    ctx = createExecutionContext();
   });
 
   it('should call deleteOldCache', async () => {

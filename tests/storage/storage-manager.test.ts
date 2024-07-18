@@ -1,15 +1,14 @@
-import { beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { env } from 'cloudflare:test';
+import { beforeEach, describe, afterEach, test, expect, vi } from 'vitest';
 import { Env } from '~/index';
 import { R2Storage, KvStorage, StorageManager } from '~/storage';
-
-const describe = setupMiniflareIsolatedStorage();
 
 describe('storage-manager', () => {
   let workerEnv: Required<Env>;
   let storageManager: StorageManager;
 
   beforeEach(() => {
-    workerEnv = getMiniflareBindings();
+    workerEnv = env as Required<Env>;
   });
 
   afterEach(() => {

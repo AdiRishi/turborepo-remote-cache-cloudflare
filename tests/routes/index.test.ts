@@ -1,16 +1,15 @@
-import { beforeEach, test, expect } from 'vitest';
+import { env, createExecutionContext } from 'cloudflare:test';
+import { describe, beforeEach, test, expect } from 'vitest';
 import { Env } from '~/index';
 import { app } from '~/routes';
-
-const describe = setupMiniflareIsolatedStorage();
 
 describe('Homepage route', () => {
   let workerEnv: Env;
   let ctx: ExecutionContext;
 
   beforeEach(() => {
-    workerEnv = getMiniflareBindings();
-    ctx = new ExecutionContext();
+    workerEnv = env;
+    ctx = createExecutionContext();
   });
 
   test('should return a 200 status code', async () => {

@@ -23,8 +23,8 @@ jobs:
       - run: pnpm install
       - run: pnpm lint
       - run: pnpm typecheck
-      - run: pnpm build
       - run: pnpm test
+      - run: pnpm build
 
       - name: Coveralls Coverage Report
         uses: coverallsapp/github-action@v2
