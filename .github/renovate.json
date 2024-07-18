@@ -14,7 +14,7 @@
       "enabled": false
     },
     {
-      "matchPackageNames": ["vitest", "@vitest/*"],
+      "matchPackagePatterns": ["vitest", "@vitest/*"],
       "enabled": false
     }
   ]
