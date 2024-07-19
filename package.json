@@ -57,7 +57,7 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "miniflare": "^3.20240712.0",
+    "miniflare": "^3.20240718.0",
     "prettier": "^3.3.3",
     "typescript": "^5.5.3",
     "vite-tsconfig-paths": "^4.3.2",
