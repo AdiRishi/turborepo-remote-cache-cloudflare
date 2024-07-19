@@ -1,9 +1,8 @@
 name = "turborepo-remote-cache"
 main = "src/index.ts"
 compatibility_date = "2024-04-05"
-usage_model = 'bundled'
 
-compatibility_flags = [ "nodejs_compat" ]
+compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ENVIRONMENT = 'production'
