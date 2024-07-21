@@ -1,5 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/raineorshine/npm-check-updates/main/src/types/RunOptions.json",
   "root": true,
-  "reject": ["eslint", "vitest", "@vitest/coverage-istanbul", "@vitest/ui"]
+  "reject": ["vitest", "@vitest/coverage-istanbul", "@vitest/ui"]
 }
