@@ -15,17 +15,12 @@ export class R2Storage implements StorageInterface {
       include: ['customMetadata'],
     });
 
-    if (listResult.truncated) {
-      listResult.cursor;
-    }
-
     return {
       keys: listResult.objects.map((object) => ({
         key: object.key,
         metadata: this.transformMetadata(object),
       })),
-      // @ts-expect-error - truncated property is hidden behind a conditional
-      cursor: listResult.cursor as string,
+      cursor: listResult.truncated ? listResult.cursor : undefined,
       truncated: listResult.truncated,
     };
   }
@@ -36,14 +31,9 @@ export class R2Storage implements StorageInterface {
       prefix: options?.prefix,
     });
 
-    if (listResult.truncated) {
-      listResult.cursor;
-    }
-
     return {
       keys: listResult.objects.map((object) => object.key),
-      // @ts-expect-error - truncated property is hidden behind a conditional
-      cursor: listResult.cursor as string,
+      cursor: listResult.truncated ? listResult.cursor : undefined,
       truncated: listResult.truncated,
     };
   }
