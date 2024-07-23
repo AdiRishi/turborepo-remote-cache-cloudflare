@@ -40,8 +40,8 @@ importers:
         specifier: ^4.3.0
         version: 4.3.0(@vue/compiler-sfc@3.4.33)(prettier@3.3.3)
       '@types/eslint':
-        specifier: ^8.56.11
-        version: 8.56.11
+        specifier: ^9.6.0
+        version: 9.6.0
       '@types/eslint__js':
         specifier: ^8.42.3
         version: 8.42.3
@@ -59,7 +59,7 @@ importers:
         version: 9.1.0(eslint@9.7.0)
       eslint-plugin-prettier:
         specifier: ^5.2.1
-        version: 5.2.1(@types/eslint@8.56.11)(eslint-config-prettier@9.1.0(eslint@9.7.0))(eslint@9.7.0)(prettier@3.3.3)
+        version: 5.2.1(@types/eslint@9.6.0)(eslint-config-prettier@9.1.0(eslint@9.7.0))(eslint@9.7.0)(prettier@3.3.3)
       miniflare:
         specifier: ^3.20240718.0
         version: 3.20240718.0
@@ -867,8 +867,8 @@ packages:
       '@vue/compiler-sfc':
         optional: true
 
-  '@types/eslint@8.56.11':
-    resolution: {integrity: sha512-sVBpJMf7UPo/wGecYOpk2aQya2VUGeHhe38WG7/mN5FufNSubf5VT9Uh9Uyp8/eLJpu1/tuhJ/qTo4mhSB4V4Q==}
+  '@types/eslint@9.6.0':
+    resolution: {integrity: sha512-gi6WQJ7cHRgZxtkQEoyHMppPjq9Kxo5Tjn2prSKDSmZrCz8TZ3jSRCeTJm+WoM+oB0WG37bRqLzaaU3q7JypGg==}
 
   '@types/eslint__js@8.42.3':
     resolution: {integrity: sha512-alfG737uhmPdnvkrLdZLcEKJ/B8s9Y4hrZ+YAdzUeoArBlSUERA2E87ROfOaS4jd/C45fzOoZzidLc1IPwLqOw==}
@@ -3318,14 +3318,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@types/eslint@8.56.11':
+  '@types/eslint@9.6.0':
     dependencies:
       '@types/estree': 1.0.5
       '@types/json-schema': 7.0.15
 
   '@types/eslint__js@8.42.3':
     dependencies:
-      '@types/eslint': 8.56.11
+      '@types/eslint': 9.6.0
 
   '@types/estree@1.0.5': {}
 
@@ -3899,14 +3899,14 @@ snapshots:
     dependencies:
       eslint: 9.7.0
 
-  eslint-plugin-prettier@5.2.1(@types/eslint@8.56.11)(eslint-config-prettier@9.1.0(eslint@9.7.0))(eslint@9.7.0)(prettier@3.3.3):
+  eslint-plugin-prettier@5.2.1(@types/eslint@9.6.0)(eslint-config-prettier@9.1.0(eslint@9.7.0))(eslint@9.7.0)(prettier@3.3.3):
     dependencies:
       eslint: 9.7.0
       prettier: 3.3.3
       prettier-linter-helpers: 1.0.0
       synckit: 0.9.1
     optionalDependencies:
-      '@types/eslint': 8.56.11
+      '@types/eslint': 9.6.0
       eslint-config-prettier: 9.1.0(eslint@9.7.0)
 
   eslint-scope@8.0.2:
