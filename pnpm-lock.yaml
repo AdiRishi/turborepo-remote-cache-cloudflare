@@ -82,8 +82,8 @@ importers:
         specifier: 1.5.3
         version: 1.5.3(@types/node@20.14.12)(@vitest/ui@1.5.3)
       wrangler:
-        specifier: ^3.67.0
-        version: 3.67.0(@cloudflare/workers-types@4.20240725.0)
+        specifier: ^3.67.1
+        version: 3.67.1(@cloudflare/workers-types@4.20240725.0)
 
 packages:
 
@@ -2451,8 +2451,8 @@ packages:
       '@cloudflare/workers-types':
         optional: true
 
-  wrangler@3.67.0:
-    resolution: {integrity: sha512-elun6p9rAmGr/CtnCixhUXWeKT+LnFbHDsLLizgAlFJbsgCPV/O1if7uMjTGD/fUJNXrwbTVRpxvInz5X9gE2Q==}
+  wrangler@3.67.1:
+    resolution: {integrity: sha512-lLVJxq/OZMfntvZ79WQJNC1OKfxOCs6PLfogqDBuPFEQ3L/Mwqvd9IZ0bB8ahrwUN/K3lSdDPXynk9HfcGZxVw==}
     engines: {node: '>=16.17.0'}
     hasBin: true
     peerDependencies:
@@ -5027,7 +5027,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  wrangler@3.67.0(@cloudflare/workers-types@4.20240725.0):
+  wrangler@3.67.1(@cloudflare/workers-types@4.20240725.0):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
       '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
@@ -5036,7 +5036,7 @@ snapshots:
       chokidar: 3.6.0
       date-fns: 3.6.0
       esbuild: 0.17.19
-      miniflare: 3.20240718.0
+      miniflare: 3.20240718.1
       nanoid: 3.3.7
       path-to-regexp: 6.2.2
       resolve: 1.22.8
