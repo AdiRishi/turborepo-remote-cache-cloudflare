@@ -29,10 +29,10 @@ importers:
         version: 2.27.7
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.4.13
-        version: 0.4.13(@cloudflare/workers-types@4.20240729.0)(@vitest/runner@1.5.3)(@vitest/snapshot@1.5.3)(vitest@1.5.3(@types/node@20.14.14)(@vitest/ui@1.5.3))
+        version: 0.4.13(@cloudflare/workers-types@4.20240806.0)(@vitest/runner@1.5.3)(@vitest/snapshot@1.5.3)(vitest@1.5.3(@types/node@20.14.14)(@vitest/ui@1.5.3))
       '@cloudflare/workers-types':
-        specifier: ^4.20240729.0
-        version: 4.20240729.0
+        specifier: ^4.20240806.0
+        version: 4.20240806.0
       '@eslint/js':
         specifier: ^9.8.0
         version: 9.8.0
@@ -83,7 +83,7 @@ importers:
         version: 1.5.3(@types/node@20.14.14)(@vitest/ui@1.5.3)
       wrangler:
         specifier: ^3.69.0
-        version: 3.69.0(@cloudflare/workers-types@4.20240729.0)
+        version: 3.69.0(@cloudflare/workers-types@4.20240806.0)
 
 packages:
 
@@ -391,8 +391,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@cloudflare/workers-types@4.20240729.0':
-    resolution: {integrity: sha512-wfe44YQkv5T9aBr/z95P706r2/Ydg32weJYyBOhvge7FqtdY6mM7l39rybNiJrbJoyN16dd0xxyQMf23aJNC6Q==}
+  '@cloudflare/workers-types@4.20240806.0':
+    resolution: {integrity: sha512-8lvgrwXGTZEBsUQJ8YUnMk72Anh9omwr6fqWLw/EwVgcw1nQxs/bfdadBEbdP48l9fWXjE4E5XERLUrrFuEpsg==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -2489,6 +2489,7 @@ packages:
   wrangler@3.69.0:
     resolution: {integrity: sha512-xi62rs2u35YLaPaUE70CtxUFtHnZQF1IVmM6RZFbF9n21fvmVfKeZidGV6tvqu74oL5zgdrjXQSv77m9KpibzA==}
     engines: {node: '>=16.17.0'}
+    deprecated: This version of Wrangler has a regression that breaks wrangler dev command.
     hasBin: true
     peerDependencies:
       '@cloudflare/workers-types': ^4.20240725.0
@@ -2983,7 +2984,7 @@ snapshots:
     dependencies:
       mime: 3.0.0
 
-  '@cloudflare/vitest-pool-workers@0.4.13(@cloudflare/workers-types@4.20240729.0)(@vitest/runner@1.5.3)(@vitest/snapshot@1.5.3)(vitest@1.5.3(@types/node@20.14.14)(@vitest/ui@1.5.3))':
+  '@cloudflare/vitest-pool-workers@0.4.13(@cloudflare/workers-types@4.20240806.0)(@vitest/runner@1.5.3)(@vitest/snapshot@1.5.3)(vitest@1.5.3(@types/node@20.14.14)(@vitest/ui@1.5.3))':
     dependencies:
       '@vitest/runner': 1.5.3
       '@vitest/snapshot': 1.5.3
@@ -2994,7 +2995,7 @@ snapshots:
       miniflare: 3.20240718.0
       semver: 7.6.3
       vitest: 1.5.3(@types/node@20.14.14)(@vitest/ui@1.5.3)
-      wrangler: 3.65.1(@cloudflare/workers-types@4.20240729.0)
+      wrangler: 3.65.1(@cloudflare/workers-types@4.20240806.0)
       zod: 3.23.8
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
@@ -3032,7 +3033,7 @@ snapshots:
   '@cloudflare/workerd-windows-64@1.20240725.0':
     optional: true
 
-  '@cloudflare/workers-types@4.20240729.0': {}
+  '@cloudflare/workers-types@4.20240806.0': {}
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -5059,7 +5060,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20240725.0
       '@cloudflare/workerd-windows-64': 1.20240725.0
 
-  wrangler@3.65.1(@cloudflare/workers-types@4.20240729.0):
+  wrangler@3.65.1(@cloudflare/workers-types@4.20240806.0):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
       '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
@@ -5078,14 +5079,14 @@ snapshots:
       unenv: unenv-nightly@1.10.0-1717606461.a117952
       xxhash-wasm: 1.0.2
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20240729.0
+      '@cloudflare/workers-types': 4.20240806.0
       fsevents: 2.3.3
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  wrangler@3.69.0(@cloudflare/workers-types@4.20240729.0):
+  wrangler@3.69.0(@cloudflare/workers-types@4.20240806.0):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
       '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
@@ -5105,7 +5106,7 @@ snapshots:
       workerd: 1.20240725.0
       xxhash-wasm: 1.0.2
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20240729.0
+      '@cloudflare/workers-types': 4.20240806.0
       fsevents: 2.3.3
     transitivePeerDependencies:
       - bufferutil
