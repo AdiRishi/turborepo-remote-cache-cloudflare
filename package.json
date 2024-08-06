@@ -65,7 +65,7 @@
     "vite-tsconfig-paths": "^4.3.2",
     "vitepress": "1.3.2",
     "vitest": "1.5.3",
-    "wrangler": "^3.68.0"
+    "wrangler": "^3.69.0"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.2.2",
