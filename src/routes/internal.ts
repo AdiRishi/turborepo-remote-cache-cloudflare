@@ -1,10 +1,10 @@
-import { Env } from '..';
+import type { Env } from '..';
 import { deleteOldCache } from '../crons/deleteOldCache';
-import { ListResult } from '../storage';
+import type { ListResult } from '../storage';
 import { vValidator } from '@hono/valibot-validator';
 import { bearerAuth } from 'hono/bearer-auth';
 import { Hono } from 'hono/tiny';
-import { object, number, optional, pipe, minValue, maxValue } from 'valibot';
+import * as v from 'valibot';
 
 export const internalRouter = new Hono<{ Bindings: Env }>();
 
@@ -15,7 +15,7 @@ internalRouter.use('*', async (c, next) => {
 
 internalRouter.post(
   '/delete-expired-objects',
-  vValidator('json', object({ expireInHours: optional(number()) })),
+  vValidator('json', v.object({ expireInHours: v.optional(v.number()) })),
   async (c) => {
     const { expireInHours } = c.req.valid('json');
     await deleteOldCache({
@@ -28,7 +28,7 @@ internalRouter.post(
 
 internalRouter.post(
   '/populate-random-objects',
-  vValidator('json', object({ count: pipe(number(), maxValue(1000), minValue(1)) })),
+  vValidator('json', v.object({ count: v.pipe(v.number(), v.maxValue(1000), v.minValue(1)) })),
   async (c) => {
     const { count } = c.req.valid('json');
     const storage = c.env.STORAGE_MANAGER.getActiveStorage();

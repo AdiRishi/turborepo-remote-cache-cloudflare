@@ -1,21 +1,9 @@
-import { Env } from '../..';
+import type { Env } from '../..';
 import { vValidator } from '@hono/valibot-validator';
 import { bearerAuth } from 'hono/bearer-auth';
 import { cache } from 'hono/cache';
 import { Hono } from 'hono/tiny';
-import {
-  object,
-  number,
-  optional,
-  pipe,
-  minValue,
-  maxValue,
-  string,
-  literal,
-  transform,
-  array,
-  union,
-} from 'valibot';
+import * as v from 'valibot';
 
 export const DEFAULT_TEAM_ID = 'team_default_team';
 
@@ -27,17 +15,17 @@ artifactRouter.use('*', async (c, next) => {
   await middleware(c, next);
 });
 
-const vCoerceNumber = () => pipe(string(), transform(Number), number());
+const vCoerceNumber = () => v.pipe(v.unknown(), v.transform(Number), v.number());
 
 artifactRouter.post(
   '/',
   vValidator(
     'json',
-    object({
-      hashes: array(string()),
+    v.object({
+      hashes: v.array(v.string()),
     })
   ),
-  vValidator('query', object({ teamId: optional(string()), slug: optional(string()) })),
+  vValidator('query', v.object({ teamId: v.optional(v.string()), slug: v.optional(v.string()) })),
   (c) => {
     const data = c.req.valid('json');
     const { teamId: teamIdQuery, slug } = c.req.valid('query');
@@ -56,17 +44,19 @@ artifactRouter.get('/status', (c) => {
 
 artifactRouter.put(
   '/:artifactId',
-  vValidator('param', object({ artifactId: string() })),
-  vValidator('query', object({ teamId: optional(string()), slug: optional(string()) })),
+  vValidator('param', v.object({ artifactId: v.string() })),
+  vValidator('query', v.object({ teamId: v.optional(v.string()), slug: v.optional(v.string()) })),
   vValidator(
     'header',
-    object({
-      'content-type': literal('application/octet-stream'),
-      'content-length': optional(vCoerceNumber()),
-      'x-artifact-duration': optional(vCoerceNumber()),
-      'x-artifact-client-ci': optional(string()),
-      'x-artifact-client-interactive': optional(pipe(vCoerceNumber(), minValue(0), maxValue(1))),
-      'x-artifact-tag': optional(string()),
+    v.object({
+      'content-type': v.literal('application/octet-stream'),
+      'content-length': v.optional(vCoerceNumber()),
+      'x-artifact-duration': v.optional(vCoerceNumber()),
+      'x-artifact-client-ci': v.optional(v.string()),
+      'x-artifact-client-interactive': v.optional(
+        v.pipe(vCoerceNumber(), v.minValue(0), v.maxValue(1))
+      ),
+      'x-artifact-tag': v.optional(v.string()),
     })
   ),
   async (c) => {
@@ -97,13 +87,15 @@ artifactRouter.get(
     wait: false,
     cacheControl: 'max-age=300, stale-while-revalidate=300',
   }),
-  vValidator('param', object({ artifactId: string() })),
-  vValidator('query', object({ teamId: optional(string()), slug: optional(string()) })),
+  vValidator('param', v.object({ artifactId: v.string() })),
+  vValidator('query', v.object({ teamId: v.optional(v.string()), slug: v.optional(v.string()) })),
   vValidator(
     'header',
-    object({
-      'x-artifact-client-ci': optional(string()),
-      'x-artifact-client-interactive': optional(pipe(vCoerceNumber(), minValue(0), maxValue(1))),
+    v.object({
+      'x-artifact-client-ci': v.optional(v.string()),
+      'x-artifact-client-interactive': v.optional(
+        v.pipe(vCoerceNumber(), v.minValue(0), v.maxValue(1))
+      ),
     })
   ),
   async (c) => {
@@ -132,22 +124,24 @@ artifactRouter.post(
   '/events',
   vValidator(
     'json',
-    array(
-      object({
-        sessionId: string(),
-        source: union([literal('LOCAL'), literal('REMOTE')]),
-        event: union([literal('HIT'), literal('MISS')]),
-        hash: string(),
-        duration: optional(number()),
+    v.array(
+      v.object({
+        sessionId: v.string(),
+        source: v.union([v.literal('LOCAL'), v.literal('REMOTE')]),
+        event: v.union([v.literal('HIT'), v.literal('MISS')]),
+        hash: v.string(),
+        duration: v.optional(v.number()),
       })
     )
   ),
-  vValidator('query', object({ teamId: optional(string()), slug: optional(string()) })),
+  vValidator('query', v.object({ teamId: v.optional(v.string()), slug: v.optional(v.string()) })),
   vValidator(
     'header',
-    object({
-      'x-artifact-client-ci': optional(string()),
-      'x-artifact-client-interactive': optional(pipe(vCoerceNumber(), minValue(0), maxValue(1))),
+    v.object({
+      'x-artifact-client-ci': v.optional(v.string()),
+      'x-artifact-client-interactive': v.optional(
+        v.pipe(vCoerceNumber(), v.minValue(0), v.maxValue(1))
+      ),
     })
   ),
   (c) => {
