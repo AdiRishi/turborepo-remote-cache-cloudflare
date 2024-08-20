@@ -14,18 +14,12 @@ importers:
       '@hono/valibot-validator':
         specifier: ^0.3.0
         version: 0.3.0(hono@4.5.6)(valibot@0.37.0(typescript@5.5.4))
-      '@hono/zod-validator':
-        specifier: ^0.2.2
-        version: 0.2.2(hono@4.5.6)(zod@3.23.8)
       hono:
         specifier: ^4.5.6
         version: 4.5.6
       valibot:
         specifier: ^0.37.0
         version: 0.37.0(typescript@5.5.4)
-      zod:
-        specifier: ^3.23.8
-        version: 3.23.8
     devDependencies:
       '@changesets/changelog-github':
         specifier: ^0.5.0
@@ -716,12 +710,6 @@ packages:
     peerDependencies:
       hono: '>=3.9.0'
       valibot: '>=0.31.0 <1'
-
-  '@hono/zod-validator@0.2.2':
-    resolution: {integrity: sha512-dSDxaPV70Py8wuIU2QNpoVEIOSzSXZ/6/B/h4xA7eOMz7+AarKTSGV8E6QwrdcCbBLkpqfJ4Q2TmBO0eP1tCBQ==}
-    peerDependencies:
-      hono: '>=3.9.0'
-      zod: ^3.19.1
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -3211,11 +3199,6 @@ snapshots:
     dependencies:
       hono: 4.5.6
       valibot: 0.37.0(typescript@5.5.4)
-
-  '@hono/zod-validator@0.2.2(hono@4.5.6)(zod@3.23.8)':
-    dependencies:
-      hono: 4.5.6
-      zod: 3.23.8
 
   '@humanwhocodes/module-importer@1.0.1': {}
 
