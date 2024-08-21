@@ -13,10 +13,10 @@ importers:
     dependencies:
       '@hono/valibot-validator':
         specifier: ^0.3.0
-        version: 0.3.0(hono@4.5.6)(valibot@0.37.0(typescript@5.5.4))
+        version: 0.3.0(hono@4.5.7)(valibot@0.37.0(typescript@5.5.4))
       hono:
-        specifier: ^4.5.6
-        version: 4.5.6
+        specifier: ^4.5.7
+        version: 4.5.7
       valibot:
         specifier: ^0.37.0
         version: 0.37.0(typescript@5.5.4)
@@ -1572,8 +1572,8 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hono@4.5.6:
-    resolution: {integrity: sha512-9SuUC/zLQv8YAcnIxJko0KCeLI0Q6menPsDWuJ9jaH+r8ZkVXeLqeLs1QJXCPKKbURAWj9x0SJBSFh803EnAUw==}
+  hono@4.5.7:
+    resolution: {integrity: sha512-7GeBa+zuZ6rXQEcsYvoAafLNgDr3IMxoMlU1JUc23Buy99FaUpjB0viKIFOsfnzMdEp7RhPL6uLYsVuddjdMvw==}
     engines: {node: '>=16.0.0'}
 
   hookable@5.5.3:
@@ -3205,9 +3205,9 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/valibot-validator@0.3.0(hono@4.5.6)(valibot@0.37.0(typescript@5.5.4))':
+  '@hono/valibot-validator@0.3.0(hono@4.5.7)(valibot@0.37.0(typescript@5.5.4))':
     dependencies:
-      hono: 4.5.6
+      hono: 4.5.7
       valibot: 0.37.0(typescript@5.5.4)
 
   '@humanwhocodes/module-importer@1.0.1': {}
@@ -4167,7 +4167,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.5.6: {}
+  hono@4.5.7: {}
 
   hookable@5.5.3: {}
 
