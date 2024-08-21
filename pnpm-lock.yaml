@@ -11,15 +11,15 @@ importers:
 
   .:
     dependencies:
-      '@hono/zod-validator':
-        specifier: ^0.2.2
-        version: 0.2.2(hono@4.5.6)(zod@3.23.8)
+      '@hono/valibot-validator':
+        specifier: ^0.3.0
+        version: 0.3.0(hono@4.5.6)(valibot@0.37.0(typescript@5.5.4))
       hono:
         specifier: ^4.5.6
         version: 4.5.6
-      zod:
-        specifier: ^3.23.8
-        version: 3.23.8
+      valibot:
+        specifier: ^0.37.0
+        version: 0.37.0(typescript@5.5.4)
     devDependencies:
       '@changesets/changelog-github':
         specifier: ^0.5.0
@@ -705,11 +705,11 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@hono/zod-validator@0.2.2':
-    resolution: {integrity: sha512-dSDxaPV70Py8wuIU2QNpoVEIOSzSXZ/6/B/h4xA7eOMz7+AarKTSGV8E6QwrdcCbBLkpqfJ4Q2TmBO0eP1tCBQ==}
+  '@hono/valibot-validator@0.3.0':
+    resolution: {integrity: sha512-EcGJKzLt11SK4K11yKHrhI93ECtKeSHAnnENHw5tCL0ZhyDIx96avc3Ua8/ri4fwVvRPuOzFQ2OBRsVvwZuqeQ==}
     peerDependencies:
       hono: '>=3.9.0'
-      zod: ^3.19.1
+      valibot: '>=0.31.0 <1'
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -2315,6 +2315,14 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
+  valibot@0.37.0:
+    resolution: {integrity: sha512-FQz52I8RXgFgOHym3XHYSREbNtkgSjF9prvMFH1nBsRyfL6SfCzoT1GuSDTlbsuPubM7/6Kbw0ZMQb8A+V+VsQ==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   vite-node@1.5.3:
     resolution: {integrity: sha512-axFo00qiCpU/JLd8N1gu9iEYL3xTbMbMrbe5nDp9GL0nb6gurIdZLkkFogZXWnE8Oyy5kfSLwNVIcVsnhE7lgQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -3197,10 +3205,10 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/zod-validator@0.2.2(hono@4.5.6)(zod@3.23.8)':
+  '@hono/valibot-validator@0.3.0(hono@4.5.6)(valibot@0.37.0(typescript@5.5.4))':
     dependencies:
       hono: 4.5.6
-      zod: 3.23.8
+      valibot: 0.37.0(typescript@5.5.4)
 
   '@humanwhocodes/module-importer@1.0.1': {}
 
@@ -4819,6 +4827,10 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
+
+  valibot@0.37.0(typescript@5.5.4):
+    optionalDependencies:
+      typescript: 5.5.4
 
   vite-node@1.5.3(@types/node@20.16.1):
     dependencies:

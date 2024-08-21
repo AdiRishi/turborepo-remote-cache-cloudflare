@@ -1,9 +1,9 @@
-import { Env } from '../..';
-import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
+import type { Env } from '../..';
+import { vValidator } from '@hono/valibot-validator';
 import { bearerAuth } from 'hono/bearer-auth';
 import { cache } from 'hono/cache';
-import { z } from 'zod';
+import { Hono } from 'hono/tiny';
+import * as v from 'valibot';
 
 export const DEFAULT_TEAM_ID = 'team_default_team';
 
@@ -15,15 +15,17 @@ artifactRouter.use('*', async (c, next) => {
   await middleware(c, next);
 });
 
+const vCoerceNumber = () => v.pipe(v.unknown(), v.transform(Number), v.number());
+
 artifactRouter.post(
   '/',
-  zValidator(
+  vValidator(
     'json',
-    z.object({
-      hashes: z.array(z.string()), // artifactIds
+    v.object({
+      hashes: v.array(v.string()),
     })
   ),
-  zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
+  vValidator('query', v.object({ teamId: v.optional(v.string()), slug: v.optional(v.string()) })),
   (c) => {
     const data = c.req.valid('json');
     const { teamId: teamIdQuery, slug } = c.req.valid('query');
@@ -42,17 +44,19 @@ artifactRouter.get('/status', (c) => {
 
 artifactRouter.put(
   '/:artifactId',
-  zValidator('param', z.object({ artifactId: z.string() })),
-  zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
-  zValidator(
+  vValidator('param', v.object({ artifactId: v.string() })),
+  vValidator('query', v.object({ teamId: v.optional(v.string()), slug: v.optional(v.string()) })),
+  vValidator(
     'header',
-    z.object({
-      'content-type': z.literal('application/octet-stream'),
-      'content-length': z.coerce.number().optional(),
-      'x-artifact-duration': z.coerce.number().optional(),
-      'x-artifact-client-ci': z.string().optional(),
-      'x-artifact-client-interactive': z.coerce.number().min(0).max(1).optional(),
-      'x-artifact-tag': z.string().optional(),
+    v.object({
+      'content-type': v.literal('application/octet-stream'),
+      'content-length': v.optional(vCoerceNumber()),
+      'x-artifact-duration': v.optional(vCoerceNumber()),
+      'x-artifact-client-ci': v.optional(v.string()),
+      'x-artifact-client-interactive': v.optional(
+        v.pipe(vCoerceNumber(), v.minValue(0), v.maxValue(1))
+      ),
+      'x-artifact-tag': v.optional(v.string()),
     })
   ),
   async (c) => {
@@ -83,13 +87,15 @@ artifactRouter.get(
     wait: false,
     cacheControl: 'max-age=300, stale-while-revalidate=300',
   }),
-  zValidator('param', z.object({ artifactId: z.string() })),
-  zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
-  zValidator(
+  vValidator('param', v.object({ artifactId: v.string() })),
+  vValidator('query', v.object({ teamId: v.optional(v.string()), slug: v.optional(v.string()) })),
+  vValidator(
     'header',
-    z.object({
-      'x-artifact-client-ci': z.string().optional(),
-      'x-artifact-client-interactive': z.coerce.number().min(0).max(1).optional(),
+    v.object({
+      'x-artifact-client-ci': v.optional(v.string()),
+      'x-artifact-client-interactive': v.optional(
+        v.pipe(vCoerceNumber(), v.minValue(0), v.maxValue(1))
+      ),
     })
   ),
   async (c) => {
@@ -116,24 +122,26 @@ artifactRouter.get(
 
 artifactRouter.post(
   '/events',
-  zValidator(
+  vValidator(
     'json',
-    z.array(
-      z.object({
-        sessionId: z.string().uuid(),
-        source: z.union([z.literal('LOCAL'), z.literal('REMOTE')]),
-        event: z.union([z.literal('HIT'), z.literal('MISS')]),
-        hash: z.string(), // artifactId
-        duration: z.coerce.number().optional(),
+    v.array(
+      v.object({
+        sessionId: v.string(),
+        source: v.union([v.literal('LOCAL'), v.literal('REMOTE')]),
+        event: v.union([v.literal('HIT'), v.literal('MISS')]),
+        hash: v.string(),
+        duration: v.optional(v.number()),
       })
     )
   ),
-  zValidator('query', z.object({ teamId: z.string().optional(), slug: z.string().optional() })),
-  zValidator(
+  vValidator('query', v.object({ teamId: v.optional(v.string()), slug: v.optional(v.string()) })),
+  vValidator(
     'header',
-    z.object({
-      'x-artifact-client-ci': z.string().optional(),
-      'x-artifact-client-interactive': z.coerce.number().min(0).max(1).optional(),
+    v.object({
+      'x-artifact-client-ci': v.optional(v.string()),
+      'x-artifact-client-interactive': v.optional(
+        v.pipe(vCoerceNumber(), v.minValue(0), v.maxValue(1))
+      ),
     })
   ),
   (c) => {
