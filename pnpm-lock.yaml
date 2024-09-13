@@ -82,8 +82,8 @@ importers:
         specifier: 1.5.3
         version: 1.5.3(@types/node@20.16.5)(@vitest/ui@1.5.3)
       wrangler:
-        specifier: ^3.78.0
-        version: 3.78.0(@cloudflare/workers-types@4.20240909.0)
+        specifier: ^3.78.1
+        version: 3.78.1(@cloudflare/workers-types@4.20240909.0)
 
 packages:
 
@@ -395,8 +395,8 @@ packages:
     resolution: {integrity: sha512-tIWLooWkBMuoKRk72lr6YrEtVlVdUTtAGVmPOnUroMrnri/9YLx+mVawL0/egDgSGmPbmvkdBFsUGRuI+aZmxg==}
     engines: {node: '>=16.7.0'}
 
-  '@cloudflare/workers-shared@0.5.1':
-    resolution: {integrity: sha512-HahGg7rp0WUDduJq3R1l/vbuA31rXm8paz6YGCZXIG/Vs2hxC64jxUvddwcbH5vdxQngc3+J6MkMwnZ6mmxP7w==}
+  '@cloudflare/workers-shared@0.5.2':
+    resolution: {integrity: sha512-7A4srUwAAfL+OeQdXgWZEflIvT0u8MQ7S/Frm1VfgdPF1kFEzTrCa37GHcL2MzXftLm3hNGdqi24vwNuQyFv2A==}
     engines: {node: '>=16.7.0'}
 
   '@cloudflare/workers-types@4.20240909.0':
@@ -2507,8 +2507,8 @@ packages:
       '@cloudflare/workers-types':
         optional: true
 
-  wrangler@3.78.0:
-    resolution: {integrity: sha512-RJVf/hTj/AXgEtmbLF5wYw3ltTaIcuRGpOj7NOhhW91R5WaRIi521JLbIsyLfsr5M3un2i+2kas/tsC2sDJtOQ==}
+  wrangler@3.78.1:
+    resolution: {integrity: sha512-octA1RZBB/AmHPHEcFQJEdPEIVaLbQd0guTNECkmJ/aKi+VSW+EKsvfhMx0m6TWLmH8NWSJBnqwJ98uiwgLvqQ==}
     engines: {node: '>=16.17.0'}
     hasBin: true
     peerDependencies:
@@ -3039,7 +3039,7 @@ snapshots:
 
   '@cloudflare/workers-shared@0.2.0': {}
 
-  '@cloudflare/workers-shared@0.5.1':
+  '@cloudflare/workers-shared@0.5.2':
     dependencies:
       mime: 3.0.0
       zod: 3.23.8
@@ -5095,10 +5095,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  wrangler@3.78.0(@cloudflare/workers-types@4.20240909.0):
+  wrangler@3.78.1(@cloudflare/workers-types@4.20240909.0):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
-      '@cloudflare/workers-shared': 0.5.1
+      '@cloudflare/workers-shared': 0.5.2
       '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
       '@esbuild-plugins/node-modules-polyfill': 0.2.2(esbuild@0.17.19)
       blake3-wasm: 2.1.5
