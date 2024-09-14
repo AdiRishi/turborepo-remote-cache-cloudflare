@@ -12,10 +12,6 @@
     {
       "matchDepTypes": ["engines"],
       "enabled": false
-    },
-    {
-      "matchPackagePatterns": ["vitest", "@vitest/*"],
-      "enabled": false
     }
   ]
 }
