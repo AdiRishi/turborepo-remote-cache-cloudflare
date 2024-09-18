@@ -28,8 +28,8 @@ importers:
         specifier: ^2.27.8
         version: 2.27.8
       '@cloudflare/vitest-pool-workers':
-        specifier: ^0.5.2
-        version: 0.5.2(@cloudflare/workers-types@4.20240909.0)(@vitest/runner@2.1.1)(@vitest/snapshot@2.1.1)(vitest@2.1.1(@types/node@20.16.5)(@vitest/ui@2.1.1))
+        specifier: ^0.5.4
+        version: 0.5.4(@cloudflare/workers-types@4.20240909.0)(@vitest/runner@2.1.1)(@vitest/snapshot@2.1.1)(vitest@2.1.1(@types/node@20.16.5)(@vitest/ui@2.1.1))
       '@cloudflare/workers-types':
         specifier: ^4.20240909.0
         version: 4.20240909.0
@@ -324,12 +324,12 @@ packages:
     resolution: {integrity: sha512-YLPHc8yASwjNkmcDMQMY35yiWjoKAKnhUbPRszBRS0YgH+IXtsMp61j+yTcnCE3oO2DgP0U3iejLC8FTtKDC8Q==}
     engines: {node: '>=16.13'}
 
-  '@cloudflare/vitest-pool-workers@0.5.2':
-    resolution: {integrity: sha512-4VuIRDBQ1FJcFjoDYxlOPDeNtxYYjtz2TMPkm9bKnCssf+7K71VVuwkbV31PmLOclaenFcSLuyvygVXtZ9DgtA==}
+  '@cloudflare/vitest-pool-workers@0.5.4':
+    resolution: {integrity: sha512-qL+5RNkzBSDmJy3BbAxR7B36ENVQiGilwz/XG4/P5HMpLxqhgxr6ww0Mxc9qM8g40Cba4FE5SAxXDHlA3QeA0w==}
     peerDependencies:
-      '@vitest/runner': 2.0.x
-      '@vitest/snapshot': 2.0.x
-      vitest: 2.0.x
+      '@vitest/runner': 2.0.x - 2.1.x
+      '@vitest/snapshot': 2.0.x - 2.1.x
+      vitest: 2.0.x - 2.1.x
 
   '@cloudflare/workerd-darwin-64@1.20240909.0':
     resolution: {integrity: sha512-nJ8jm/6PR8DPzVb4QifNAfSdrFZXNblwIdOhLTU5FpSvFFocmzFX5WgzQagvtmcC9/ZAQyxuf7WynDNyBcoe0Q==}
@@ -1854,11 +1854,6 @@ packages:
     engines: {node: '>=10.0.0'}
     hasBin: true
 
-  miniflare@3.20240909.1:
-    resolution: {integrity: sha512-tdzJFApHmqFYlpjfpqBDnsE6dHUDLHejBrNgXftLfTf/ni5NySgXKnuntCCMdRtnTpjUKmkHiusGrBCf9b1rnA==}
-    engines: {node: '>=16.13'}
-    hasBin: true
-
   miniflare@3.20240909.2:
     resolution: {integrity: sha512-rZe7d0GkP02DnsgLD6qT+0K3O1azWCbDQIeHyH7WHJeyfkGPONS8U5FeNJEmus05z+2F6jcMI/Gc/Irc+UFTAA==}
     engines: {node: '>=16.13'}
@@ -2546,16 +2541,6 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  wrangler@3.78.2:
-    resolution: {integrity: sha512-PL7GchswGrNm2OvdSw5yG3ZAqNjpaQIO++p8E1TaCi63DSyssKFYeYqTvfFshsQPP2u1dox5JFXtLc6IE/m1xw==}
-    engines: {node: '>=16.17.0'}
-    hasBin: true
-    peerDependencies:
-      '@cloudflare/workers-types': ^4.20240909.0
-    peerDependenciesMeta:
-      '@cloudflare/workers-types':
-        optional: true
-
   wrangler@3.78.4:
     resolution: {integrity: sha512-tIzfqg9yLk1mCxD2jwczN24vVK1W5CQ+xDCBZPxI24qWyGH5nE0n5xMnS6eknXNw0bhKaHCN7bzfxpE3DP4lPg==}
     engines: {node: '>=16.17.0'}
@@ -3041,7 +3026,7 @@ snapshots:
     dependencies:
       mime: 3.0.0
 
-  '@cloudflare/vitest-pool-workers@0.5.2(@cloudflare/workers-types@4.20240909.0)(@vitest/runner@2.1.1)(@vitest/snapshot@2.1.1)(vitest@2.1.1(@types/node@20.16.5)(@vitest/ui@2.1.1))':
+  '@cloudflare/vitest-pool-workers@0.5.4(@cloudflare/workers-types@4.20240909.0)(@vitest/runner@2.1.1)(@vitest/snapshot@2.1.1)(vitest@2.1.1(@types/node@20.16.5)(@vitest/ui@2.1.1))':
     dependencies:
       '@vitest/runner': 2.1.1
       '@vitest/snapshot': 2.1.1
@@ -3049,10 +3034,10 @@ snapshots:
       cjs-module-lexer: 1.4.1
       devalue: 4.3.3
       esbuild: 0.17.19
-      miniflare: 3.20240909.1
+      miniflare: 3.20240909.2
       semver: 7.6.3
       vitest: 2.1.1(@types/node@20.16.5)(@vitest/ui@2.1.1)
-      wrangler: 3.78.2(@cloudflare/workers-types@4.20240909.0)
+      wrangler: 3.78.4(@cloudflare/workers-types@4.20240909.0)
       zod: 3.23.8
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
@@ -4531,25 +4516,6 @@ snapshots:
 
   mime@3.0.0: {}
 
-  miniflare@3.20240909.1:
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      acorn: 8.12.1
-      acorn-walk: 8.3.4
-      capnp-ts: 0.7.0
-      exit-hook: 2.2.1
-      glob-to-regexp: 0.4.1
-      stoppable: 1.1.0
-      undici: 5.28.4
-      workerd: 1.20240909.0
-      ws: 8.18.0
-      youch: 3.3.3
-      zod: 3.23.8
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-
   miniflare@3.20240909.2:
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
@@ -5207,34 +5173,6 @@ snapshots:
       '@cloudflare/workerd-linux-64': 1.20240909.0
       '@cloudflare/workerd-linux-arm64': 1.20240909.0
       '@cloudflare/workerd-windows-64': 1.20240909.0
-
-  wrangler@3.78.2(@cloudflare/workers-types@4.20240909.0):
-    dependencies:
-      '@cloudflare/kv-asset-handler': 0.3.4
-      '@cloudflare/workers-shared': 0.5.3
-      '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
-      '@esbuild-plugins/node-modules-polyfill': 0.2.2(esbuild@0.17.19)
-      blake3-wasm: 2.1.5
-      chokidar: 3.6.0
-      date-fns: 3.6.0
-      esbuild: 0.17.19
-      miniflare: 3.20240909.1
-      nanoid: 3.3.7
-      path-to-regexp: 6.3.0
-      resolve: 1.22.8
-      resolve.exports: 2.0.2
-      selfsigned: 2.4.1
-      source-map: 0.6.1
-      unenv: unenv-nightly@2.0.0-1724863496.70db6f1
-      workerd: 1.20240909.0
-      xxhash-wasm: 1.0.2
-    optionalDependencies:
-      '@cloudflare/workers-types': 4.20240909.0
-      fsevents: 2.3.3
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
 
   wrangler@3.78.4(@cloudflare/workers-types@4.20240909.0):
     dependencies:
