@@ -74,7 +74,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@types/node": "20.16.8"
+      "@types/node": "20.16.9"
     }
   },
   "packageManager": "pnpm@9.11.0"
