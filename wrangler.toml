@@ -1,6 +1,9 @@
 name = "turborepo-remote-cache"
 main = "src/index.ts"
-compatibility_date = "2024-09-20"
+compatibility_date = "2024-10-02"
+
+[observability]
+enabled = true
 
 [vars]
 ENVIRONMENT = 'production'

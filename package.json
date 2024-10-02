@@ -33,7 +33,7 @@
   "scripts": {
     "build": "wrangler deploy --dry-run --minify --outdir dist",
     "dev": "wrangler dev --test-scheduled",
-    "deploy": "wrangler deploy",
+    "deploy": "wrangler deploy --minify",
     "test": "vitest run --coverage",
     "test:ui": "vitest --coverage --ui",
     "test:watch": "vitest",
@@ -77,5 +77,5 @@
       "@types/node": "20.16.10"
     }
   },
-  "packageManager": "pnpm@9.11.0"
+  "packageManager": "pnpm@9.12.0"
 }

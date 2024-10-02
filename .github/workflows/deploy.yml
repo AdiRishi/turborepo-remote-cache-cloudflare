@@ -33,4 +33,4 @@ jobs:
             echo "******"
           secrets: |
             TURBO_TOKEN
-          command: 'deploy --minify'
+          command: deploy --minify
