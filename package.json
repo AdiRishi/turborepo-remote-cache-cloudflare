@@ -47,7 +47,7 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.9",
-    "@cloudflare/vitest-pool-workers": "^0.5.13",
+    "@cloudflare/vitest-pool-workers": "^0.5.14",
     "@cloudflare/workers-types": "^4.20240925.0",
     "@eslint/js": "^9.11.1",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
