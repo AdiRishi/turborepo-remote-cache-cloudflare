@@ -28,8 +28,8 @@ importers:
         specifier: ^2.27.9
         version: 2.27.9
       '@cloudflare/vitest-pool-workers':
-        specifier: ^0.5.16
-        version: 0.5.16(@cloudflare/workers-types@4.20241004.0)(@vitest/runner@2.1.2)(@vitest/snapshot@2.1.2)(vitest@2.1.2)
+        specifier: ^0.5.17
+        version: 0.5.17(@cloudflare/workers-types@4.20241004.0)(@vitest/runner@2.1.2)(@vitest/snapshot@2.1.2)(vitest@2.1.2)
       '@cloudflare/workers-types':
         specifier: ^4.20241004.0
         version: 4.20241004.0
@@ -324,8 +324,8 @@ packages:
     resolution: {integrity: sha512-YLPHc8yASwjNkmcDMQMY35yiWjoKAKnhUbPRszBRS0YgH+IXtsMp61j+yTcnCE3oO2DgP0U3iejLC8FTtKDC8Q==}
     engines: {node: '>=16.13'}
 
-  '@cloudflare/vitest-pool-workers@0.5.16':
-    resolution: {integrity: sha512-djrFlOHEV2KB8H4lNMFHQE03J2F3c/H4x3Wp439gqRzc/zB20YUuJf4DSynqr1mqRmBleg2/2iQ+vVcR1mwGww==}
+  '@cloudflare/vitest-pool-workers@0.5.17':
+    resolution: {integrity: sha512-u5YdDmvsQFH4hP70mjGHGI9+ZxTZND8gnSIiIaiPEc83mg5wHMZ0AQfga6A86bfDuk/16mVkUxe/Qj7+ryaKXA==}
     peerDependencies:
       '@vitest/runner': 2.0.x - 2.1.x
       '@vitest/snapshot': 2.0.x - 2.1.x
@@ -2372,6 +2372,9 @@ packages:
   unenv-nightly@2.0.0-20240919-125358-9a64854:
     resolution: {integrity: sha512-XjsgUTrTHR7iw+k/SRTNjh6EQgwpC9voygnoCJo5kh4hKqsSDHUW84MhL9EsHTNfLctvVBHaSw8e2k3R2fKXsQ==}
 
+  unenv-nightly@2.0.0-20241009-125958-e8ea22f:
+    resolution: {integrity: sha512-hRxmKz1iSVRmuFx/vBdPsx7rX4o7Cas9vdjDNeUeWpQTK2LzU3Xy3Jz0zbo7MJX0bpqo/LEFCA+GPwsbl6zKEQ==}
+
   unist-util-is@6.0.0:
     resolution: {integrity: sha512-2qCTHimwdxLfz+YzdGfkqNlH0tLi9xjTnHddPmJwtIG9MGsdbutfTc4P+haPD7l7Cjxf/WZj+we5qfVPvvxfYw==}
 
@@ -2545,6 +2548,16 @@ packages:
 
   wrangler@3.80.2:
     resolution: {integrity: sha512-WSMDXoNcg+DjZ4i0RMJpz2TKrCbTtsxNsQAwyYg7LRZlfmTZQZOPbHWhATVa4fCsNL6eElN050fMHOW9MptM9g==}
+    engines: {node: '>=16.17.0'}
+    hasBin: true
+    peerDependencies:
+      '@cloudflare/workers-types': ^4.20240925.0
+    peerDependenciesMeta:
+      '@cloudflare/workers-types':
+        optional: true
+
+  wrangler@3.80.3:
+    resolution: {integrity: sha512-Qe/7Sp8Vf7LYrdLPVsQFznac/1FweLI4aRgHmdCr6SCP5V81PP5ArogQX6BcuZ1tHvtNLNk4B4JC39awJdZvUg==}
     engines: {node: '>=16.17.0'}
     hasBin: true
     peerDependencies:
@@ -3026,7 +3039,7 @@ snapshots:
     dependencies:
       mime: 3.0.0
 
-  '@cloudflare/vitest-pool-workers@0.5.16(@cloudflare/workers-types@4.20241004.0)(@vitest/runner@2.1.2)(@vitest/snapshot@2.1.2)(vitest@2.1.2)':
+  '@cloudflare/vitest-pool-workers@0.5.17(@cloudflare/workers-types@4.20241004.0)(@vitest/runner@2.1.2)(@vitest/snapshot@2.1.2)(vitest@2.1.2)':
     dependencies:
       '@vitest/runner': 2.1.2
       '@vitest/snapshot': 2.1.2
@@ -3037,7 +3050,7 @@ snapshots:
       miniflare: 3.20240925.1
       semver: 7.6.3
       vitest: 2.1.2(@types/node@20.16.11)(@vitest/ui@2.1.2)
-      wrangler: 3.80.2(@cloudflare/workers-types@4.20241004.0)
+      wrangler: 3.80.3(@cloudflare/workers-types@4.20241004.0)
       zod: 3.23.8
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
@@ -4966,6 +4979,13 @@ snapshots:
       pathe: 1.1.2
       ufo: 1.5.4
 
+  unenv-nightly@2.0.0-20241009-125958-e8ea22f:
+    dependencies:
+      defu: 6.1.4
+      ohash: 1.1.4
+      pathe: 1.1.2
+      ufo: 1.5.4
+
   unist-util-is@6.0.0:
     dependencies:
       '@types/unist': 3.0.3
@@ -5197,6 +5217,33 @@ snapshots:
       selfsigned: 2.4.1
       source-map: 0.6.1
       unenv: unenv-nightly@2.0.0-20240919-125358-9a64854
+      workerd: 1.20240925.0
+      xxhash-wasm: 1.0.2
+    optionalDependencies:
+      '@cloudflare/workers-types': 4.20241004.0
+      fsevents: 2.3.3
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  wrangler@3.80.3(@cloudflare/workers-types@4.20241004.0):
+    dependencies:
+      '@cloudflare/kv-asset-handler': 0.3.4
+      '@cloudflare/workers-shared': 0.5.4
+      '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
+      '@esbuild-plugins/node-modules-polyfill': 0.2.2(esbuild@0.17.19)
+      blake3-wasm: 2.1.5
+      chokidar: 3.6.0
+      esbuild: 0.17.19
+      miniflare: 3.20240925.1
+      nanoid: 3.3.7
+      path-to-regexp: 6.3.0
+      resolve: 1.22.8
+      resolve.exports: 2.0.2
+      selfsigned: 2.4.1
+      source-map: 0.6.1
+      unenv: unenv-nightly@2.0.0-20241009-125958-e8ea22f
       workerd: 1.20240925.0
       xxhash-wasm: 1.0.2
     optionalDependencies:
