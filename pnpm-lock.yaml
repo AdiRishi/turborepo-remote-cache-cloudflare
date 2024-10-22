@@ -61,8 +61,8 @@ importers:
         specifier: ^5.2.1
         version: 5.2.1(@types/eslint@9.6.1)(eslint-config-prettier@9.1.0(eslint@9.13.0))(eslint@9.13.0)(prettier@3.3.3)
       miniflare:
-        specifier: ^3.20241011.0
-        version: 3.20241011.0
+        specifier: ^3.20241018.0
+        version: 3.20241018.0
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
