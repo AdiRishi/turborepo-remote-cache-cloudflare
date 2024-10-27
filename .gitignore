@@ -199,8 +199,8 @@ dist
 .pnp.\*
 
 # wrangler project
-
 .wrangler/
+build
 
 # turborepo
 .turbo

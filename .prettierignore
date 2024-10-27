@@ -6,6 +6,7 @@
 **/.nuxt
 **/.output
 **/dist
+**/build
 **/functions/*.js
 **/functions/*.js.map
 .wrangler/*

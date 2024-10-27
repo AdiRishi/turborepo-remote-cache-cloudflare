@@ -48,6 +48,7 @@ export default [
       'functions/*.js.*',
       '**/public',
       '**/dist',
+      '**/build',
       '**/coverage',
       '**/.wrangler',
       '**/.prettierrc.js',
