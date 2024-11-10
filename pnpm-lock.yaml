@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@hono/valibot-validator':
-        specifier: ^0.4.1
-        version: 0.4.1(hono@4.6.9)(valibot@0.42.1(typescript@5.6.3))
+        specifier: ^0.5.0
+        version: 0.5.0(hono@4.6.9)(valibot@0.42.1(typescript@5.6.3))
       hono:
         specifier: ^4.6.9
         version: 4.6.9
@@ -865,11 +865,11 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@hono/valibot-validator@0.4.1':
-    resolution: {integrity: sha512-yOxJfU//A6T5oceBz+SylwYCQEmbgvsLxjqereIBSnRABEbQpd1j7zKf4lBP8i7JP5zvrKsHZHLmcLa/TCh8Sw==}
+  '@hono/valibot-validator@0.5.0':
+    resolution: {integrity: sha512-4RLru9SRKaH5cla9vsYVwZ2x40TnvdlbZtk3RefMSJof/FyC3Ru90mdISpBEWNNs0CFxNtWfGqDdQzjV/E/mnw==}
     peerDependencies:
       hono: '>=3.9.0'
-      valibot: ^1.0.0 || ^1.0.0-beta || ^1.0.0-rc
+      valibot: ^1.0.0 || ^1.0.0-beta.4 || ^1.0.0-rc
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -3508,7 +3508,7 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/valibot-validator@0.4.1(hono@4.6.9)(valibot@0.42.1(typescript@5.6.3))':
+  '@hono/valibot-validator@0.5.0(hono@4.6.9)(valibot@0.42.1(typescript@5.6.3))':
     dependencies:
       hono: 4.6.9
       valibot: 0.42.1(typescript@5.6.3)
