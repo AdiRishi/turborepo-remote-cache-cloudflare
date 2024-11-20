@@ -79,5 +79,5 @@
       "@types/node": "22.9.1"
     }
   },
-  "packageManager": "pnpm@9.13.2"
+  "packageManager": "pnpm@9.14.1"
 }
