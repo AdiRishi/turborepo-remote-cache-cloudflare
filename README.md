@@ -27,11 +27,11 @@ This project offers an open source implementation of the [Turborepo custom remot
 
 If you're a Turborepo user, this project offers compelling advantages:
 
--   💿 **Storage Options**: Choose between 🪣 [R2](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/r2-storage) or 🔑 [KV](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/kv-storage) storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
--   🚀 **Faster Builds**: Harness the power of remote caching to significantly speed up your builds
--   🌐 **Independence from Vercel**: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
--   🌍 **Global Deployment**: Code deploys instantly across the globe in over 300 countries, ensuring unmatched performance and reliability.
--   💰 **Affordable Start**: With Cloudflare Workers' [generous free tier](https://developers.cloudflare.com/workers/platform/pricing), you can make up to 100,000 requests every day at no cost. Even better Cloudflare has [zero egress fees](https://www.cloudflare.com/en-au/learning/cloud/what-are-data-egress-fees/) on it's platform, meaning you only pay for what you use.
+- 💿 **Storage Options**: Choose between 🪣 [R2](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/r2-storage) or 🔑 [KV](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/kv-storage) storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
+- 🚀 **Faster Builds**: Harness the power of remote caching to significantly speed up your builds
+- 🌐 **Independence from Vercel**: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
+- 🌍 **Global Deployment**: Code deploys instantly across the globe in over 300 countries, ensuring unmatched performance and reliability.
+- 💰 **Affordable Start**: With Cloudflare Workers' [generous free tier](https://developers.cloudflare.com/workers/platform/pricing), you can make up to 100,000 requests every day at no cost. Even better Cloudflare has [zero egress fees](https://www.cloudflare.com/en-au/learning/cloud/what-are-data-egress-fees/) on it's platform, meaning you only pay for what you use.
 
 ## ⚡️ Quick start
 
@@ -73,9 +73,9 @@ This project also supports one-click deploy via Cloudflare's deploy button. Use 
 
 In order to successfully run the [deploy](.github/workflows//deploy.yml) Github action you will need the following secrets
 
--   `CLOUDFLARE_API_TOKEN`
--   `CLOUDFLARE_ACCOUNT_ID`
--   `TURBO_TOKEN`
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `TURBO_TOKEN`
 
 For those who have forked this repository, feel free to delete the [release.yml](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/release.yml) workflow file. This is only used to automatically publish new releases of this repository to GitHub releases.
 
@@ -83,8 +83,8 @@ For those who have forked this repository, feel free to delete the [release.yml]
 
 This project sets up a [cron trigger](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for Cloudflare workers, which automatically deletes old cache files within the bound R2 bucket. This behavior can be customized:
 
--   To disable the automatic deletion, remove the [triggers] configuration in [wrangler.toml](./wrangler.toml)
--   To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.toml](./wrangler.toml) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
+- To disable the automatic deletion, remove the [triggers] configuration in [wrangler.toml](./wrangler.toml)
+- To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.toml](./wrangler.toml) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
 
 ## ▲ Setting up remote caching in your Turborepo project
 
@@ -122,11 +122,11 @@ TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
 
 Keep the following in mind
 
--   Replace `SECRET` and `YOUR_API_URL` with your chosen values.
--   Turborepo requires that the `TURBO_API` value must not end with a trailing slash
--   The `TURBO_TEAM` value must begin with `team_`
--   Remember to add the `.env` file to `.gitignore`
--   If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
+- Replace `SECRET` and `YOUR_API_URL` with your chosen values.
+- Turborepo requires that the `TURBO_API` value must not end with a trailing slash
+- The `TURBO_TEAM` value must begin with `team_`
+- Remember to add the `.env` file to `.gitignore`
+- If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
 
 ### Step 4: Modify Turbo Commands
 

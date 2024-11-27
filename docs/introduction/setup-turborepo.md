@@ -38,11 +38,11 @@ TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
 
 Keep the following in mind
 
--   Replace `SECRET` and `YOUR_API_URL` with your chosen values.
--   Turborepo requires that the `TURBO_API` value must not end with a trailing slash
--   The `TURBO_TEAM` value must begin with `team_`
--   Remember to add the `.env` file to `.gitignore`
--   If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
+- Replace `SECRET` and `YOUR_API_URL` with your chosen values.
+- Turborepo requires that the `TURBO_API` value must not end with a trailing slash
+- The `TURBO_TEAM` value must begin with `team_`
+- Remember to add the `.env` file to `.gitignore`
+- If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
 
 ## Step 4: Modify Turbo Commands
 

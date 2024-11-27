@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Software Details (Please complete the following information)**
 
--   Turborepo version
+- Turborepo version
 
 **Additional context**
 Add any other context about the problem here.

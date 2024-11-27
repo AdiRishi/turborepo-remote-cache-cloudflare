@@ -37,9 +37,9 @@ If you went through the one-click deploy process, or decided to fork this reposi
 
 In order to successfully run the [deploy](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/deploy.yml) Github action you will need the following secrets
 
--   `CLOUDFLARE_API_TOKEN`
--   `CLOUDFLARE_ACCOUNT_ID`
--   `TURBO_TOKEN`
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `TURBO_TOKEN`
 
 For those who have forked this repository, feel free to delete the [release.yml](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/release.yml), [docs-pr-preview.yml](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/docs-pr-preview.yml) and [deploy-docs.yml](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/deploy-docs.yml) workflow fils. These are used as part of the main projects CI/CD pipeline and are not needed.
 
