@@ -34,7 +34,9 @@ export class StorageManager {
   public static async readableStreamToText(stream: ReadableStream): Promise<string> {
     return await new Response(stream).text();
   }
-  public static async readableStreamToBuffer(stream: ReadableStream): Promise<ArrayBuffer> {
+  public static async readableStreamToBuffer(
+    stream: ReadableStream
+  ): Promise<ArrayBuffer | ArrayBufferView> {
     return await new Response(stream).arrayBuffer();
   }
   public static textToReadableStream(text: string): ReadableStream {

@@ -121,7 +121,7 @@ describe('kv-storage', () => {
       const buffer = new TextEncoder().encode('value1');
       await storage.write('key1', buffer);
       const result = await storage.read('key1');
-      const dataAsBuffer = await StorageManager.readableStreamToBuffer(result!);
+      const dataAsBuffer = (await StorageManager.readableStreamToBuffer(result!)) as ArrayBuffer;
       const bufferView = new Uint8Array(dataAsBuffer);
       expect(bufferView).toEqual(new Uint8Array(buffer));
     });
