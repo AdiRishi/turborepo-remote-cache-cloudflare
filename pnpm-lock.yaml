@@ -85,8 +85,8 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(@types/node@22.10.1)(@vitest/ui@2.1.8)
       wrangler:
-        specifier: ^3.93.0
-        version: 3.93.0(@cloudflare/workers-types@4.20241205.0)
+        specifier: ^3.94.0
+        version: 3.94.0(@cloudflare/workers-types@4.20241205.0)
 
 packages:
 
@@ -362,10 +362,6 @@ packages:
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
-
-  '@cloudflare/workers-shared@0.10.0':
-    resolution: {integrity: sha512-j3EwZBc9ctavmFVOQT1gqztRO/Plx4ZR0LMEEOif+5YoCcuD1P7/NEjlODPMc5a1w+8+7A/H+Ci8Ihd55+x0Zw==}
-    engines: {node: '>=16.7.0'}
 
   '@cloudflare/workers-shared@0.11.0':
     resolution: {integrity: sha512-A+lQ8xp7992qSeMmuQ0ssL6CPmm+ZmAv6Ddikan0n1jjpMAic+97l7xtVIsswSn9iLMFPYQ9uNN/8Fl0AgARIQ==}
@@ -2657,16 +2653,6 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  wrangler@3.93.0:
-    resolution: {integrity: sha512-+wfxjOrtm6YgDS+NdJkB6aiBIS3ED97mNRQmfrEShRJW4pVo4sWY6oQ1FsGT+j4tGHplrTbWCE6U5yTgjNW/lw==}
-    engines: {node: '>=16.17.0'}
-    hasBin: true
-    peerDependencies:
-      '@cloudflare/workers-types': ^4.20241205.0
-    peerDependenciesMeta:
-      '@cloudflare/workers-types':
-        optional: true
-
   wrangler@3.94.0:
     resolution: {integrity: sha512-4yw8FKp6SI6WQkALnRlWYjehmgliaaMroLLnymWS9qHndjqrZIPZ16trrhl1HvAEDov/rIg0jZ4nxo5n6K0a/Q==}
     engines: {node: '>=16.17.0'}
@@ -3167,11 +3153,6 @@ snapshots:
 
   '@cloudflare/workerd-windows-64@1.20241205.0':
     optional: true
-
-  '@cloudflare/workers-shared@0.10.0':
-    dependencies:
-      mime: 3.0.0
-      zod: 3.23.8
 
   '@cloudflare/workers-shared@0.11.0':
     dependencies:
@@ -5344,34 +5325,6 @@ snapshots:
       '@cloudflare/workerd-linux-64': 1.20241205.0
       '@cloudflare/workerd-linux-arm64': 1.20241205.0
       '@cloudflare/workerd-windows-64': 1.20241205.0
-
-  wrangler@3.93.0(@cloudflare/workers-types@4.20241205.0):
-    dependencies:
-      '@cloudflare/kv-asset-handler': 0.3.4
-      '@cloudflare/workers-shared': 0.10.0
-      '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
-      '@esbuild-plugins/node-modules-polyfill': 0.2.2(esbuild@0.17.19)
-      blake3-wasm: 2.1.5
-      chokidar: 4.0.1
-      date-fns: 4.1.0
-      esbuild: 0.17.19
-      itty-time: 1.0.6
-      miniflare: 3.20241205.0
-      nanoid: 3.3.8
-      path-to-regexp: 6.3.0
-      resolve: 1.22.8
-      selfsigned: 2.4.1
-      source-map: 0.6.1
-      unenv: unenv-nightly@2.0.0-20241204-140205-a5d5190
-      workerd: 1.20241205.0
-      xxhash-wasm: 1.1.0
-    optionalDependencies:
-      '@cloudflare/workers-types': 4.20241205.0
-      fsevents: 2.3.3
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
 
   wrangler@3.94.0(@cloudflare/workers-types@4.20241205.0):
     dependencies:
