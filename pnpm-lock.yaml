@@ -31,7 +31,7 @@ importers:
         specifier: ^0.5.36
         version: 0.5.36(@cloudflare/workers-types@4.20241216.0)(@vitest/runner@2.1.8)(@vitest/snapshot@2.1.8)(vitest@2.1.8)
       '@cloudflare/workers-types':
-        specifier: ^4.20241214.0
+        specifier: ^4.20241216.0
         version: 4.20241216.0
       '@eslint/js':
         specifier: ^9.17.0
