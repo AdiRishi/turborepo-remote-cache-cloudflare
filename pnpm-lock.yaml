@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@hono/valibot-validator':
-        specifier: ^0.5.1
-        version: 0.5.1(hono@4.6.16)(valibot@0.42.1(typescript@5.7.2))
+        specifier: ^0.5.2
+        version: 0.5.2(hono@4.6.16)(valibot@0.42.1(typescript@5.7.2))
       hono:
         specifier: ^4.6.16
         version: 4.6.16
@@ -833,8 +833,8 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@hono/valibot-validator@0.5.1':
-    resolution: {integrity: sha512-TXNFh1jofWNCX9sOX2gyw6qCXuAKr4yk//hOf9Lc8vcdIhQXTRQY6RPkKwL/14EldoIngkLj3iMHTXXhjgMCWg==}
+  '@hono/valibot-validator@0.5.2':
+    resolution: {integrity: sha512-WbTr8PCFNAME0ale62rmmq+E8bGp5a7VPiVNmNT+Ue12GJE3Ax+CWBGtHhR0TzAEiloPvJND3IbjHIgtNtsqhw==}
     peerDependencies:
       hono: '>=3.9.0'
       valibot: ^1.0.0 || ^1.0.0-beta.4 || ^1.0.0-rc
@@ -3377,7 +3377,7 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/valibot-validator@0.5.1(hono@4.6.16)(valibot@0.42.1(typescript@5.7.2))':
+  '@hono/valibot-validator@0.5.2(hono@4.6.16)(valibot@0.42.1(typescript@5.7.2))':
     dependencies:
       hono: 4.6.16
       valibot: 0.42.1(typescript@5.7.2)
