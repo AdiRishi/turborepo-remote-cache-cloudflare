@@ -70,7 +70,7 @@
     "wrangler": "^3.99.0"
   },
   "dependencies": {
-    "@hono/valibot-validator": "^0.5.1",
+    "@hono/valibot-validator": "^0.5.2",
     "hono": "^4.6.16",
     "valibot": "^0.42.1"
   },
