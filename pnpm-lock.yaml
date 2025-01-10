@@ -64,8 +64,8 @@ importers:
         specifier: ^5.2.1
         version: 5.2.1(@types/eslint@9.6.1)(eslint-config-prettier@9.1.0(eslint@9.17.0))(eslint@9.17.0)(prettier@3.4.2)
       miniflare:
-        specifier: ^3.20241230.0
-        version: 3.20241230.0
+        specifier: ^3.20241230.1
+        version: 3.20241230.1
       prettier:
         specifier: ^3.4.2
         version: 3.4.2
@@ -1981,6 +1981,11 @@ packages:
 
   miniflare@3.20241230.0:
     resolution: {integrity: sha512-ZtWNoNAIj5Q0Vb3B4SPEKr7DDmVG8a0Stsp/AuRkYXoJniA5hsbKjFNIGhTXGMIHVP5bvDrKJWt/POIDGfpiKg==}
+    engines: {node: '>=16.13'}
+    hasBin: true
+
+  miniflare@3.20241230.1:
+    resolution: {integrity: sha512-CS6zm12IK7VQGAnypfqqfweVtRKwkz1k4E1cKuF04yCDsuKzkM1UkzCfKhD7cJdGwdEtdtRwq69kODeVFAl8og==}
     engines: {node: '>=16.13'}
     hasBin: true
 
@@ -4623,6 +4628,25 @@ snapshots:
   mime@3.0.0: {}
 
   miniflare@3.20241230.0:
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      acorn: 8.14.0
+      acorn-walk: 8.3.4
+      capnp-ts: 0.7.0
+      exit-hook: 2.2.1
+      glob-to-regexp: 0.4.1
+      stoppable: 1.1.0
+      undici: 5.28.4
+      workerd: 1.20241230.0
+      ws: 8.18.0
+      youch: 3.3.4
+      zod: 3.24.0
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  miniflare@3.20241230.1:
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       acorn: 8.14.0
