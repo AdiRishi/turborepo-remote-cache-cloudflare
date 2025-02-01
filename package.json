@@ -48,10 +48,10 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.12",
-    "@cloudflare/vitest-pool-workers": "^0.6.7",
-    "@cloudflare/workers-types": "^4.20250124.3",
+    "@cloudflare/vitest-pool-workers": "^0.6.11",
+    "@cloudflare/workers-types": "^4.20250129.0",
     "@eslint/js": "^9.19.0",
-    "@trivago/prettier-plugin-sort-imports": "^5.2.1",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/eslint": "^9.6.1",
     "@types/eslint__js": "^8.42.3",
     "@vitest/coverage-istanbul": "2.1.8",
@@ -60,23 +60,23 @@
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
-    "miniflare": "^3.20250124.0",
+    "miniflare": "^3.20250129.0",
     "prettier": "^3.4.2",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.21.0",
+    "typescript-eslint": "^8.22.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitepress": "1.6.3",
     "vitest": "2.1.8",
-    "wrangler": "^3.105.1"
+    "wrangler": "^3.107.2"
   },
   "dependencies": {
     "@hono/valibot-validator": "^0.5.2",
-    "hono": "^4.6.19",
+    "hono": "^4.6.20",
     "valibot": "^0.42.1"
   },
   "pnpm": {
     "overrides": {
-      "@types/node": "22.10.10"
+      "@types/node": "22.13.0"
     }
   },
   "packageManager": "pnpm@9.15.4"
