@@ -1,5 +1,11 @@
 # turborepo-remote-cache-cf
 
+## 4.0.0
+
+### Major Changes
+
+- [#633](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/633) [`9a4fe22`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/9a4fe22e4bfeb586e3f52eab0bd653f8aae65d9f) Thanks [@ItsWendell](https://github.com/ItsWendell)! - replace hono with hono/tiny and zod with valibot to decrease bundle size and improve performance
+
 ## 3.2.0
 
 ### Minor Changes
