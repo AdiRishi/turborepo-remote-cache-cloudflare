@@ -53,7 +53,6 @@
     "@eslint/js": "^9.21.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/eslint": "^9.6.1",
-    "@types/eslint__js": "^9.14.0",
     "@vitest/coverage-istanbul": "3.0.6",
     "@vitest/ui": "3.0.6",
     "esbuild": "^0.25.0",
