@@ -38,7 +38,7 @@ importers:
         version: 9.21.0
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^5.2.2
-        version: 5.2.2(@vue/compiler-sfc@3.5.13)(prettier@3.5.1)
+        version: 5.2.2(@vue/compiler-sfc@3.5.13)(prettier@3.5.2)
       '@types/eslint':
         specifier: ^9.6.1
         version: 9.6.1
@@ -59,13 +59,13 @@ importers:
         version: 10.0.1(eslint@9.21.0)
       eslint-plugin-prettier:
         specifier: ^5.2.3
-        version: 5.2.3(@types/eslint@9.6.1)(eslint-config-prettier@10.0.1(eslint@9.21.0))(eslint@9.21.0)(prettier@3.5.1)
+        version: 5.2.3(@types/eslint@9.6.1)(eslint-config-prettier@10.0.1(eslint@9.21.0))(eslint@9.21.0)(prettier@3.5.2)
       miniflare:
         specifier: ^3.20250214.0
         version: 3.20250214.0
       prettier:
-        specifier: ^3.5.1
-        version: 3.5.1
+        specifier: ^3.5.2
+        version: 3.5.2
       typescript:
         specifier: ^5.7.3
         version: 5.7.3
@@ -2415,8 +2415,8 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.5.1:
-    resolution: {integrity: sha512-hPpFQvHwL3Qv5AdRvBFMhnKo4tYxp0ReXiPn2bxkiohEX6mBeBwEpBSQTkD458RaaDKQMYSp4hX4UtfUTA5wDw==}
+  prettier@3.5.2:
+    resolution: {integrity: sha512-lc6npv5PH7hVqozBR7lkBNOGXV9vMwROAPlumdBkX0wTbbzPu/U1hk5yL8p2pt4Xoc+2mkT8t/sow2YrV/M5qg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -4000,7 +4000,7 @@ snapshots:
 
   '@shikijs/vscode-textmate@10.0.2': {}
 
-  '@trivago/prettier-plugin-sort-imports@5.2.2(@vue/compiler-sfc@3.5.13)(prettier@3.5.1)':
+  '@trivago/prettier-plugin-sort-imports@5.2.2(@vue/compiler-sfc@3.5.13)(prettier@3.5.2)':
     dependencies:
       '@babel/generator': 7.26.9
       '@babel/parser': 7.26.9
@@ -4008,7 +4008,7 @@ snapshots:
       '@babel/types': 7.26.9
       javascript-natural-sort: 0.7.1
       lodash: 4.17.21
-      prettier: 3.5.1
+      prettier: 3.5.2
     optionalDependencies:
       '@vue/compiler-sfc': 3.5.13
     transitivePeerDependencies:
@@ -4627,10 +4627,10 @@ snapshots:
     dependencies:
       eslint: 9.21.0
 
-  eslint-plugin-prettier@5.2.3(@types/eslint@9.6.1)(eslint-config-prettier@10.0.1(eslint@9.21.0))(eslint@9.21.0)(prettier@3.5.1):
+  eslint-plugin-prettier@5.2.3(@types/eslint@9.6.1)(eslint-config-prettier@10.0.1(eslint@9.21.0))(eslint@9.21.0)(prettier@3.5.2):
     dependencies:
       eslint: 9.21.0
-      prettier: 3.5.1
+      prettier: 3.5.2
       prettier-linter-helpers: 1.0.0
       synckit: 0.9.2
     optionalDependencies:
@@ -5224,7 +5224,7 @@ snapshots:
 
   prettier@2.8.8: {}
 
-  prettier@3.5.1: {}
+  prettier@3.5.2: {}
 
   printable-characters@1.0.42: {}
 
