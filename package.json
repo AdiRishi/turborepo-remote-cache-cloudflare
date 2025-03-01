@@ -48,25 +48,25 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.28.1",
-    "@cloudflare/vitest-pool-workers": "^0.7.1",
-    "@cloudflare/workers-types": "^4.20250214.0",
+    "@cloudflare/vitest-pool-workers": "^0.7.4",
+    "@cloudflare/workers-types": "^4.20250224.0",
     "@eslint/js": "^9.21.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/eslint": "^9.6.1",
-    "@vitest/coverage-istanbul": "3.0.6",
-    "@vitest/ui": "3.0.6",
+    "@vitest/coverage-istanbul": "3.0.7",
+    "@vitest/ui": "3.0.7",
     "esbuild": "^0.25.0",
     "eslint": "^9.21.0",
-    "eslint-config-prettier": "^10.0.1",
+    "eslint-config-prettier": "^10.0.2",
     "eslint-plugin-prettier": "^5.2.3",
-    "miniflare": "^3.20250214.0",
+    "miniflare": "^3.20250214.1",
     "prettier": "^3.5.2",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.1",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.25.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitepress": "1.6.3",
-    "vitest": "3.0.6",
-    "wrangler": "^3.109.2"
+    "vitest": "3.0.7",
+    "wrangler": "^3.111.0"
   },
   "dependencies": {
     "@hono/valibot-validator": "^0.5.2",
@@ -75,7 +75,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@types/node": "22.13.5"
+      "@types/node": "22.13.7"
     },
     "onlyBuiltDependencies": [
       "esbuild",
@@ -83,5 +83,5 @@
       "workerd"
     ]
   },
-  "packageManager": "pnpm@10.4.1"
+  "packageManager": "pnpm@10.5.2"
 }
