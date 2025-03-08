@@ -75,7 +75,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@types/node": "22.13.9"
+      "@types/node": "22.13.10"
     },
     "onlyBuiltDependencies": [
       "esbuild",
