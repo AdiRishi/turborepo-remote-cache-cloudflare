@@ -48,21 +48,21 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.28.1",
-    "@cloudflare/vitest-pool-workers": "^0.7.7",
-    "@cloudflare/workers-types": "^4.20250303.0",
+    "@cloudflare/vitest-pool-workers": "^0.8.0",
+    "@cloudflare/workers-types": "^4.20250313.0",
     "@eslint/js": "^9.22.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/eslint": "^9.6.1",
     "@vitest/coverage-istanbul": "3.0.8",
     "@vitest/ui": "3.0.8",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.25.1",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
-    "miniflare": "^3.20250224.0",
+    "miniflare": "^4.20250310.0",
     "prettier": "^3.5.3",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.26.0",
+    "typescript-eslint": "^8.26.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitepress": "1.6.3",
     "vitest": "3.0.8",
@@ -83,5 +83,5 @@
       "workerd"
     ]
   },
-  "packageManager": "pnpm@10.6.1"
+  "packageManager": "pnpm@10.6.3"
 }
