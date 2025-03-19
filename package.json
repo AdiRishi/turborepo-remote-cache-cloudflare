@@ -71,7 +71,7 @@
   "dependencies": {
     "@hono/valibot-validator": "^0.5.2",
     "hono": "^4.7.4",
-    "valibot": "^0.42.1"
+    "valibot": "^1.0.0"
   },
   "pnpm": {
     "overrides": {
