@@ -1,6 +1,7 @@
+#:schema node_modules/wrangler/config-schema.json
 name = "turborepo-remote-cache"
 main = "src/index.ts"
-compatibility_date = "2025-02-14"
+compatibility_date = "2025-02-24"
 
 compatibility_flags = ["nodejs_compat"]
 

@@ -18,6 +18,7 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install
+      - run: pnpm build
 
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
@@ -33,4 +34,4 @@ jobs:
             echo "******"
           secrets: |
             TURBO_TOKEN
-          command: deploy --minify
+          command: deploy

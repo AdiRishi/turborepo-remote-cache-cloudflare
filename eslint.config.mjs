@@ -39,6 +39,7 @@ export default [
   {
     ignores: [
       '**/.eslintrc.json',
+      '**/eslint.config.mjs',
       '**/node_modules',
       '**/.nuxt',
       '**/.output',

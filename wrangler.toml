@@ -1,6 +1,9 @@
+#:schema node_modules/wrangler/config-schema.json
 name = "turborepo-remote-cache"
 main = "src/index.ts"
-compatibility_date = "2025-02-14"
+compatibility_date = "2025-02-24"
+
+upload_source_maps = true
 
 [observability]
 enabled = true
