@@ -46,22 +46,29 @@ You can find the list of regions and their codes [here](https://developers.cloud
 
 ## 2. Update Your Configuration
 
-Update your `wrangler.toml` file to include the R2 bucket details.
+Update your `wrangler.jsonc` file to include the R2 bucket details.
 
-```toml{6,8}
-name = "turborepo-remote-cache"
-# Other settings...
+```jsonc{5-11}
+{
+  "name": "turborepo-remote-cache",
+  // Other settings...
 
-[[r2_buckets]] // [!code focus]
-binding = 'R2_STORE' // [!code focus]
-bucket_name = 'your-bucket-name' // [!code focus]
-# Preview bucket can be the same as the main bucket // [!code focus]
-preview_bucket_name = 'your-preview-bucket-name' // [!code focus]
+  "r2_buckets": [
+    {
+      "binding": "R2_STORE",
+      "bucket_name": "your-bucket-name",
+      "preview_bucket_name": "your-preview-bucket-name"
+    }
+  ],
 
-# [[kv_namespaces]]
-# binding = "KV_STORE"
-# id = "ea20b0eb60f44b13b8d013eeace98ca2"
-# preview_id = "ea20b0eb60f44b13b8d013eeace98ca2"
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "KV_STORE",
+  //     "id": "ea20b0eb60f44b13b8d013eeace98ca2",
+  //     "preview_id": "ea20b0eb60f44b13b8d013eeace98ca2"
+  //   }
+  // ]
+}
 ```
 
 ::: info
@@ -70,5 +77,5 @@ If you want to use R2 as the store, ensure that the `kv_namespaces` section is c
 
 ## 3. Deploy Your Worker
 
-Once you've updated your Worker script and `wrangler.toml` file, deploy your Worker using the Wrangler CLI or your GitHub actions workflow.
+Once you've updated your Worker script and `wrangler.jsonc` file, deploy your Worker using the Wrangler CLI or your GitHub actions workflow.
 And that's it! Your build artifacts will now be stored in Cloudflare R2.

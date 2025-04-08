@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "turborepo-remote-cache",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-02-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ENVIRONMENT": "production",
+    // - TURBO_TOKEN (must a valid Bearer auth token)
+    // Run `echo <VALUE> | wrangler secret put <NAME>` for each of these
+    "BUCKET_OBJECT_EXPIRATION_HOURS": 720, // 30 days
+  },
+  "r2_buckets": [
+    {
+      "binding": "R2_STORE",
+      "bucket_name": "turborepo-cache",
+      "preview_bucket_name": "turborepo-cache-preview",
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV_STORE",
+      "id": "ea20b0eb60f44b13b8d013eeace98ca2",
+      "preview_id": "ea20b0eb60f44b13b8d013eeace98ca2",
+    },
+  ],
+  "triggers": {
+    "crons": ["0 3 * * *"],
+  },
+}

@@ -12,7 +12,7 @@ export default defineWorkersConfig({
           },
         },
         wrangler: {
-          configPath: './wrangler.vitest.toml',
+          configPath: './wrangler.vitest.jsonc',
         },
       },
     },
