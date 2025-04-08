@@ -39,21 +39,28 @@ kv_namespaces = [
 
 ## 2. Update Your Configuration
 
-Update your `wrangler.toml` file to include the KV namespace details.
+Update your `wrangler.jsonc` file to include the KV namespace details.
 
-```toml{11,12}
-name = "turborepo-remote-cache"
-# Other settings...
+```jsonc{11-16}
+{
+  "name": "turborepo-remote-cache",
+  // Other settings...
 
-# [[r2_buckets]]
-# binding = 'R2_STORE'
-# bucket_name = 'turborepo-cache'
-# preview_bucket_name = 'turborepo-cache-preview'
-
-[[kv_namespaces]] // [!code focus]
-binding = "KV_STORE" // [!code focus]
-id = "ea20b0eb60f44b13b8d013eeace98ca2" // [!code focus]
-preview_id = "ea20b0eb60f44b13b8d013eeace98ca2" // [!code focus]
+  // "r2_buckets": [
+  //   {
+  //     "binding": "R2_STORE",
+  //     "bucket_name": "turborepo-cache",
+  //     "preview_bucket_name": "turborepo-cache-preview"
+  //   }
+  // ],
+  "kv_namespaces": [
+    {
+      "binding": "KV_STORE",
+      "id": "ea20b0eb60f44b13b8d013eeace98ca2",
+      "preview_id": "ea20b0eb60f44b13b8d013eeace98ca2"
+    }
+  ]
+}
 ```
 
 ::: info
@@ -62,5 +69,5 @@ If you want to use KV as the store, ensure that the `r2_buckets` section is comm
 
 ## 3. Deploy Your Worker
 
-Once you've updated your Worker script and `wrangler.toml` file, deploy your Worker using the Wrangler CLI or your GitHub actions workflow.
+Once you've updated your Worker script and `wrangler.jsonc` file, deploy your Worker using the Wrangler CLI or your GitHub actions workflow.
 And that's it! Your build artifacts will now be stored in Cloudflare KV.

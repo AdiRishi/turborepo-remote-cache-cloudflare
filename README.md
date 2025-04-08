@@ -74,8 +74,8 @@ For those who have forked this repository, feel free to delete the [release.yml]
 
 This project sets up a [cron trigger](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for Cloudflare workers, which automatically deletes old cache files within the bound R2 bucket. This behavior can be customized:
 
-- To disable the automatic deletion, remove the [triggers] configuration in [wrangler.toml](./wrangler.toml)
-- To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.toml](./wrangler.toml) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
+- To disable the automatic deletion, remove the [triggers] configuration in [wrangler.jsonc](./wrangler.jsonc)
+- To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.jsonc](./wrangler.jsonc) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
 
 ## ▲ Setting up remote caching in your Turborepo project
 
