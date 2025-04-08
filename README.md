@@ -35,11 +35,11 @@ If you're a Turborepo user, this project offers compelling advantages:
 
 ## ⚡️ Quick start
 
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
+
 ### Deploy Using the CLI
 
-The fastest and easiest way to deploy this project is with [wrangler](https://developers.cloudflare.com/workers/wrangler/) (cloudflare's CLI tool for managing workers).
-
-This project already comes with wrangler installed and configured, so all you need to do is clone this repository and run `pnpm run deploy`.
+This project already comes with [wrangler](https://developers.cloudflare.com/workers/wrangler/) (cloudflare's CLI tool for managing works) installed and configured, so all you need to do is clone this repository and run `pnpm run deploy`.
 
 ```sh
 # 1. Clone the repository
@@ -57,15 +57,6 @@ pnpm run deploy
 # 5. Set a Bearer auth token
 echo "SECRET" | pnpm wrangler secret put TURBO_TOKEN
 ```
-
-### Deploy using Cloudflare's deploy button
-
-This project also supports one-click deploy via Cloudflare's deploy button. Use this option only if you already have a Cloudflare account and have used R2 buckets before.
-
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
-
-> [!WARNING]
-> The deploy button workflow has some bugs/gotchas that may catch people new to Cloudflare's ecosystem off guard (see https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/issues/258 or [our docs](https://adirishi.github.io/turborepo-remote-cache-cloudflare/introduction/getting-started#one-click-deploy)). It's recommended to use the CLI method if you're new to Cloudflare.
 
 ## ⚙️ Configuration
 
