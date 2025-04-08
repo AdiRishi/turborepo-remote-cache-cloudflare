@@ -41,7 +41,7 @@ kv_namespaces = [
 
 Update your `wrangler.jsonc` file to include the KV namespace details.
 
-```jsonc{12-17}
+```jsonc{12-18}
 {
   "name": "turborepo-remote-cache",
   // Other settings...
