@@ -61,7 +61,7 @@
     "eslint-plugin-prettier": "^5.4.1",
     "miniflare": "^4.20250525.1",
     "prettier": "^3.5.3",
-    "rollup-plugin-visualizer": "^6.0.1",
+    "rollup-plugin-visualizer": "^6.0.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.33.1",
     "vite": "^6.3.5",
