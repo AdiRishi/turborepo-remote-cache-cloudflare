@@ -117,7 +117,7 @@ describe('r2-storage', () => {
     });
 
     test('can write ArrayBuffer value', async () => {
-      const buffer = new TextEncoder().encode('value1');
+      const buffer = new TextEncoder().encode('value1').buffer;
       await storage.write('key1', buffer);
       const result = await storage.read('key1');
       const dataAsBuffer = (await StorageManager.readableStreamToBuffer(result!)) as ArrayBuffer;
