@@ -1,0 +1,27 @@
+---
+alwaysApply: true
+description: High-level project structure and navigation for the Cloudflare Workers-based Turborepo Remote Cache
+---
+
+## Overview
+
+- **Entry & lifecycle**: The worker entry is [src/index.ts](mdc:src/index.ts). It exports `workerHandler` with `fetch` and `scheduled`, and defines the `Env` bindings shape.
+- **Routers**: Main app router in [src/routes/index.ts](mdc:src/routes/index.ts) mounts API groups:
+    - V8 API: [src/routes/v8/index.ts](mdc:src/routes/v8/index.ts), [src/routes/v8/artifacts.ts](mdc:src/routes/v8/artifacts.ts)
+    - Internal admin: [src/routes/internal.ts](mdc:src/routes/internal.ts)
+- **Storage**: Abstractions in [src/storage/storage-manager.ts](mdc:src/storage/storage-manager.ts) with R2 and KV implementations:
+    - R2: [src/storage/r2-storage.ts](mdc:src/storage/r2-storage.ts)
+    - KV: [src/storage/kv-storage.ts](mdc:src/storage/kv-storage.ts)
+    - Types: [src/storage/interface.d.ts](mdc:src/storage/interface.d.ts)
+- **Background jobs**: Cleanup cron in [src/crons/deleteOldCache.ts](mdc:src/crons/deleteOldCache.ts)
+- **Configuration**: Worker config in [wrangler.jsonc](mdc:wrangler.jsonc) and test config in [wrangler.vitest.jsonc](mdc:wrangler.vitest.jsonc)
+- **Tests**: Start at [tests/index.test.ts](mdc:tests/index.test.ts) and related suites under `tests/`
+- **Docs**: Site sources under `docs/` (e.g. [docs/index.md](mdc:docs/index.md))
+
+## Tech choices
+
+- **Runtime**: Cloudflare Workers (Hono `tiny` runtime)
+- **Routing**: Hono with CORS and valibot validation
+- **Storage**: Cloudflare R2 or KV, selected at runtime
+- **TypeScript**: Strict mode via [tsconfig.json](mdc:tsconfig.json)
+- **Tooling**: Vite, Vitest (Workers pool), ESLint + Prettier

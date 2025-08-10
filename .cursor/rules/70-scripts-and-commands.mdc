@@ -1,0 +1,19 @@
+---
+globs: package.json
+description: Common scripts and commands
+---
+
+## Scripts (pnpm)
+
+- Build/serve: `pnpm build`, `pnpm dev`, `pnpm preview`
+- Deploy: `pnpm deploy` (wrangler deploy)
+- Tests: `pnpm test`, `pnpm test:watch`, `pnpm test:ui`
+- Lint/format: `pnpm lint`, `pnpm format`, `pnpm typecheck`
+- Docs: `pnpm docs:dev`, `pnpm docs:build`, `pnpm docs:preview`
+
+## Cloudflare setup snippets
+
+- Create R2 bucket: `pnpm wrangler r2 bucket create turborepo-cache`
+- Set secret: `echo "SECRET" | pnpm wrangler secret put TURBO_TOKEN`
+
+See [package.json](mdc:package.json) and [README.md](mdc:README.md) for details.

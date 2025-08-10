@@ -1,0 +1,43 @@
+---
+globs: src/routes/**/*.ts
+description: Routing conventions with Hono, CORS, validation and auth
+---
+
+## Conventions
+
+- Routers are built with `Hono` (tiny runtime) and typed as `Hono<{ Bindings: Env }>()`
+- Global CORS and error handling in [src/routes/index.ts](mdc:src/routes/index.ts)
+- Input validation via `@hono/valibot-validator` and `valibot`
+- Protected routers use `bearerAuth` with `c.env.TURBO_TOKEN`
+
+## Mounted routes
+
+- `/v8` → [src/routes/v8/index.ts](mdc:src/routes/v8/index.ts)
+    - `/artifacts` → [src/routes/v8/artifacts.ts](mdc:src/routes/v8/artifacts.ts)
+- `/internal` → [src/routes/internal.ts](mdc:src/routes/internal.ts)
+
+## Notable endpoints
+
+- `GET /ping`: health check
+- `GET /`: HTML landing page linking to docs
+
+### V8 Artifacts
+
+- `PUT /v8/artifacts/:artifactId`
+    - Headers: `content-type: application/octet-stream` and optional `x-artifact-tag`, `x-artifact-duration`, etc.
+    - Query: `teamId` or `slug`; fallback to `DEFAULT_TEAM_ID`
+    - Stores data at key `${teamId}/${artifactId}` using active storage
+    - Returns `202` with `urls` echo
+- `GET|HEAD /v8/artifacts/:artifactId`
+    - Reads from `${teamId}/${artifactId}` and returns the stream with `x-artifact-tag` if present
+    - Cached via `hono/cache` with SWR headers
+- `GET /v8/artifacts/status`
+    - Returns `{ status: 'enabled' }`
+- `POST /v8/artifacts/events`
+    - Accepts event batch; currently a no-op placeholder
+
+### Internal
+
+- `POST /internal/delete-expired-objects` (json: `{ expireInHours?: number }`)
+- `POST /internal/populate-random-objects` (json: `{ count: 1..1000 }`)
+- `GET /internal/count-objects` → counts all stored keys

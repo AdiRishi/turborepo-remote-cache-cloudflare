@@ -1,0 +1,16 @@
+---
+globs: src/crons/*.ts,wrangler.jsonc
+description: Cache cleanup job, batching strategy, and configuration
+---
+
+## Job: delete old cache
+
+- Logic in [src/crons/deleteOldCache.ts](mdc:src/crons/deleteOldCache.ts)
+- Uses `listWithMetadata` pagination with `CURSOR_SIZE = 500`
+- Two-phase deletion to avoid list truncation while iterating
+- Deletes keys whose `staticMetadata.createdAt` is older than `BUCKET_OBJECT_EXPIRATION_HOURS`
+
+## Scheduling
+
+- Cron configured in [wrangler.jsonc](mdc:wrangler.jsonc) at `0 3 * * *`
+- To disable, remove the `triggers` section; to change retention, set `BUCKET_OBJECT_EXPIRATION_HOURS`

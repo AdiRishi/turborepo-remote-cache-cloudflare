@@ -1,0 +1,17 @@
+---
+globs: tests/**/*.ts,vitest.config.ts,wrangler.vitest.jsonc
+description: Testing in Workers using Vitest + @cloudflare/vitest-pool-workers
+---
+
+## Configuration
+
+- Vitest config: [vitest.config.ts](mdc:vitest.config.ts)
+    - Uses Workers pool with Miniflare/Wrangler
+    - Binds `ENVIRONMENT: 'testing'`
+    - Coverage provider: Istanbul
+- Worker test bindings: [wrangler.vitest.jsonc](mdc:wrangler.vitest.jsonc)
+
+## Conventions
+
+- Tests live under `tests/**` (e.g. [tests/routes/v8/artifacts.test.ts](mdc:tests/routes/v8/artifacts.test.ts))
+- Run tests: `pnpm test` (CI-friendly) or `pnpm test:watch`

@@ -1,0 +1,34 @@
+---
+globs: src/storage/**/*.ts
+description: Storage abstractions, metadata model, and selection rules (R2 vs KV)
+---
+
+## Abstractions
+
+- Interface and types in [src/storage/interface.d.ts](mdc:src/storage/interface.d.ts)
+    - `StorageInterface` exposes `list`, `listWithMetadata`, `read(WithMetadata)`, `write`, `delete`
+    - `Metadata` has `staticMetadata.createdAt: Date` and `customMetadata: Record<string,string>`
+
+## Implementations
+
+- R2: [src/storage/r2-storage.ts](mdc:src/storage/r2-storage.ts)
+    - `listWithMetadata` requests `include: ['customMetadata']`
+    - `createdAt` = `R2Object.uploaded`, `customMetadata` passes through
+- KV: [src/storage/kv-storage.ts](mdc:src/storage/kv-storage.ts)
+    - Persists `{ createdAtEpochMilliseconds, customMetadata }` in KV metadata
+    - `expirationTtl` is derived from `BUCKET_OBJECT_EXPIRATION_HOURS` if provided
+
+## Selection
+
+- Manager: [src/storage/storage-manager.ts](mdc:src/storage/storage-manager.ts)
+    - Prefers KV when available; otherwise R2
+    - Attaches `StorageManager` to `env` in `fetch`/`scheduled`
+
+## Usage guidance
+
+- Compose artifact keys as `${teamId}/${artifactId}` (see [artifacts router](mdc:src/routes/v8/artifacts.ts))
+- Use `listWithMetadata` for cleanup/reporting; `list` for fast listing when metadata is not needed
+- Converting streams:
+    - `StorageManager.readableStreamToText(stream)`
+    - `StorageManager.readableStreamToBuffer(stream)`
+    - `StorageManager.textToReadableStream(text)`

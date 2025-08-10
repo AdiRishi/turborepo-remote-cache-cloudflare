@@ -1,0 +1,23 @@
+---
+globs: *.ts,*.tsx
+description: TypeScript, ESLint, and formatting standards for this repo
+---
+
+## TypeScript
+
+- Strict mode enabled (see [tsconfig.json](mdc:tsconfig.json)) with `lib: [ES2022, DOM]`
+- Module resolution: `Bundler`; module target: `es2022`
+- Workers types available via `@cloudflare/workers-types/experimental`
+
+## Linting & formatting
+
+- ESLint + Prettier configured in [eslint.config.mjs](mdc:eslint.config.mjs)
+- Key rules:
+    - `prettier/prettier`: error
+    - `@typescript-eslint/no-unused-vars`: underscore-prefixed names are ignored (`^_`)
+    - `@typescript-eslint/consistent-type-definitions`: off
+- Style guidance:
+    - Prefer descriptive names; avoid overly short identifiers
+    - Use early returns and handle edge-cases first
+    - Keep functions small and readable; avoid deep nesting
+    - Wrap long lines; avoid inline explanatory comments—document above blocks when needed

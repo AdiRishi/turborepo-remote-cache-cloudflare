@@ -1,0 +1,31 @@
+---
+globs: src/index.ts,wrangler.jsonc,wrangler.vitest.jsonc
+description: Cloudflare Worker bindings and environment usage
+---
+
+## Env bindings
+
+- Defined in [src/index.ts](mdc:src/index.ts) as `Env`:
+    - `ENVIRONMENT: 'development' | 'production'`
+    - `R2_STORE?: R2Bucket`
+    - `KV_STORE?: KVNamespace`
+    - `TURBO_TOKEN: string`
+    - `BUCKET_OBJECT_EXPIRATION_HOURS: number`
+    - `STORAGE_MANAGER: StorageManager`
+
+## Lifecycle
+
+- `fetch` attaches `StorageManager` to `env` and delegates to the app router
+- `scheduled` attaches `StorageManager` and executes the cleanup cron
+
+## Worker config
+
+- Primary config: [wrangler.jsonc](mdc:wrangler.jsonc)
+    - Sets `ENVIRONMENT`, `BUCKET_OBJECT_EXPIRATION_HOURS`, and R2 binding `R2_STORE`
+    - Cron trigger at `0 3 * * *`
+    - Set secrets like TURBO token with: `echo "TOKEN" | pnpm wrangler secret put TURBO_TOKEN`
+- Test config: [wrangler.vitest.jsonc](mdc:wrangler.vitest.jsonc) (enables `nodejs_compat`, adds KV binding for tests)
+
+## Accessing bindings
+
+- In Hono handlers, use `c.env` (typed via `Hono<{ Bindings: Env }>()`) to access bindings and `STORAGE_MANAGER`
