@@ -20,7 +20,7 @@ jobs:
           private_key: ${{ secrets.CHANGESETS_RELEASE_PRIVATE_KEY }}
 
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ steps.create_token.outputs.token }}
           fetch-depth: 0
