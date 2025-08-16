@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.1",
-    "@changesets/cli": "^2.29.5",
+    "@changesets/cli": "^2.29.6",
     "@cloudflare/vite-plugin": "^1.11.5",
     "@cloudflare/vitest-pool-workers": "^0.8.64",
     "@cloudflare/workers-types": "^4.20250816.0",
