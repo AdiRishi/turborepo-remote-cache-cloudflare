@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "turborepo-remote-cache",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-02-24",
+  "upload_source_maps": true,
+  "observability": {
+    "enabled": true,
+  },
+  "vars": {
+    "ENVIRONMENT": "production",
+    "BUCKET_OBJECT_EXPIRATION_HOURS": 720,
+    "S3_BUCKET_NAME": "your-turborepo-cache-bucket",
+    "S3_REGION": "us-east-1",
+  },
+  "triggers": {
+    "crons": ["0 3 * * *"],
+  },
+}

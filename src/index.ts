@@ -6,6 +6,10 @@ export type Env = {
   ENVIRONMENT: 'development' | 'production';
   R2_STORE?: R2Bucket;
   KV_STORE?: KVNamespace;
+  S3_ACCESS_KEY_ID?: string;
+  S3_SECRET_ACCESS_KEY?: string;
+  S3_BUCKET_NAME?: string;
+  S3_REGION?: string;
   TURBO_TOKEN: string;
   BUCKET_OBJECT_EXPIRATION_HOURS: number;
   STORAGE_MANAGER: StorageManager;
