@@ -7,7 +7,9 @@
     "cloudflare-workers",
     "vercel",
     "turborepo",
-    "cloudflare-r2"
+    "cloudflare-r2",
+    "amazon-s3",
+    "aws-s3"
   ],
   "version": "3.2.0",
   "author": {
@@ -72,6 +74,7 @@
   },
   "dependencies": {
     "@hono/valibot-validator": "^0.5.3",
+    "aws4fetch": "^1.0.20",
     "hono": "^4.9.2",
     "valibot": "^1.1.0"
   },
