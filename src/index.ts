@@ -6,6 +6,12 @@ export type Env = {
   ENVIRONMENT: 'development' | 'production';
   R2_STORE?: R2Bucket;
   KV_STORE?: KVNamespace;
+  // S3 credentials and configuration (used when neither KV nor R2 are configured)
+  AWS_ACCESS_KEY_ID?: string;
+  AWS_SECRET_ACCESS_KEY?: string;
+  AWS_REGION?: string;
+  S3_BUCKET?: string;
+  S3_ENDPOINT?: string; // optional custom endpoint for S3-compatible storage or testing
   TURBO_TOKEN: string;
   BUCKET_OBJECT_EXPIRATION_HOURS: number;
   STORAGE_MANAGER: StorageManager;

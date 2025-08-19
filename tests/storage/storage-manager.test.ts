@@ -1,7 +1,7 @@
 import { env } from 'cloudflare:test';
 import { beforeEach, describe, afterEach, test, expect, vi } from 'vitest';
 import { Env } from '~/index';
-import { R2Storage, KvStorage, StorageManager } from '~/storage';
+import { R2Storage, KvStorage, StorageManager, S3Storage } from '~/storage';
 
 describe('storage-manager', () => {
   let workerEnv: Required<Env>;
@@ -35,6 +35,21 @@ describe('storage-manager', () => {
   test('getActiveStorage() returns kv if both are available', () => {
     storageManager = new StorageManager(workerEnv);
     expect(storageManager.getActiveStorage()).toBeInstanceOf(KvStorage);
+  });
+
+  test('getActiveStorage() returns s3 if only s3 is configured', () => {
+    const s3OnlyEnv = {
+      ...workerEnv,
+      R2_STORE: undefined,
+      KV_STORE: undefined,
+      AWS_ACCESS_KEY_ID: 'test',
+      AWS_SECRET_ACCESS_KEY: 'test',
+      AWS_REGION: 'us-east-1',
+      S3_BUCKET: 'bucket',
+      S3_ENDPOINT: 'https://mock-s3.local',
+    } as unknown as Required<Env>;
+    storageManager = new StorageManager(s3OnlyEnv);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(S3Storage);
   });
 
   test('readableStreamToText() returns text from stream', async () => {

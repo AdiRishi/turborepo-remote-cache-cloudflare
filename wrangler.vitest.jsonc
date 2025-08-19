@@ -8,7 +8,7 @@
     "ENVIRONMENT": "production",
     // - TURBO_TOKEN (must a valid Bearer auth token)
     // Run `echo <VALUE> | wrangler secret put <NAME>` for each of these
-    "BUCKET_OBJECT_EXPIRATION_HOURS": 720, // 30 days
+    "BUCKET_OBJECT_EXPIRATION_HOURS": 720 // 30 days
   },
   "r2_buckets": [
     {

@@ -24,7 +24,7 @@ features:
       details: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
     - icon: 🪣
       title: Multiple Storage Options
-      details: Choose between R2 or KV storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
+      details: Choose between R2, KV, or S3 storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
     - icon: 💰
       title: Affordable Start
       details: With Cloudflare Workers' generous free tier and zero egress fees, you can make up to 100,000 requests every day at no cost.
