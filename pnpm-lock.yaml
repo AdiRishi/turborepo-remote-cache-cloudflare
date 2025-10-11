@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@hono/valibot-validator':
         specifier: ^0.5.3
-        version: 0.5.3(hono@4.9.10)(valibot@1.1.0(typescript@5.9.3))
+        version: 0.5.3(hono@4.9.11)(valibot@1.1.0(typescript@5.9.3))
       hono:
-        specifier: ^4.9.10
-        version: 4.9.10
+        specifier: ^4.9.11
+        version: 4.9.11
       valibot:
         specifier: ^1.1.0
         version: 1.1.0(typescript@5.9.3)
@@ -1965,8 +1965,8 @@ packages:
   hast-util-whitespace@3.0.0:
     resolution: {integrity: sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==}
 
-  hono@4.9.10:
-    resolution: {integrity: sha512-AlI15ijFyKTXR7eHo7QK7OR4RoKIedZvBuRjO8iy4zrxvlY5oFCdiRG/V/lFJHCNXJ0k72ATgnyzx8Yqa5arug==}
+  hono@4.9.11:
+    resolution: {integrity: sha512-MyJ4xop3boTyXl8bJBh4i20AAZTLM3AXUJphyrUb0CpgTKYb1N703z53XiKUKchGUpcPqiiYkiLOXA3kqK3icA==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -3657,9 +3657,9 @@ snapshots:
       '@eslint/core': 0.16.0
       levn: 0.4.1
 
-  '@hono/valibot-validator@0.5.3(hono@4.9.10)(valibot@1.1.0(typescript@5.9.3))':
+  '@hono/valibot-validator@0.5.3(hono@4.9.11)(valibot@1.1.0(typescript@5.9.3))':
     dependencies:
-      hono: 4.9.10
+      hono: 4.9.11
       valibot: 1.1.0(typescript@5.9.3)
 
   '@humanfs/core@0.19.1': {}
@@ -4804,7 +4804,7 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.4
 
-  hono@4.9.10: {}
+  hono@4.9.11: {}
 
   hookable@5.5.3: {}
 
