@@ -48,8 +48,8 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.29.7",
-    "@cloudflare/vite-plugin": "^1.13.14",
-    "@cloudflare/vitest-pool-workers": "^0.9.14",
+    "@cloudflare/vite-plugin": "^1.13.15",
+    "@cloudflare/vitest-pool-workers": "^0.10.0",
     "@cloudflare/workers-types": "^4.20251014.0",
     "@eslint/js": "^9.38.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
@@ -59,16 +59,16 @@
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
-    "miniflare": "^4.20251011.0",
+    "miniflare": "^4.20251011.1",
     "prettier": "^3.6.2",
     "rollup-plugin-visualizer": "^6.0.5",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
-    "vite": "^7.1.11",
+    "vite": "^7.1.12",
     "vite-tsconfig-paths": "^5.1.4",
     "vitepress": "1.6.4",
     "vitest": "3.2.4",
-    "wrangler": "^4.44.0"
+    "wrangler": "^4.45.0"
   },
   "dependencies": {
     "@hono/valibot-validator": "^0.5.3",
