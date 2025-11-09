@@ -52,7 +52,7 @@
     "@cloudflare/vitest-pool-workers": "^0.10.5",
     "@cloudflare/workers-types": "^4.20251109.0",
     "@eslint/js": "^9.39.1",
-    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/eslint": "^9.6.1",
     "@vitest/coverage-istanbul": "3.2.4",
     "@vitest/ui": "3.2.4",
