@@ -10,13 +10,13 @@ importers:
     dependencies:
       '@hono/valibot-validator':
         specifier: ^0.6.0
-        version: 0.6.0(hono@4.9.11)(valibot@1.1.0(typescript@5.9.3))
+        version: 0.6.0(hono@4.9.11)(valibot@1.2.0(typescript@5.9.3))
       hono:
         specifier: ^4.9.11
         version: 4.9.11
       valibot:
         specifier: ^1.1.0
-        version: 1.1.0(typescript@5.9.3)
+        version: 1.2.0(typescript@5.9.3)
     devDependencies:
       '@changesets/changelog-github':
         specifier: ^0.5.1
@@ -2682,8 +2682,8 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
-  valibot@1.1.0:
-    resolution: {integrity: sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw==}
+  valibot@1.2.0:
+    resolution: {integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -3659,10 +3659,10 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@hono/valibot-validator@0.6.0(hono@4.9.11)(valibot@1.1.0(typescript@5.9.3))':
+  '@hono/valibot-validator@0.6.0(hono@4.9.11)(valibot@1.2.0(typescript@5.9.3))':
     dependencies:
       hono: 4.9.11
-      valibot: 1.1.0(typescript@5.9.3)
+      valibot: 1.2.0(typescript@5.9.3)
 
   '@humanfs/core@0.19.1': {}
 
@@ -5488,7 +5488,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  valibot@1.1.0(typescript@5.9.3):
+  valibot@1.2.0(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
 
