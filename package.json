@@ -50,7 +50,7 @@
     "@changesets/cli": "^2.29.8",
     "@cloudflare/vite-plugin": "^1.20.1",
     "@cloudflare/vitest-pool-workers": "^0.12.1",
-    "@cloudflare/workers-types": "^4.20260109.0",
+    "@cloudflare/workers-types": "^4.20260111.0",
     "@eslint/js": "^9.39.2",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/eslint": "^9.6.1",
