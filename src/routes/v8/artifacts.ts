@@ -11,8 +11,9 @@ export const DEFAULT_TEAM_ID = 'team_default_team';
 export const artifactRouter = new Hono<{ Bindings: Env }>();
 
 artifactRouter.use('*', async (c, next) => {
-  const middleware = bearerAuth({ token: c.env.TURBO_TOKEN });
-  await middleware(c, next);
+  const bearer = bearerAuth({ token: c.env.TURBO_TOKEN });
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  return bearer(c, next);
 });
 
 const vCoerceNumber = () => v.pipe(v.unknown(), v.transform(Number), v.number());

@@ -9,8 +9,9 @@ import * as v from 'valibot';
 export const internalRouter = new Hono<{ Bindings: Env }>();
 
 internalRouter.use('*', async (c, next) => {
-  const middleware = bearerAuth({ token: c.env.TURBO_TOKEN });
-  await middleware(c, next);
+  const bearer = bearerAuth({ token: c.env.TURBO_TOKEN });
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  return bearer(c, next);
 });
 
 internalRouter.post(
