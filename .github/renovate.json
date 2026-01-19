@@ -13,6 +13,11 @@
     {
       "matchDepTypes": ["engines"],
       "enabled": false
+    },
+    {
+      "description": "Ignored packages (synced with .ncurc.json)",
+      "matchPackageNames": ["vitest", "@vitest/ui", "@vitest/coverage-istanbul"],
+      "enabled": false
     }
   ]
 }
