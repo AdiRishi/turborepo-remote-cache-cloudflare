@@ -54,8 +54,8 @@
     "@eslint/js": "^9.39.2",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/eslint": "^9.6.1",
-    "@vitest/coverage-istanbul": "^3.2.4",
-    "@vitest/ui": "^3.2.4",
+    "@vitest/coverage-istanbul": "^4.0.17",
+    "@vitest/ui": "^4.0.17",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
@@ -67,7 +67,7 @@
     "vite": "^7.3.1",
     "vite-tsconfig-paths": "^6.0.4",
     "vitepress": "1.6.4",
-    "vitest": "^3.2.4",
+    "vitest": "^4.0.17",
     "wrangler": "^4.59.2"
   },
   "dependencies": {
