@@ -1,5 +1,15 @@
 # turborepo-remote-cache-cf
 
+## 4.0.0
+
+### Major Changes
+
+- [#633](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/633) [`9a4fe22`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/9a4fe22e4bfeb586e3f52eab0bd653f8aae65d9f) Thanks [@ItsWendell](https://github.com/ItsWendell)! - replace hono with hono/tiny and zod with valibot to decrease bundle size and improve performance
+
+### Patch Changes
+
+- [#1049](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/1049) [`ce7af83`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/ce7af83542b1f36a8939ff0aed790f07af78d17a) Thanks [@AdiRishi](https://github.com/AdiRishi)! - Fix bearerAuth middleware usage by returning the middleware result instead of just awaiting it
+
 ## 3.2.0
 
 ### Minor Changes
