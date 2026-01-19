@@ -208,3 +208,6 @@ build
 # Vitepress
 docs/.vitepress/dist
 docs/.vitepress/cache
+
+# AI Agents
+.claude/settings.local.json
