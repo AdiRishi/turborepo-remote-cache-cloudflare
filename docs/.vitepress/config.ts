@@ -57,6 +57,7 @@ export default defineConfig({
           { text: 'Project Configuration', link: '/configuration/project-configuration' },
           { text: 'R2 Storage', link: '/configuration/r2-storage' },
           { text: 'KV Storage', link: '/configuration/kv-storage' },
+          { text: 'S3 Storage', link: '/configuration/s3-storage' },
         ],
       },
     ],
