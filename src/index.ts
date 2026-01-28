@@ -9,13 +9,17 @@ export type Env = {
   TURBO_TOKEN: string;
   BUCKET_OBJECT_EXPIRATION_HOURS: number;
   STORAGE_MANAGER: StorageManager;
+  // S3 configuration
+  S3_ACCESS_KEY_ID?: string;
+  S3_SECRET_ACCESS_KEY?: string;
+  S3_ENDPOINT?: string;
+  S3_REGION?: string;
 };
 
 export const workerHandler = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     try {
-      const storageManager = new StorageManager(env);
-      env.STORAGE_MANAGER = storageManager;
+      env.STORAGE_MANAGER = new StorageManager(env);
       return app.fetch(request, env, ctx);
     } catch (e: unknown) {
       return new Response(`Storage options not configured correctly: ${String(e)}`, {
@@ -24,8 +28,7 @@ export const workerHandler = {
     }
   },
   async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext) {
-    const storageManager = new StorageManager(env);
-    env.STORAGE_MANAGER = storageManager;
+    env.STORAGE_MANAGER = new StorageManager(env);
     await deleteOldCache(env);
   },
 };
