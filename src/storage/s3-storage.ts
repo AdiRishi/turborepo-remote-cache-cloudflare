@@ -1,5 +1,5 @@
+import { ListFilterOptions, Metadata, StorageInterface, WritableValue } from './interface';
 import { S3mini } from 's3mini';
-import { StorageInterface, ListFilterOptions, Metadata, WritableValue } from './interface';
 
 const METADATA_CREATED_AT_HEADER = 'x-amz-meta-createdat';
 const METADATA_CUSTOM_HEADER = 'x-amz-meta-custom';
@@ -12,32 +12,30 @@ export class S3Storage implements StorageInterface {
   }
 
   async listWithMetadata(options?: ListFilterOptions) {
-    const result = await this.s3Client.listObjectsPaged(
-      undefined, // delimiter
-      options?.prefix,
-      options?.limit,
-      options?.cursor
-    );
-
-    const objects = result?.objects ?? [];
+    const result = await this.listObjects(options);
 
     return {
-      keys: objects.map((obj) => ({
+      keys: result.objects.map((obj) => ({
         key: obj.Key,
-        metadata: {
-          staticMetadata: {
-            // Use LastModified as createdAt - acceptable for cache expiry since objects aren't modified
-            createdAt: obj.LastModified,
-          },
-          customMetadata: {},
-        } as Metadata,
+        // Use LastModified as createdAt - acceptable for cache expiry since objects aren't modified
+        metadata: this.createMetadataFromDate(obj.LastModified),
       })),
-      cursor: result?.nextContinuationToken,
-      truncated: !!result?.nextContinuationToken,
+      cursor: result.cursor,
+      truncated: result.truncated,
     };
   }
 
   async list(options?: ListFilterOptions) {
+    const result = await this.listObjects(options);
+
+    return {
+      keys: result.objects.map((obj) => obj.Key),
+      cursor: result.cursor,
+      truncated: result.truncated,
+    };
+  }
+
+  private async listObjects(options?: ListFilterOptions) {
     const result = await this.s3Client.listObjectsPaged(
       undefined, // delimiter
       options?.prefix,
@@ -45,10 +43,8 @@ export class S3Storage implements StorageInterface {
       options?.cursor
     );
 
-    const objects = result?.objects ?? [];
-
     return {
-      keys: objects.map((obj) => obj.Key),
+      objects: result?.objects ?? [],
       cursor: result?.nextContinuationToken,
       truncated: !!result?.nextContinuationToken,
     };
@@ -73,19 +69,17 @@ export class S3Storage implements StorageInterface {
   }
 
   async write(key: string, data: WritableValue, metadata?: Record<string, string>) {
+    const hasCustomMetadata = metadata && Object.keys(metadata).length > 0;
     const additionalHeaders: Record<string, string> = {
       [METADATA_CREATED_AT_HEADER]: new Date().toISOString(),
+      ...(hasCustomMetadata && { [METADATA_CUSTOM_HEADER]: JSON.stringify(metadata) }),
     };
-
-    if (metadata && Object.keys(metadata).length > 0) {
-      additionalHeaders[METADATA_CUSTOM_HEADER] = JSON.stringify(metadata);
-    }
 
     await this.s3Client.putAnyObject(
       key,
       data,
       'application/octet-stream',
-      undefined, // ssecHeaders
+      undefined,
       additionalHeaders
     );
   }
@@ -102,20 +96,26 @@ export class S3Storage implements StorageInterface {
   private extractMetadataFromHeaders(headers: Headers): Metadata {
     const createdAtStr = headers.get(METADATA_CREATED_AT_HEADER);
     const customMetadataStr = headers.get(METADATA_CUSTOM_HEADER);
+    const createdAt = createdAtStr ? new Date(createdAtStr) : new Date();
 
-    let customMetadata: Record<string, string> = {};
-    if (customMetadataStr) {
-      try {
-        customMetadata = JSON.parse(customMetadataStr) as Record<string, string>;
-      } catch {
-        // Ignore invalid JSON
-      }
+    return this.createMetadataFromDate(createdAt, this.parseCustomMetadata(customMetadataStr));
+  }
+
+  private parseCustomMetadata(json: string | null): Record<string, string> {
+    if (!json) return {};
+    try {
+      return JSON.parse(json) as Record<string, string>;
+    } catch {
+      return {};
     }
+  }
 
+  private createMetadataFromDate(
+    date: Date,
+    customMetadata: Record<string, string> = {}
+  ): Metadata {
     return {
-      staticMetadata: {
-        createdAt: createdAtStr ? new Date(createdAtStr) : new Date(),
-      },
+      staticMetadata: { createdAt: date },
       customMetadata,
     };
   }

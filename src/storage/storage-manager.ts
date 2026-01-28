@@ -1,43 +1,43 @@
-import { S3mini } from 's3mini';
 import { Env } from '..';
 import { StorageInterface } from './interface';
 import { KvStorage } from './kv-storage';
 import { R2Storage } from './r2-storage';
 import { S3Storage } from './s3-storage';
+import { S3mini } from 's3mini';
 
 export class StorageManager {
-  private r2Storage?: StorageInterface;
-  private kvStorage?: StorageInterface;
-  private s3Storage?: StorageInterface;
+  private activeStorage: StorageInterface;
 
-  private storageToUse: StorageInterface;
-
-  constructor(env: Env, s3Client?: S3mini) {
-    if (env.R2_STORE) {
-      this.r2Storage = new R2Storage(env.R2_STORE);
-    }
-    if (env.KV_STORE) {
-      this.kvStorage = new KvStorage(env.KV_STORE, env.BUCKET_OBJECT_EXPIRATION_HOURS);
-    }
-    if (s3Client) {
-      this.s3Storage = new S3Storage(s3Client);
-    }
-    if (!this.r2Storage && !this.kvStorage && !this.s3Storage) {
+  constructor(env: Env) {
+    // Priority: KV > R2 > S3
+    const storage = this.initializeStorage(env);
+    if (!storage) {
       throw new InvalidStorageError('No storage provided');
     }
+    this.activeStorage = storage;
+  }
 
-    // Priority: KV > R2 > S3
-    if (this.kvStorage) {
-      this.storageToUse = this.kvStorage;
-    } else if (this.r2Storage) {
-      this.storageToUse = this.r2Storage;
-    } else {
-      this.storageToUse = this.s3Storage!;
+  private initializeStorage(env: Env): StorageInterface | undefined {
+    if (env.KV_STORE) {
+      return new KvStorage(env.KV_STORE, env.BUCKET_OBJECT_EXPIRATION_HOURS);
     }
+    if (env.R2_STORE) {
+      return new R2Storage(env.R2_STORE);
+    }
+    if (env.S3_ACCESS_KEY_ID && env.S3_SECRET_ACCESS_KEY && env.S3_ENDPOINT) {
+      const s3Client = new S3mini({
+        accessKeyId: env.S3_ACCESS_KEY_ID,
+        secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+        endpoint: env.S3_ENDPOINT,
+        region: env.S3_REGION ?? 'auto',
+      });
+      return new S3Storage(s3Client);
+    }
+    return undefined;
   }
 
   public getActiveStorage(): StorageInterface {
-    return this.storageToUse;
+    return this.activeStorage;
   }
 
   public static async readableStreamToText(stream: ReadableStream): Promise<string> {
