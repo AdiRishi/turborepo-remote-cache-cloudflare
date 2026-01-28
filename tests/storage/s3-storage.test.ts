@@ -1,13 +1,44 @@
+import { S3mini } from 's3mini';
 import { beforeEach, afterEach, describe, test, expect, vi } from 'vitest';
 import { StorageManager } from '~/storage';
-import { S3Storage, S3Client } from '~/storage/s3-storage';
+import { S3Storage } from '~/storage/s3-storage';
+
+/**
+ * Mock S3 client store entry
+ */
+interface MockStoreEntry {
+  data: ArrayBuffer;
+  headers: Record<string, string>;
+  lastModified: Date;
+}
+
+/**
+ * Mock S3 client type - simplified interface for testing
+ */
+interface MockS3Client {
+  _store: Map<string, MockStoreEntry>;
+  putAnyObject: (
+    key: string,
+    data: string | ArrayBuffer | ReadableStream,
+    contentType?: string,
+    ssecHeaders?: Record<string, string>,
+    additionalHeaders?: Record<string, string>
+  ) => Promise<Response>;
+  getObjectResponse: (key: string) => Promise<Response | null>;
+  listObjectsPaged: (
+    delimiter?: string,
+    prefix?: string,
+    maxKeys?: number,
+    continuationToken?: string
+  ) => Promise<{ objects: { Key: string; LastModified: Date }[]; nextContinuationToken?: string }>;
+  deleteObject: (key: string) => Promise<boolean>;
+  deleteObjects: (keys: string[]) => Promise<boolean[]>;
+}
 
 /**
  * Creates a mock S3 client backed by an in-memory Map
  */
-function createMockS3Client(): S3Client & {
-  _store: Map<string, { data: ArrayBuffer; headers: Record<string, string>; lastModified: Date }>;
-} {
+function createMockS3Client(): MockS3Client {
   const store = new Map<
     string,
     { data: ArrayBuffer; headers: Record<string, string>; lastModified: Date }
@@ -110,13 +141,14 @@ function createMockS3Client(): S3Client & {
 }
 
 describe('s3-storage', () => {
-  let mockClient: ReturnType<typeof createMockS3Client>;
+  let mockClient: MockS3Client;
   let storage: S3Storage;
   let startTime: number;
 
   beforeEach(() => {
     mockClient = createMockS3Client();
-    storage = new S3Storage(mockClient);
+    // Cast to S3mini since we only implement the subset of methods S3Storage uses
+    storage = new S3Storage(mockClient as unknown as S3mini);
     startTime = Date.now();
     vi.useFakeTimers();
     vi.setSystemTime(startTime);

@@ -1,8 +1,7 @@
+import { S3mini } from 's3mini';
 import { deleteOldCache } from './crons/deleteOldCache';
 import { app } from './routes';
 import { StorageManager } from './storage';
-import { S3Client } from './storage/s3-storage';
-import { S3mini } from 's3mini';
 
 export type Env = {
   ENVIRONMENT: 'development' | 'production';
@@ -18,7 +17,7 @@ export type Env = {
   S3_REGION?: string;
 };
 
-function createS3Client(env: Env): S3Client | undefined {
+function createS3Client(env: Env): S3mini | undefined {
   if (!env.S3_ACCESS_KEY_ID || !env.S3_SECRET_ACCESS_KEY || !env.S3_ENDPOINT) {
     return undefined;
   }

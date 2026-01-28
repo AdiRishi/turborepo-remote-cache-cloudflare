@@ -1,46 +1,13 @@
+import { S3mini } from 's3mini';
 import { StorageInterface, ListFilterOptions, Metadata, WritableValue } from './interface';
-
-/**
- * S3 client interface - matches s3mini's API
- */
-export interface S3Client {
-  putAnyObject(
-    key: string,
-    data: string | ArrayBuffer | ReadableStream | Blob | File,
-    contentType?: string,
-    ssecHeaders?: {
-      'x-amz-server-side-encryption-customer-algorithm': string;
-      'x-amz-server-side-encryption-customer-key': string;
-      'x-amz-server-side-encryption-customer-key-md5': string;
-    },
-    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-    additionalHeaders?: { [k: `x-amz-${string}`]: string }
-  ): Promise<Response | { ok: boolean; status: number; headers: Map<string, string> }>;
-  getObjectResponse(key: string): Promise<Response | null>;
-  listObjectsPaged(
-    delimiter?: string,
-    prefix?: string,
-    maxKeys?: number,
-    continuationToken?: string
-  ): Promise<
-    | {
-        objects: { Key: string; LastModified: Date }[] | null;
-        nextContinuationToken?: string;
-      }
-    | null
-    | undefined
-  >;
-  deleteObject(key: string): Promise<boolean>;
-  deleteObjects(keys: string[]): Promise<boolean[]>;
-}
 
 const METADATA_CREATED_AT_HEADER = 'x-amz-meta-createdat';
 const METADATA_CUSTOM_HEADER = 'x-amz-meta-custom';
 
 export class S3Storage implements StorageInterface {
-  private s3Client: S3Client;
+  private s3Client: S3mini;
 
-  constructor(s3Client: S3Client) {
+  constructor(s3Client: S3mini) {
     this.s3Client = s3Client;
   }
 

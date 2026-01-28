@@ -1,8 +1,9 @@
+import { S3mini } from 's3mini';
 import { Env } from '..';
 import { StorageInterface } from './interface';
 import { KvStorage } from './kv-storage';
 import { R2Storage } from './r2-storage';
-import { S3Storage, S3Client } from './s3-storage';
+import { S3Storage } from './s3-storage';
 
 export class StorageManager {
   private r2Storage?: StorageInterface;
@@ -11,7 +12,7 @@ export class StorageManager {
 
   private storageToUse: StorageInterface;
 
-  constructor(env: Env, s3Client?: S3Client) {
+  constructor(env: Env, s3Client?: S3mini) {
     if (env.R2_STORE) {
       this.r2Storage = new R2Storage(env.R2_STORE);
     }
