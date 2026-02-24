@@ -10,7 +10,15 @@
   "vars": {
     "ENVIRONMENT": "production",
     // - TURBO_TOKEN (must a valid Bearer auth token)
+    // - AWS_ACCESS_KEY_ID (required for S3 backend)
+    // - AWS_SECRET_ACCESS_KEY (required for S3 backend)
     // Run `echo <VALUE> | wrangler secret put <NAME>` for each of these
+    // Optionally force a backend with "r2", "kv", or "s3"
+    // "STORAGE_BACKEND": "r2",
+    // Required when STORAGE_BACKEND is "s3" (or whenever S3 is configured)
+    // "S3_ENDPOINT": "https://your-bucket.s3.amazonaws.com",
+    // Optional S3 region (defaults to "us-east-1")
+    // "S3_REGION": "us-east-1",
     "BUCKET_OBJECT_EXPIRATION_HOURS": 720,
   },
   "r2_buckets": [
