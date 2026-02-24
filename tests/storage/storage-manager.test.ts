@@ -131,16 +131,54 @@ describe('storage-manager', () => {
     );
   });
 
-  test('getActiveStorage() throws if S3_ENDPOINT is configured without credentials', () => {
+  test('getActiveStorage() throws if s3 backend is required but credentials are missing', () => {
     const incompleteS3Env: Env = {
       ...workerEnv,
+      R2_STORE: undefined,
+      KV_STORE: undefined,
       S3_ENDPOINT: 'https://example.s3.amazonaws.com/my-bucket',
+      STORAGE_BACKEND: 's3',
       AWS_ACCESS_KEY_ID: undefined,
       AWS_SECRET_ACCESS_KEY: undefined,
     };
     expect(() => new StorageManager(incompleteS3Env)).toThrowError(
       'Incomplete S3 storage configuration: missing AWS_ACCESS_KEY_ID'
     );
+  });
+
+  test('getActiveStorage() does not validate S3 config when STORAGE_BACKEND is r2', () => {
+    const r2SelectedEnvWithPartialS3: Env = {
+      ...workerEnv,
+      STORAGE_BACKEND: 'r2',
+      S3_ENDPOINT: undefined,
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(r2SelectedEnvWithPartialS3);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(R2Storage);
+  });
+
+  test('getActiveStorage() does not validate S3 config when STORAGE_BACKEND is kv', () => {
+    const kvSelectedEnvWithPartialS3: Env = {
+      ...workerEnv,
+      STORAGE_BACKEND: 'kv',
+      S3_ENDPOINT: undefined,
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(kvSelectedEnvWithPartialS3);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(KvStorage);
+  });
+
+  test('getActiveStorage() does not validate S3 config when fallback selects r2', () => {
+    const fallbackR2EnvWithPartialS3: Env = {
+      ...workerEnv,
+      S3_ENDPOINT: undefined,
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(fallbackR2EnvWithPartialS3);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(R2Storage);
   });
 
   test('readableStreamToText() returns text from stream', async () => {

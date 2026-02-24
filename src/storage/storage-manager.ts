@@ -20,10 +20,12 @@ export class StorageManager {
     if (env.KV_STORE) {
       this.kvStorage = new KvStorage(env.KV_STORE, env.BUCKET_OBJECT_EXPIRATION_HOURS);
     }
-    this.s3Storage = this.createS3StorageIfConfigured(env);
 
     const selectedStorageBackend = this.getSelectedStorageBackend(env.STORAGE_BACKEND);
     if (selectedStorageBackend) {
+      if (selectedStorageBackend === 's3') {
+        this.s3Storage = this.createS3StorageIfConfigured(env);
+      }
       this.storageToUse = this.getStorageByBackend(selectedStorageBackend);
       return;
     }
@@ -36,6 +38,8 @@ export class StorageManager {
       this.storageToUse = this.kvStorage;
       return;
     }
+
+    this.s3Storage = this.createS3StorageIfConfigured(env);
     if (this.s3Storage) {
       this.storageToUse = this.s3Storage;
       return;
