@@ -1,7 +1,7 @@
 import { env } from 'cloudflare:test';
 import { beforeEach, describe, afterEach, test, expect, vi } from 'vitest';
 import { Env } from '~/index';
-import { R2Storage, KvStorage, StorageManager } from '~/storage';
+import { KvStorage, R2Storage, S3Storage, StorageManager } from '~/storage';
 
 describe('storage-manager', () => {
   let workerEnv: Required<Env>;
@@ -27,14 +27,158 @@ describe('storage-manager', () => {
     expect(storageManager.getActiveStorage()).toBeInstanceOf(KvStorage);
   });
 
+  test('getActiveStorage() returns s3 if only s3 is available', () => {
+    const s3OnlyEnv: Env = {
+      ...workerEnv,
+      R2_STORE: undefined,
+      KV_STORE: undefined,
+      S3_ENDPOINT: 'https://example.s3.amazonaws.com/my-bucket',
+      S3_REGION: 'us-east-1',
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(s3OnlyEnv);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(S3Storage);
+  });
+
   test('getActiveStorage() throws if no storage is available', () => {
-    const emptyEnv = { ...workerEnv, R2_STORE: undefined, KV_STORE: undefined };
+    const emptyEnv = {
+      ...workerEnv,
+      R2_STORE: undefined,
+      KV_STORE: undefined,
+      S3_ENDPOINT: undefined,
+      S3_REGION: undefined,
+      AWS_ACCESS_KEY_ID: undefined,
+      AWS_SECRET_ACCESS_KEY: undefined,
+    };
     expect(() => new StorageManager(emptyEnv)).toThrowError('No storage provided');
   });
 
-  test('getActiveStorage() returns kv if both are available', () => {
+  test('getActiveStorage() returns r2 if both r2 and kv are available', () => {
     storageManager = new StorageManager(workerEnv);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(R2Storage);
+  });
+
+  test('getActiveStorage() returns r2 if r2, kv, and s3 are all available', () => {
+    const allStorageEnv: Env = {
+      ...workerEnv,
+      S3_ENDPOINT: 'https://example.s3.amazonaws.com/my-bucket',
+      S3_REGION: 'us-east-1',
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(allStorageEnv);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(R2Storage);
+  });
+
+  test('getActiveStorage() respects STORAGE_BACKEND selector for kv', () => {
+    const kvSelectedEnv: Env = {
+      ...workerEnv,
+      STORAGE_BACKEND: 'kv',
+      S3_ENDPOINT: 'https://example.s3.amazonaws.com/my-bucket',
+      S3_REGION: 'us-east-1',
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(kvSelectedEnv);
     expect(storageManager.getActiveStorage()).toBeInstanceOf(KvStorage);
+  });
+
+  test('getActiveStorage() respects STORAGE_BACKEND selector for r2', () => {
+    const r2SelectedEnv: Env = {
+      ...workerEnv,
+      STORAGE_BACKEND: 'r2',
+      S3_ENDPOINT: 'https://example.s3.amazonaws.com/my-bucket',
+      S3_REGION: 'us-east-1',
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(r2SelectedEnv);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(R2Storage);
+  });
+
+  test('getActiveStorage() respects STORAGE_BACKEND selector for s3', () => {
+    const s3SelectedEnv: Env = {
+      ...workerEnv,
+      STORAGE_BACKEND: 's3',
+      S3_ENDPOINT: 'https://example.s3.amazonaws.com/my-bucket',
+      S3_REGION: 'us-east-1',
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(s3SelectedEnv);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(S3Storage);
+  });
+
+  test('getActiveStorage() throws if STORAGE_BACKEND points to backend that is not configured', () => {
+    const s3SelectedWithoutConfigEnv: Env = {
+      ...workerEnv,
+      STORAGE_BACKEND: 's3',
+      S3_ENDPOINT: undefined,
+      S3_REGION: undefined,
+      AWS_ACCESS_KEY_ID: undefined,
+      AWS_SECRET_ACCESS_KEY: undefined,
+    };
+    expect(() => new StorageManager(s3SelectedWithoutConfigEnv)).toThrowError(
+      'STORAGE_BACKEND is set to "s3" but this backend is not configured'
+    );
+  });
+
+  test('getActiveStorage() throws if STORAGE_BACKEND is invalid', () => {
+    const invalidBackendEnv = { ...workerEnv, STORAGE_BACKEND: 'not-a-storage' };
+    expect(() => new StorageManager(invalidBackendEnv as Env)).toThrowError(
+      'Invalid STORAGE_BACKEND value'
+    );
+  });
+
+  test('getActiveStorage() throws if s3 backend is required but credentials are missing', () => {
+    const incompleteS3Env: Env = {
+      ...workerEnv,
+      R2_STORE: undefined,
+      KV_STORE: undefined,
+      S3_ENDPOINT: 'https://example.s3.amazonaws.com/my-bucket',
+      STORAGE_BACKEND: 's3',
+      AWS_ACCESS_KEY_ID: undefined,
+      AWS_SECRET_ACCESS_KEY: undefined,
+    };
+    expect(() => new StorageManager(incompleteS3Env)).toThrowError(
+      'Incomplete S3 storage configuration: missing AWS_ACCESS_KEY_ID'
+    );
+  });
+
+  test('getActiveStorage() does not validate S3 config when STORAGE_BACKEND is r2', () => {
+    const r2SelectedEnvWithPartialS3: Env = {
+      ...workerEnv,
+      STORAGE_BACKEND: 'r2',
+      S3_ENDPOINT: undefined,
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(r2SelectedEnvWithPartialS3);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(R2Storage);
+  });
+
+  test('getActiveStorage() does not validate S3 config when STORAGE_BACKEND is kv', () => {
+    const kvSelectedEnvWithPartialS3: Env = {
+      ...workerEnv,
+      STORAGE_BACKEND: 'kv',
+      S3_ENDPOINT: undefined,
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(kvSelectedEnvWithPartialS3);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(KvStorage);
+  });
+
+  test('getActiveStorage() does not validate S3 config when fallback selects r2', () => {
+    const fallbackR2EnvWithPartialS3: Env = {
+      ...workerEnv,
+      S3_ENDPOINT: undefined,
+      AWS_ACCESS_KEY_ID: 'access-key-id',
+      AWS_SECRET_ACCESS_KEY: 'secret-access-key',
+    };
+    storageManager = new StorageManager(fallbackR2EnvWithPartialS3);
+    expect(storageManager.getActiveStorage()).toBeInstanceOf(R2Storage);
   });
 
   test('readableStreamToText() returns text from stream', async () => {
