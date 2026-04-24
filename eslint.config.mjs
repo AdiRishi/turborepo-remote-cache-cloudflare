@@ -53,6 +53,7 @@ export default [
       '**/coverage',
       '**/.wrangler',
       '**/.prettierrc.js',
+      'worker-configuration.d.ts',
     ],
   },
 ];

@@ -1,4 +1,4 @@
-import { env } from 'cloudflare:test';
+import { env } from 'cloudflare:workers';
 import { beforeEach, describe, afterEach, test, expect, vi } from 'vitest';
 import { Env } from '~/index';
 import { R2Storage, KvStorage, StorageManager } from '~/storage';

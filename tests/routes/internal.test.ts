@@ -1,4 +1,5 @@
-import { env, createExecutionContext } from 'cloudflare:test';
+import { createExecutionContext, reset } from 'cloudflare:test';
+import { env } from 'cloudflare:workers';
 import { describe, MockedFunction, afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { deleteOldCache } from '~/crons/deleteOldCache';
 import { Env, workerHandler } from '~/index';
@@ -17,13 +18,18 @@ describe('/internal Routes', () => {
   let ctx: ExecutionContext;
   const app = workerHandler;
 
+  beforeEach(async () => {
+    await reset();
+  });
+
   describe('/internal/delete-old-cache route', () => {
     beforeEach(() => {
-      workerEnv = env;
+      workerEnv = env as Env;
       ctx = createExecutionContext();
     });
 
     afterEach(() => {
+      vi.clearAllMocks();
       vi.restoreAllMocks();
     });
 
@@ -74,11 +80,12 @@ describe('/internal Routes', () => {
 
   describe('/internal/populate-random-objects route', () => {
     beforeEach(() => {
-      workerEnv = env;
+      workerEnv = env as Env;
       ctx = createExecutionContext();
     });
 
     afterEach(() => {
+      vi.clearAllMocks();
       vi.restoreAllMocks();
     });
 
@@ -115,11 +122,12 @@ describe('/internal Routes', () => {
 
   describe('/internal/count-objects route', () => {
     beforeEach(() => {
-      workerEnv = env;
+      workerEnv = env as Env;
       ctx = createExecutionContext();
     });
 
     afterEach(() => {
+      vi.clearAllMocks();
       vi.restoreAllMocks();
     });
 

@@ -1,6 +1,6 @@
 import '../src';
-import { env, createExecutionContext } from 'cloudflare:test';
-import { SELF } from 'cloudflare:test';
+import { createExecutionContext } from 'cloudflare:test';
+import { env } from 'cloudflare:workers';
 import { expect, it, describe, vi, type MockedFunction, beforeEach } from 'vitest';
 import { deleteOldCache } from '~/crons/deleteOldCache';
 import { Env, workerHandler } from '~/index';
@@ -20,12 +20,16 @@ describe('remote-cache worker', () => {
   let ctx: ExecutionContext;
 
   beforeEach(() => {
-    workerEnv = env;
+    workerEnv = env as Env;
     ctx = createExecutionContext();
   });
 
-  it('should respond to the ping route by simulating the worker', async () => {
-    const response = await SELF.fetch('https://turborepo-remote-cache.com/ping');
+  it('should respond to the ping route via invoking the worker handler', async () => {
+    const response = await workerHandler.fetch(
+      new Request('https://turborepo-remote-cache.com/ping'),
+      workerEnv,
+      ctx
+    );
     expect(response).toBeTruthy();
     expect(response.status).toBe(200);
     const text = await response.text();
@@ -60,7 +64,7 @@ describe('remote-cache scheduled event', () => {
   let ctx: ExecutionContext;
 
   beforeEach(() => {
-    workerEnv = env;
+    workerEnv = env as Env;
     ctx = createExecutionContext();
   });
 

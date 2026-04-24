@@ -1,21 +1,29 @@
-import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import { cloudflareTest } from '@cloudflare/vitest-pool-workers';
+import { defineConfig } from 'vitest/config';
 
-export default defineWorkersConfig({
-  plugins: [tsconfigPaths()],
-  test: {
-    poolOptions: {
-      workers: {
-        miniflare: {
-          bindings: {
-            ENVIRONMENT: 'testing',
-          },
-        },
-        wrangler: {
-          configPath: './wrangler.vitest.jsonc',
-        },
+const ciTimeout = process.env.CI ? 15_000 : undefined;
+
+export default defineConfig({
+  resolve: {
+    tsconfigPaths: true,
+  },
+  plugins: [
+    cloudflareTest({
+      wrangler: {
+        configPath: './wrangler.jsonc',
       },
-    },
+      miniflare: {
+        bindings: {
+          ENVIRONMENT: 'testing',
+          TURBO_TOKEN: 'test-token',
+        },
+        kvNamespaces: ['KV_STORE'],
+      },
+    }),
+  ],
+  test: {
+    hookTimeout: ciTimeout,
+    testTimeout: ciTimeout,
     reporters: ['verbose'],
     coverage: {
       provider: 'istanbul',
