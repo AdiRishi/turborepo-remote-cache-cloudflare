@@ -32,6 +32,7 @@
   },
   "scripts": {
     "build": "vite build",
+    "cf-typegen": "wrangler types",
     "dev": "vite",
     "preview": "vite preview",
     "deploy": "wrangler deploy",
@@ -47,33 +48,32 @@
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.6.0",
-    "@changesets/cli": "^2.30.0",
-    "@cloudflare/vite-plugin": "^1.26.0",
-    "@cloudflare/vitest-pool-workers": "^0.12.19",
-    "@cloudflare/workers-types": "^4.20260303.0",
+    "@changesets/cli": "^2.31.0",
+    "@cloudflare/vite-plugin": "^1.33.2",
+    "@cloudflare/vitest-pool-workers": "^0.15.0",
     "@eslint/js": "^10.0.1",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/eslint": "^9.6.1",
-    "@vitest/coverage-istanbul": "^3.2.4",
-    "@vitest/ui": "^3.2.4",
-    "eslint": "^10.0.2",
+    "@vitest/coverage-istanbul": "^4.1.5",
+    "@vitest/ui": "^4.1.5",
+    "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
-    "miniflare": "^4.20260302.0",
-    "prettier": "^3.8.1",
+    "miniflare": "^4.20260424.0",
+    "prettier": "^3.8.3",
     "rollup-plugin-visualizer": "^7.0.1",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.1",
-    "vite": "^7.3.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0",
+    "vite": "^8.0.10",
     "vite-tsconfig-paths": "^6.1.1",
     "vitepress": "2.0.0-alpha.16",
-    "vitest": "^3.2.4",
-    "wrangler": "^4.70.0"
+    "vitest": "^4.1.5",
+    "wrangler": "^4.85.0"
   },
   "dependencies": {
     "@hono/valibot-validator": "^0.6.1",
-    "hono": "^4.12.5",
-    "valibot": "^1.2.0"
+    "hono": "^4.12.15",
+    "valibot": "^1.3.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -82,5 +82,5 @@
       "workerd"
     ]
   },
-  "packageManager": "pnpm@10.30.3"
+  "packageManager": "pnpm@10.33.2"
 }

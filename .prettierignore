@@ -14,3 +14,4 @@
 .yarn
 pnpm-lock.yaml
 CHANGELOG.md
+worker-configuration.d.ts

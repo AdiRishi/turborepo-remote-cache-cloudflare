@@ -1,4 +1,5 @@
-import { env } from 'cloudflare:test';
+import { reset } from 'cloudflare:test';
+import { env } from 'cloudflare:workers';
 import { beforeEach, afterEach, describe, test, expect, vi } from 'vitest';
 import { Env } from '~/index';
 import { StorageManager } from '~/storage';
@@ -9,7 +10,8 @@ describe('r2-storage', () => {
   let storage: R2Storage;
   let startTime: number;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await reset();
     workerEnv = env as Required<Env>;
     storage = new R2Storage(workerEnv.R2_STORE);
     startTime = Date.now();

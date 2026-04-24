@@ -1,4 +1,5 @@
-import { env } from 'cloudflare:test';
+import { reset } from 'cloudflare:test';
+import { env } from 'cloudflare:workers';
 import { type MockedFunction, describe, test, expect, afterEach, beforeEach, vi } from 'vitest';
 import { CURSOR_SIZE, deleteOldCache } from '~/crons/deleteOldCache';
 import { Env } from '~/index';
@@ -22,8 +23,9 @@ describe('deleteOldCache', () => {
   const teamId = 'UNIQUE-teamId-' + Math.random();
   const artifactContent = '🎉😄😇';
 
-  beforeEach(() => {
-    workerEnv = env;
+  beforeEach(async () => {
+    await reset();
+    workerEnv = env as Env;
   });
 
   describe('r2 storage', () => {

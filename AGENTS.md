@@ -71,10 +71,11 @@ Deletes objects older than `BUCKET_OBJECT_EXPIRATION_HOURS` (default 720h/30 day
 
 ## Testing
 
-Uses Vitest with `@cloudflare/vitest-pool-workers` for Workers simulation. Test config (`wrangler.vitest.jsonc`) provides both R2 and KV bindings.
+Uses Vitest with `@cloudflare/vitest-pool-workers` for Workers simulation. The Vitest config uses the `cloudflareTest()` plugin with `wrangler.jsonc` plus Miniflare overrides for test-only bindings like `KV_STORE`.
 
 ```typescript
-import { createExecutionContext, env } from 'cloudflare:test';
+import { createExecutionContext } from 'cloudflare:test';
+import { env } from 'cloudflare:workers';
 import { workerHandler } from '~/index';
 import { StorageManager } from '~/storage';
 

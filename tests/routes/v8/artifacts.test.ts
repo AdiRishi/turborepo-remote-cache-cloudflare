@@ -1,5 +1,5 @@
-import { createExecutionContext } from 'cloudflare:test';
-import { env } from 'cloudflare:test';
+import { createExecutionContext, reset } from 'cloudflare:test';
+import { env } from 'cloudflare:workers';
 import { describe, beforeEach, expect, test } from 'vitest';
 import { Env, workerHandler } from '~/index';
 import { DEFAULT_TEAM_ID } from '~/routes/v8/artifacts';
@@ -14,9 +14,13 @@ describe('v8 Artifacts API', () => {
   const teamId = 'UNIQUE-teamId-' + Math.random();
   const artifactContent = '🎉😄😇';
 
+  beforeEach(async () => {
+    await reset();
+  });
+
   describe('GET artifact endpoint', () => {
     beforeEach(async () => {
-      workerEnv = env;
+      workerEnv = env as Env;
       workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
       ctx = createExecutionContext();
       await workerEnv.STORAGE_MANAGER.getActiveStorage().write(
@@ -121,7 +125,7 @@ describe('v8 Artifacts API', () => {
 
   describe('PUT artifact endpoint', () => {
     beforeEach(() => {
-      workerEnv = env;
+      workerEnv = env as Env;
       workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
       ctx = createExecutionContext();
     });
@@ -209,7 +213,7 @@ describe('v8 Artifacts API', () => {
 
   describe('HEAD artifact endpoint', () => {
     beforeEach(async () => {
-      workerEnv = env;
+      workerEnv = env as Env;
       workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
       ctx = createExecutionContext();
       await workerEnv.STORAGE_MANAGER.getActiveStorage().write(
@@ -274,7 +278,7 @@ describe('v8 Artifacts API', () => {
 
   describe('Artifact events endpoint', () => {
     beforeEach(() => {
-      workerEnv = env;
+      workerEnv = env as Env;
       workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
       ctx = createExecutionContext();
     });
