@@ -2,32 +2,21 @@ import { vValidator } from '@hono/valibot-validator';
 import { Hono } from 'hono/tiny';
 import * as v from 'valibot';
 
-import type { Env } from '..';
-import type { ListResult } from '../storage';
+import type { AppBindings } from '../runtime/app-env';
 
 import { deleteOldCache } from '../crons/deleteOldCache';
 import { bearerAuthFromEnv } from './auth';
 
-export const internalRouter = new Hono<{ Bindings: Env }>();
+export const internalRouter = new Hono<{ Bindings: AppBindings }>();
 
 internalRouter.use('*', bearerAuthFromEnv);
 
-const getActiveStorage = (env: Env) => {
-  if (!env.STORAGE_MANAGER) {
-    throw new Error('Storage manager is not configured');
-  }
-  return env.STORAGE_MANAGER.getActiveStorage();
-};
-
 internalRouter.post(
   '/delete-expired-objects',
-  vValidator('json', v.object({ expireInHours: v.optional(v.number()) })),
+  vValidator('json', v.object({ expireInHours: v.optional(v.pipe(v.number(), v.minValue(0))) })),
   async (c) => {
     const { expireInHours } = c.req.valid('json');
-    await deleteOldCache({
-      ...c.env,
-      BUCKET_OBJECT_EXPIRATION_HOURS: expireInHours ?? c.env.BUCKET_OBJECT_EXPIRATION_HOURS,
-    });
+    await deleteOldCache(c.env.FILES, expireInHours ?? c.env.CACHE_RETENTION_HOURS);
     return c.json({ success: true });
   },
 );
@@ -37,13 +26,13 @@ internalRouter.post(
   vValidator('json', v.object({ count: v.pipe(v.number(), v.maxValue(1000), v.minValue(1)) })),
   async (c) => {
     const { count } = c.req.valid('json');
-    const storage = getActiveStorage(c.env);
+    const files = c.env.FILES;
 
     const emojis: string[] = ['🤪', '🤬', '😄', '🥶', '😆', '😅', '😂', '🤣', '😊', '😇'];
     const promises = [];
     for (let i = 0; i < count; i++) {
       const key = `random-data/${crypto.randomUUID()}`;
-      promises.push(storage.write(key, emojis[Math.floor(Math.random() * emojis.length)]));
+      promises.push(files.upload(key, emojis[Math.floor(Math.random() * emojis.length)]));
     }
     await Promise.all(promises);
 
@@ -52,17 +41,14 @@ internalRouter.post(
 );
 
 internalRouter.get('/count-objects', async (c) => {
-  let truncated: boolean;
   let cursor: string | undefined;
-  let list: ListResult;
   let count = 0;
-  const storage = getActiveStorage(c.env);
+  const files = c.env.FILES;
   do {
-    list = await storage.list({ limit: 999, cursor });
-    truncated = list.truncated;
-    cursor = list.truncated ? list.cursor : undefined;
-    count += list.keys.length;
-  } while (truncated);
+    const page = await files.list({ cursor, limit: 999 });
+    cursor = page.cursor;
+    count += page.items.length;
+  } while (cursor);
 
   return c.json({ count });
 });

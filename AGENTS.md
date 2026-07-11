@@ -4,19 +4,21 @@ This file provides guidance to AI Agents when working with code in this reposito
 
 ## Project Overview
 
-An open-source Turborepo custom remote cache server built for Cloudflare Workers. Enables Turborepo remote caching using Cloudflare R2 (object storage) or KV (key-value) storage backends instead of Vercel's cache.
+An open-source Turborepo custom remote cache server that defaults to Cloudflare Workers and deploys through Nitro. Files SDK provides first-class Cloudflare R2, Cloudflare KV, and Amazon S3 storage, plus a typed custom-adapter escape hatch.
 
 ## Commands
 
 ```bash
 # Development
 pnpm install          # Install dependencies (requires Node >= 22, pnpm 11.6.0)
-pnpm dev              # Start development server
-pnpm build            # Build for production (outputs to dist/)
+pnpm dev              # Start the Nitro development server
+pnpm build            # Build the default Cloudflare target into .output/
+pnpm build:node       # Build the portable Node server target
 
 # Testing
 pnpm test             # Run tests with coverage
 pnpm test:watch       # Run tests in watch mode
+pnpm test:turbo       # Smoke-test signed remote caching with the real Turbo CLI
 pnpm vitest run tests/routes/v8/artifacts.test.ts  # Run single test file
 
 # Code Quality
@@ -32,20 +34,23 @@ pnpm docs:build       # Build documentation
 
 ## Architecture
 
-### Worker Entry Point (`src/index.ts`)
+### Runtime Entry Points
 
-Exports Cloudflare Worker with two handlers:
+- `server.ts`: Nitro server entry point; resolves runtime bindings and delegates every request to Hono
+- `tasks/cache/delete-expired.ts`: Nitro retention task, scheduled daily at 3 AM by the Cloudflare preset
+- `src/index.ts`: compatibility Cloudflare Worker facade retained for integrations and Worker-pool tests
 
-- `fetch`: Initializes `StorageManager`, delegates to Hono router
-- `scheduled`: Cron handler running `deleteOldCache` daily at 3 AM
+Cloudflare Workers is the default deployment target. Nitro also supports Node and other presets.
 
 ### Storage Layer (`src/storage/`)
 
-Interface-based abstraction with two backends:
+Files SDK provides the storage abstraction:
 
-- `R2Storage`: Uses Cloudflare R2 bucket, metadata stored via `customMetadata`
-- `KvStorage`: Uses Cloudflare KV namespace with TTL-based expiration
-- `StorageManager`: Factory that selects backend (KV preferred when both available)
+- R2 and S3 use the official Files SDK adapters.
+- `cloudflareKv`: Project-owned Files SDK adapter for the native Cloudflare KV binding.
+- `prepareUploadBody`: Restores Cloudflare's fixed-length stream marker only for the native R2 adapter.
+- `createStorageServices`: Selects `r2`, `kv`, `s3`, or `custom` from runtime configuration. Legacy auto-detection keeps KV precedence when both bindings exist.
+- `storage.config.ts`: Typed source escape hatch for other Files SDK adapters.
 
 ### Routing (`src/routes/`)
 
@@ -68,26 +73,20 @@ Uses Hono (`hono/tiny` for smaller bundle) with valibot validation:
 
 ### Cron Job (`src/crons/deleteOldCache.ts`)
 
-Deletes objects older than `BUCKET_OBJECT_EXPIRATION_HOURS` (default 720h/30 days). Uses cursor-based pagination with batch size of 500 to avoid Cloudflare limits.
+Deletes objects older than `CACHE_RETENTION_HOURS` (default 720h/30 days), with `BUCKET_OBJECT_EXPIRATION_HOURS` retained as a fallback. Uses Files SDK cursor pagination with a batch size of 500. A value of `0` disables cleanup and KV TTL.
 
 ## Testing
 
-Uses Vitest with `@cloudflare/vitest-pool-workers` for Workers simulation. The Vitest config uses the `cloudflareTest()` plugin with `wrangler.jsonc` plus Miniflare overrides for test-only bindings like `KV_STORE`.
+Uses Vitest with `@cloudflare/vitest-pool-workers` for Workers simulation. The Vitest config uses the `cloudflareTest()` plugin with `wrangler.jsonc` plus Miniflare overrides for test-only bindings like `KV_STORE`. Route tests can construct a Files SDK memory adapter and pass `AppBindings` directly to Hono.
 
 ```typescript
-import { createExecutionContext } from 'cloudflare:test';
-import { env } from 'cloudflare:workers';
-import { workerHandler } from '~/index';
-import { StorageManager } from '~/storage';
+import { Files } from 'files-sdk';
+import { memory } from 'files-sdk/memory';
 
-beforeEach(() => {
-    workerEnv = env;
-    workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
-    ctx = createExecutionContext();
-});
+const files = new Files({ adapter: memory() });
 ```
 
-Tests mirror source structure in `tests/` directory. Use unique IDs (`Math.random()`) for test isolation.
+Tests mirror source structure in `tests/` directory. Use unique IDs (`crypto.randomUUID()`) for test isolation.
 
 ## Documentation
 

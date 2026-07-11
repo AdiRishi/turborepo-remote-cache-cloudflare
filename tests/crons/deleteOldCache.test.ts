@@ -1,10 +1,8 @@
-import { reset } from 'cloudflare:test';
-import { env } from 'cloudflare:workers';
-import { describe, test, expect, afterEach, beforeEach, vi } from 'vitest';
+import { Files } from 'files-sdk';
+import { memory, type MemoryAdapter } from 'files-sdk/memory';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { CURSOR_SIZE, deleteOldCache } from '~/crons/deleteOldCache';
-import { Env } from '~/index';
-import { KvStorage, R2Storage, StorageInterface, StorageManager } from '~/storage';
 import { isDateOlderThan } from '~/utils/date';
 
 vi.mock('~/utils/date', async (importActual) => {
@@ -14,144 +12,86 @@ vi.mock('~/utils/date', async (importActual) => {
     isDateOlderThan: vi.fn<typeof actual.isDateOlderThan>(actual.isDateOlderThan),
   };
 });
+
 const isDateOlderThanMock = vi.mocked(isDateOlderThan);
 
 describe('deleteOldCache', () => {
-  let workerEnv: Env;
-  const artifactId = 'UNIQUE-artifactId-' + Math.random();
-  const artifactTag = 'UNIQUE-artifactTag-' + Math.random();
-  const customMetadata = { artifactId, artifactTag };
-  const teamId = 'UNIQUE-teamId-' + Math.random();
-  const artifactContent = '🎉😄😇';
+  let adapter: MemoryAdapter;
+  let files: Files<MemoryAdapter>;
 
-  beforeEach(async () => {
-    await reset();
-    workerEnv = env;
+  beforeEach(() => {
+    adapter = memory();
+    files = new Files({ adapter });
+    isDateOlderThanMock.mockReset();
   });
 
-  describe('r2 storage', () => {
-    let storage: StorageInterface;
+  test('deletes artifacts older than the configured retention window', async () => {
+    await files.upload('team/artifact', 'payload');
+    isDateOlderThanMock.mockReturnValue(true);
 
-    beforeEach(async () => {
-      workerEnv = { ...workerEnv, KV_STORE: undefined };
-      workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
-      storage = workerEnv.STORAGE_MANAGER.getActiveStorage();
-      await storage.write(`${teamId}/${artifactId}`, artifactContent, customMetadata);
-    });
+    const result = await deleteOldCache(files, 24);
 
-    afterEach(() => {
-      vi.resetAllMocks();
-    });
-
-    test('should use r2 storage', () => {
-      expect(workerEnv.STORAGE_MANAGER!.getActiveStorage()).toBe(storage);
-      expect(storage).toBeInstanceOf(R2Storage);
-    });
-
-    test('should delete artifact when it is older than the cutoff', async () => {
-      isDateOlderThanMock.mockReturnValue(true);
-      await deleteOldCache(workerEnv);
-      const artifact = await storage.read(`${teamId}/${artifactId}`);
-      expect(artifact).toBeUndefined();
-    });
-
-    test('should not delete artifact when it is not older than the cutoff', async () => {
-      isDateOlderThanMock.mockReturnValue(false);
-      await deleteOldCache(workerEnv);
-      const artifactStream = await storage.read(`${teamId}/${artifactId}`);
-      expect(artifactStream).toBeDefined();
-      const artifact = await StorageManager.readableStreamToText(artifactStream!);
-      expect(artifact).toBe(artifactContent);
-    });
-
-    test('should delete all artifacts when the number of artifacts exceeds CURSOR_SIZE', async () => {
-      isDateOlderThanMock.mockReturnValue(true);
-      for (let i = 0; i < Math.round(CURSOR_SIZE * 1.5); i++) {
-        await storage.write(`${teamId}/${artifactId}-${i}`, artifactContent, customMetadata);
-      }
-      await deleteOldCache(workerEnv);
-      const artifacts = await storage.list();
-      expect(artifacts.keys.length).toBe(0);
-    });
-
-    test('should delete all artifacts when there are over 1000 items ready for deletion', async () => {
-      isDateOlderThanMock.mockReturnValue(true);
-      for (let i = 0; i < Math.round(CURSOR_SIZE * 1.5); i++) {
-        await storage.write(`${teamId}/${artifactId}-${i}`, artifactContent, customMetadata);
-      }
-      await deleteOldCache(workerEnv);
-      const artifacts = await storage.list();
-      expect(artifacts.keys.length).toBe(0);
-    });
-
-    test('should not call delete with no keys', async () => {
-      const spy = vi.spyOn(storage, 'delete');
-      isDateOlderThanMock.mockReturnValue(false); // Make sure no objects are marked for deletion
-      await deleteOldCache(workerEnv);
-      expect(spy).not.toHaveBeenCalled();
-    });
+    expect(result).toEqual({ deleted: 1, skipped: 0 });
+    expect(await files.exists('team/artifact')).toBe(false);
+    expect(isDateOlderThanMock).toHaveBeenCalledWith(expect.any(Date), 24);
   });
 
-  describe('kv storage', () => {
-    let storage: StorageInterface;
+  test('keeps artifacts that are still inside the retention window', async () => {
+    await files.upload('team/artifact', 'payload');
+    isDateOlderThanMock.mockReturnValue(false);
+    const deleteSpy = vi.spyOn(files, 'delete');
 
-    beforeEach(async () => {
-      workerEnv = { ...workerEnv, R2_STORE: undefined };
-      workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
-      storage = workerEnv.STORAGE_MANAGER.getActiveStorage();
-      await storage.write(`${teamId}/${artifactId}`, artifactContent, customMetadata);
-    });
+    const result = await deleteOldCache(files, 24);
 
-    afterEach(() => {
-      vi.resetAllMocks();
-    });
+    expect(result).toEqual({ deleted: 0, skipped: 0 });
+    expect(deleteSpy).not.toHaveBeenCalled();
+    expect(await (await files.download('team/artifact')).text()).toBe('payload');
+  });
 
-    test('should use kv storage', () => {
-      expect(workerEnv.STORAGE_MANAGER!.getActiveStorage()).toBe(storage);
-      expect(storage).toBeInstanceOf(KvStorage);
+  test('lists every page before deleting more than one provider page', async () => {
+    const artifactCount = CURSOR_SIZE + 17;
+    adapter = memory({
+      initial: Object.fromEntries(
+        Array.from({ length: artifactCount }, (_, index) => [
+          `team/artifact-${String(index).padStart(4, '0')}`,
+          'payload',
+        ]),
+      ),
     });
+    files = new Files({ adapter });
+    isDateOlderThanMock.mockReturnValue(true);
+    const listSpy = vi.spyOn(files, 'list');
 
-    test('should delete artifact when it is older than the cutoff', async () => {
-      isDateOlderThanMock.mockReturnValue(true);
-      await deleteOldCache(workerEnv);
-      const artifact = await storage.read(`${teamId}/${artifactId}`);
-      expect(artifact).toBeUndefined();
-    });
+    const result = await deleteOldCache(files, 720);
 
-    test('should not delete artifact when it is not older than the cutoff', async () => {
-      isDateOlderThanMock.mockReturnValue(false);
-      await deleteOldCache(workerEnv);
-      const artifactStream = await storage.read(`${teamId}/${artifactId}`);
-      expect(artifactStream).toBeDefined();
-      const artifact = await StorageManager.readableStreamToText(artifactStream!);
-      expect(artifact).toBe(artifactContent);
-    });
+    expect(result).toEqual({ deleted: artifactCount, skipped: 0 });
+    expect(listSpy).toHaveBeenCalledTimes(2);
+    expect((await files.list()).items).toHaveLength(0);
+  });
 
-    test('should delete all artifacts when the number of artifacts exceeds CURSOR_SIZE', async () => {
-      isDateOlderThanMock.mockReturnValue(true);
-      for (let i = 0; i < Math.round(CURSOR_SIZE * 1.5); i++) {
-        await storage.write(`${teamId}/${artifactId}-${i}`, artifactContent, customMetadata);
-      }
-      await deleteOldCache(workerEnv);
-      const artifacts = await storage.list();
-      expect(artifacts.keys.length).toBe(0);
-    });
+  test('skips objects whose provider cannot supply last-modified metadata', async () => {
+    await files.upload('legacy-artifact', 'payload');
+    const entry = adapter.raw.get('legacy-artifact');
+    if (!entry) throw new Error('Expected seeded memory entry');
+    Reflect.deleteProperty(entry, 'lastModified');
+    isDateOlderThanMock.mockReturnValue(true);
 
-    test('should delete all artifacts when there are over 1000 items ready for deletion', async () => {
-      isDateOlderThanMock.mockReturnValue(true);
-      for (let i = 0; i < Math.round(CURSOR_SIZE * 1.5); i++) {
-        await storage.write(`${teamId}/${artifactId}-${i}`, artifactContent, customMetadata);
-      }
-      await deleteOldCache(workerEnv);
-      const artifacts = await storage.list();
-      expect(artifacts.keys.length).toBe(0);
-    });
+    const result = await deleteOldCache(files, 720);
 
-    test('should not call delete with no keys', async () => {
-      const spy = vi.spyOn(storage, 'delete');
-      isDateOlderThanMock.mockReturnValue(false); // Make sure no objects are marked for deletion
-      await deleteOldCache(workerEnv);
-      expect(spy).not.toHaveBeenCalled();
-    });
+    expect(result).toEqual({ deleted: 0, skipped: 1 });
+    expect(await files.exists('legacy-artifact')).toBe(true);
+    expect(isDateOlderThanMock).not.toHaveBeenCalled();
+  });
+
+  test('disables retention entirely when configured with zero hours', async () => {
+    await files.upload('team/artifact', 'payload');
+    const listSpy = vi.spyOn(files, 'list');
+
+    const result = await deleteOldCache(files, 0);
+
+    expect(result).toEqual({ deleted: 0, skipped: 0 });
+    expect(listSpy).not.toHaveBeenCalled();
+    expect(isDateOlderThanMock).not.toHaveBeenCalled();
+    expect(await files.exists('team/artifact')).toBe(true);
   });
 });

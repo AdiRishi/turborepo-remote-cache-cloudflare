@@ -126,6 +126,8 @@ web_modules/
 
 # dotenv environment variable files
 
+.dev.vars*
+!.dev.vars.example
 .env
 .env.development.local
 .env.test.local
@@ -146,6 +148,8 @@ out
 
 .nuxt
 dist
+.nitro
+.output
 
 # Gatsby files
 

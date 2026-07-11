@@ -7,7 +7,7 @@ const isCloudflareDeployment = process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true'
 export default defineConfig({
   title: 'Turborepo Remote Cache',
   description:
-    'An implementation of the turborepo-remote-cache server custom made for Cloudflare Workers',
+    'A Cloudflare-first Turborepo remote cache that deploys anywhere with Nitro',
   sitemap: {
     hostname: isCloudflareDeployment
       ? 'https://cloudflare.turborepo-remote-cache.dev/'
@@ -49,6 +49,8 @@ export default defineConfig({
         items: [
           { text: 'Getting Started', link: '/introduction/getting-started' },
           { text: 'Setup Turborepo', link: '/introduction/setup-turborepo' },
+          { text: 'Deployment Targets', link: '/introduction/deployment-targets' },
+          { text: 'Migration Guide', link: '/introduction/migration' },
         ],
       },
       {
@@ -57,6 +59,14 @@ export default defineConfig({
           { text: 'Project Configuration', link: '/configuration/project-configuration' },
           { text: 'R2 Storage', link: '/configuration/r2-storage' },
           { text: 'KV Storage', link: '/configuration/kv-storage' },
+          { text: 'S3 Storage', link: '/configuration/s3-storage' },
+          { text: 'Custom Storage', link: '/configuration/custom-storage' },
+        ],
+      },
+      {
+        text: 'Contributing',
+        items: [
+          { text: 'Remote Cache API', link: '/contributing/remote-cache-api' },
         ],
       },
     ],

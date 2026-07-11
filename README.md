@@ -1,10 +1,8 @@
 <div align="center">
 
-# Turborepo Remote Cache (For Cloudflare Workers!)
+# Turborepo Remote Cache
 
-</div>
-
-<div align="center">
+**Cloudflare-first, deploy anywhere.**
 
 [![CI](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/actions/workflows/ci.yml/badge.svg)](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/github/AdiRishi/turborepo-remote-cache-cloudflare/badge.svg)](https://coveralls.io/github/AdiRishi/turborepo-remote-cache-cloudflare) ![GitHub License](https://img.shields.io/github/license/AdiRishi/turborepo-remote-cache-cloudflare) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](.github/CONTRIBUTING.md)
 
@@ -14,148 +12,109 @@
 
 </div>
 
-## 🚀 Introduction
+An open-source [Turborepo custom remote cache](https://turborepo.dev/docs/core-concepts/remote-caching) that defaults to Cloudflare Workers while remaining portable through [Nitro](https://nitro.build/). [Files SDK](https://files-sdk.dev/) provides a small, consistent storage layer across Cloudflare R2, Cloudflare KV, Amazon S3, and custom providers.
 
-This project offers an open source implementation of the [Turborepo custom remote cache server](https://turbo.build/repo/docs/core-concepts/remote-caching) **purpose-built from the ground up for [Cloudflare Workers](https://developers.cloudflare.com/workers/)**
+## Why use it?
 
-📚 For detailed documentation, please refer to our [official website](https://adirishi.github.io/turborepo-remote-cache-cloudflare)
+- **Simple to self-host:** clone the repository, create a bucket, and deploy with Wrangler.
+- **Storage choice without source changes:** select R2, KV, or S3 with `STORAGE_PROVIDER`.
+- **Cloudflare-first:** the included configuration and primary deployment workflow target Cloudflare Workers.
+- **Portable:** build for Node or another supported Nitro preset when Cloudflare is not the right target.
+- **Extensible:** connect another Files SDK adapter through the typed `storage.config.ts` escape hatch.
+- **Turborepo-compatible:** bearer authentication, signed artifacts, and the existing `/v8/artifacts` API remain supported.
 
-> [!IMPORTANT]
-> You can now store your build artifacts in either Cloudflare 🪣 R2 or 🔑 KV storage. Find out how in our [official documentation](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/kv-storage)
+## Quick start on Cloudflare
 
-## 🤔 Why should I use this?
+The included Wrangler configuration selects R2 and binds it as `R2_STORE`, so the default path needs no provider code or configuration changes.
 
-If you're a Turborepo user, this project offers compelling advantages:
+```sh
+# 1. Clone and install
+git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
+cd turborepo-remote-cache-cloudflare
+pnpm install
 
-- 💿 **Storage Options**: Choose between 🪣 [R2](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/r2-storage) or 🔑 [KV](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/kv-storage) storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
-- 🚀 **Faster Builds**: Harness the power of remote caching to significantly speed up your builds
-- 🌐 **Independence from Vercel**: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
-- 🌍 **Global Deployment**: Code deploys instantly across the globe in over 300 countries, ensuring unmatched performance and reliability.
-- 💰 **Affordable Start**: With Cloudflare Workers' [generous free tier](https://developers.cloudflare.com/workers/platform/pricing), you can make up to 100,000 requests every day at no cost. Even better Cloudflare has [zero egress fees](https://www.cloudflare.com/en-au/learning/cloud/what-are-data-egress-fees/) on it's platform, meaning you only pay for what you use.
+# 2. Create the bucket referenced by wrangler.jsonc
+pnpm wrangler r2 bucket create turborepo-cache
 
-## ⚡️ Quick start
+# 3. Deploy the Worker
+pnpm deploy
+
+# 4. Set the Bearer token used by Turborepo
+echo "YOUR_SECRET" | pnpm wrangler secret put TURBO_TOKEN
+```
+
+Then point Turborepo at the deployed Worker. The [Turborepo setup guide](https://adirishi.github.io/turborepo-remote-cache-cloudflare/introduction/setup-turborepo) covers signed caching and local environment configuration.
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
 
-### Deploy Using the CLI
+## Storage providers
 
-This project already comes with [wrangler](https://developers.cloudflare.com/workers/wrangler/) (cloudflare's CLI tool for managing works) installed and configured, so all you need to do is clone this repository and run `pnpm run deploy`.
+R2, KV, and S3 are first-class providers. Set `STORAGE_PROVIDER` to select a storage mode at runtime:
+
+| Value    | Provider                                | Required configuration                                                                                         |
+| -------- | --------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `r2`     | Cloudflare R2                           | `R2_STORE` binding on Workers, or `R2_BUCKET`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, and `R2_SECRET_ACCESS_KEY` |
+| `kv`     | Cloudflare KV                           | `KV_STORE` binding; Cloudflare Workers only                                                                    |
+| `s3`     | Amazon S3 or an S3-compatible service   | `S3_BUCKET`, `AWS_REGION`, and AWS credentials; optionally `S3_ENDPOINT` and `S3_FORCE_PATH_STYLE`             |
+| `custom` | Adapter exported by `storage.config.ts` | The adapter package and its provider-specific configuration                                                    |
+
+For compatibility with existing deployments, `STORAGE_PROVIDER` can be omitted. The service checks `KV_STORE`, `R2_STORE`, `S3_BUCKET`, and then `R2_BUCKET`. Set it explicitly for new deployments and whenever more than one provider is configured.
+
+See the provider guides for [R2](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/r2-storage), [KV](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/kv-storage), [S3](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/s3-storage), and [custom Files SDK adapters](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/custom-storage).
+
+> [!NOTE]
+> KV has a 25 MiB per-artifact limit and is only available through a Cloudflare binding. Streamed KV uploads are buffered with that limit enforced; R2 and S3 uploads remain streamed.
+
+## Deployment targets
+
+Cloudflare Workers is the default target:
 
 ```sh
-# 1. Clone the repository
-git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
-
-# 2. Install packages
-pnpm install
-
-# 3. Create the R2 bucket for storage
-pnpm wrangler r2 bucket create turborepo-cache
-
-# 4. Publish the project
-pnpm run deploy
-
-# 5. Set a Bearer auth token
-echo "SECRET" | pnpm wrangler secret put TURBO_TOKEN
+cp .dev.vars.example .dev.vars
+# Replace the example TURBO_TOKEN before starting the server.
+pnpm dev
+pnpm build
+pnpm deploy
 ```
 
-## ⚙️ Configuration
+There is also a Node build shortcut:
 
-### Github actions requirements
+```sh
+pnpm build:node
+```
 
-In order to successfully run the [deploy](.github/workflows//deploy.yml) Github action you will need the following secrets
+For another Nitro target, select its documented preset when building:
+
+```sh
+NITRO_PRESET=<preset> pnpm build
+```
+
+Deployment after that build is provider-specific; follow the [Nitro deployment guide](https://nitro.build/deploy) for the selected preset. The project intentionally keeps those platform commands outside its core workflow.
+
+## Configuration
+
+Common settings are documented in [Project configuration](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/project-configuration). The most important are:
+
+- `TURBO_TOKEN`: required bearer token.
+- `STORAGE_PROVIDER`: `r2`, `kv`, `s3`, or `custom`; optional when a provider can be auto-detected.
+- `CACHE_RETENTION_HOURS`: artifact retention period. Set it to `0` to disable application cleanup and KV TTL. The legacy `BUCKET_OBJECT_EXPIRATION_HOURS` name remains a fallback.
+- `STORAGE_PREFIX`: optional object-key prefix. Leave it unset when upgrading if existing artifact keys must remain reachable.
+
+Cleanup runs through the Nitro task `cache:delete-expired`; the default Cloudflare deployment schedules it with a Cron Trigger.
+
+## GitHub Actions
+
+Forks using the included deployment workflow need these repository secrets:
 
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
 - `TURBO_TOKEN`
 
-For those who have forked this repository, feel free to delete the [release.yml](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/release.yml) workflow file. This is only used to automatically publish new releases of this repository to GitHub releases.
+The repository's release and documentation workflows serve the upstream project and can be removed from a fork.
 
-### Automatic deletion of old cache files
+## Upgrading
 
-This project sets up a [cron trigger](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for Cloudflare workers, which automatically deletes old cache files within the bound R2 bucket. This behavior can be customized:
-
-- To disable the automatic deletion, remove the [triggers] configuration in [wrangler.jsonc](./wrangler.jsonc)
-- To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.jsonc](./wrangler.jsonc) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
-
-## ▲ Setting up remote caching in your Turborepo project
-
-Here's my recommended approach for setting up remote caching in your Turborepo project. You can read more about this topic in the [official Turborepo documentation](https://turbo.build/repo/docs/core-concepts/remote-caching).
-
-### Step 1: Update `turbo.json`
-
-Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)
-
-```json
-{
-    "remoteCache": { "signature": true }
-}
-```
-
-### Step 2: Install `dotenv-cli`
-
-Install the `dotenv-cli` npm package:
-
-```sh
-# You may have to add -W if you are installing this on your workspace root
-pnpm add -D dotenv-cli
-```
-
-### Step 3: Create a `.env` File
-
-Create a `.env` file at your project root with the following content:
-
-```dotenv
-TURBO_API=YOUR_API_URL # Remember to remove the trailing slash
-TURBO_TEAM=team_my_team_name
-TURBO_TOKEN=SECRET # The turbo token must be a valid Bearer auth token
-TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
-```
-
-Keep the following in mind
-
-- Replace `SECRET` and `YOUR_API_URL` with your chosen values.
-- Turborepo requires that the `TURBO_API` value must not end with a trailing slash
-- The `TURBO_TEAM` value must begin with `team_`
-- Remember to add the `.env` file to `.gitignore`
-- If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
-
-### Step 4: Modify Turbo Commands
-
-Load the `.env` file prior to execution. Instead of running a command like `turbo run build` directly, use `dotenv -- turbo run build`. This loads everything in our `.env` file into the process's environment variables.
-
-Here's how to modify your scripts in `package.json` to use dotenv-cli:
-
-```json
-{
-    "scripts": {
-        "build": "dotenv -- turbo run build",
-        "dev": "dotenv -- turbo run dev",
-        "lint": "dotenv -- turbo run lint",
-        "test": "dotenv -- turbo run test"
-    }
-}
-```
-
-And that's it 🎉🎉
-
-Whenever you run a turbo command you will see `Remote cache enabled` in it's log output
-
-```
-pnpm lint
-
-$ dotenv -- turbo run lint
-• Packages in scope: turborepo-project, webapp, docs
-• Running lint in 3 packages
-• Remote caching enabled
-
-...output
-
- Tasks:    3 successful, 3 total
-Cached:    3 cached, 3 total
-  Time:    1.174s >>> FULL TURBO
-
-✨  Done in 3.54s.
-```
+This architecture is a major release, but existing Turborepo API behavior, bearer authentication, `R2_STORE` and `KV_STORE` bindings, stored object keys, and the legacy retention variable remain compatible wherever practical. Read the [migration guide](https://adirishi.github.io/turborepo-remote-cache-cloudflare/introduction/migration) before upgrading a deployed cache.
 
 ---
 

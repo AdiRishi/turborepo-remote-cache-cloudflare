@@ -2,11 +2,12 @@ import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { Hono } from 'hono/tiny';
 
-import { Env } from '..';
+import type { AppBindings } from '../runtime/app-env';
+
 import { internalRouter } from './internal';
 import { v8App } from './v8';
 
-export const app = new Hono<{ Bindings: Env }>();
+export const app = new Hono<{ Bindings: AppBindings }>();
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {

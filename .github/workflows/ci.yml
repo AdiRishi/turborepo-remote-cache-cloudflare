@@ -19,10 +19,14 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install
+      - run: pnpm api:check
+      - run: pnpm cf-typegen --check
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm test:turbo
       - run: pnpm build
+      - run: pnpm build:node
 
       - name: Coveralls Coverage Report
         uses: coverallsapp/github-action@v2

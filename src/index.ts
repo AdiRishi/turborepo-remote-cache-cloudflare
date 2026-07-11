@@ -1,35 +1,31 @@
-import { deleteOldCache } from './crons/deleteOldCache';
-import { app } from './routes';
-import { StorageManager } from './storage';
+import type { RuntimeEnv } from './runtime/env';
 
-export type Env = Omit<
-  Cloudflare.Env,
-  'BUCKET_OBJECT_EXPIRATION_HOURS' | 'ENVIRONMENT' | 'R2_STORE'
-> & {
-  BUCKET_OBJECT_EXPIRATION_HOURS: number;
-  ENVIRONMENT: string;
-  R2_STORE?: R2Bucket;
-  KV_STORE?: KVNamespace;
-  STORAGE_MANAGER?: StorageManager;
-};
+import { handleRequest } from './runtime/handler';
+import { runDeleteExpired } from './runtime/retention';
 
+export type Env = RuntimeEnv;
+export { handleRequest, runDeleteExpired };
+
+// Kept as a source-level compatibility entrypoint for existing integrations
+// and Worker-pool tests. Production deployment is built through Nitro.
 export const workerHandler = {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    try {
-      const storageManager = new StorageManager(env);
-      env.STORAGE_MANAGER = storageManager;
-      return app.fetch(request, env, ctx);
-    } catch (e: unknown) {
-      return new Response(`Storage options not configured correctly: ${String(e)}`, {
-        status: 500,
-      });
-    }
+  fetch(request: Request, env: RuntimeEnv, ctx: ExecutionContext): Promise<Response> {
+    return handleRequest(request, env, (promise) => ctx.waitUntil(promise));
   },
-  async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext) {
-    const storageManager = new StorageManager(env);
-    env.STORAGE_MANAGER = storageManager;
-    await deleteOldCache(env);
+  scheduled(
+    _event: ScheduledController | ScheduledEvent,
+    env: RuntimeEnv,
+    ctx: ExecutionContext,
+  ): void {
+    ctx.waitUntil(runDeleteExpired(env));
   },
 };
 
-export default workerHandler;
+export default {
+  fetch(request: Request, env: Cloudflare.Env, ctx: ExecutionContext) {
+    return workerHandler.fetch(request, { ...env }, ctx);
+  },
+  scheduled(event: ScheduledController, env: Cloudflare.Env, ctx: ExecutionContext) {
+    return workerHandler.scheduled(event, { ...env }, ctx);
+  },
+} satisfies ExportedHandler<Cloudflare.Env>;

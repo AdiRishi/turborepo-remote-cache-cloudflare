@@ -1,9 +1,13 @@
-export { R2Storage } from './r2-storage';
-export { KvStorage } from './kv-storage';
-export { StorageManager, InvalidStorageError } from './storage-manager';
-export type {
-  StorageInterface,
-  ListFilterOptions,
-  ListResult,
-  ListResultWithMetadata,
-} from './interface';
+export { cloudflareKv, type CloudflareKvAdapterOptions } from './cloudflare-kv';
+export {
+  createStorageServices,
+  resolveStorageProvider,
+  STORAGE_PROVIDERS,
+  type StorageProvider,
+  type StorageServices,
+} from './files-storage';
+export {
+  defineStorageConfig,
+  type CustomStorageContext,
+  type CustomStorageFactory,
+} from './custom';

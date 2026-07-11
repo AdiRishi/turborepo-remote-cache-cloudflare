@@ -1,56 +1,51 @@
-import { Env } from '..';
-import { ListResultWithMetadata } from '../storage';
+import type { Files } from 'files-sdk';
+
 import { isDateOlderThan } from '../utils/date';
 
-// Cursor size should be kept below 1000 to avoid limits on bulk operations
+// Keep pages below common provider bulk-operation limits.
 export const CURSOR_SIZE = 500;
 
-class R2KeysForDeletion {
-  keys: string[] = [];
-  add(key: string) {
-    this.keys.push(key);
-  }
+export interface DeleteOldCacheResult {
+  deleted: number;
+  skipped: number;
 }
 
-export async function deleteOldCache(env: Env): Promise<void> {
-  const BUCKET_CUTOFF_HOURS = env.BUCKET_OBJECT_EXPIRATION_HOURS;
-  if (!env.STORAGE_MANAGER) {
-    throw new Error('Storage manager is not configured');
-  }
-  const storage = env.STORAGE_MANAGER.getActiveStorage();
-  let truncated: boolean;
+export async function deleteOldCache(
+  files: Files,
+  retentionHours: number,
+): Promise<DeleteOldCacheResult> {
+  if (retentionHours === 0) return { deleted: 0, skipped: 0 };
+
   let cursor: string | undefined;
-  let list: ListResultWithMetadata;
-  const keysMarkedForDeletion: R2KeysForDeletion[] = [];
+  let skipped = 0;
+  const keysForDeletion: string[][] = [];
 
+  // Determine every candidate before deleting. Mutating a provider while
+  // following its opaque listing cursor can otherwise skip objects.
   do {
-    list = await storage.listWithMetadata({ limit: CURSOR_SIZE, cursor });
-    truncated = list.truncated;
-    cursor = list.cursor;
-
-    /**
-     * Deleting keys while iterating over the list can sometimes cause the list to be truncated.
-     * So we mark the keys for deletion and delete after at least one additional iteration.
-     */
-    const keysAvailableForDeletion = keysMarkedForDeletion.shift();
-    if (keysAvailableForDeletion) {
-      await storage.delete(keysAvailableForDeletion.keys);
-    }
-
-    const keysForDeletion = new R2KeysForDeletion();
-    for (const keyWithMeta of list.keys) {
-      const createdAt = keyWithMeta.metadata?.staticMetadata.createdAt;
-      if (!createdAt || isDateOlderThan(createdAt, BUCKET_CUTOFF_HOURS)) {
-        keysForDeletion.add(keyWithMeta.key);
+    const page = await files.list({ cursor, limit: CURSOR_SIZE });
+    const pageKeys: string[] = [];
+    for (const item of page.items) {
+      if (item.lastModified === undefined) {
+        skipped += 1;
+        continue;
+      }
+      if (isDateOlderThan(new Date(item.lastModified), retentionHours)) {
+        pageKeys.push(item.key);
       }
     }
+    if (pageKeys.length > 0) keysForDeletion.push(pageKeys);
+    cursor = page.cursor;
+  } while (cursor);
 
-    // Only append if there's keys to delete from this page
-    if (keysForDeletion.keys.length > 0) {
-      keysMarkedForDeletion.push(keysForDeletion);
+  let deleted = 0;
+  for (const keys of keysForDeletion) {
+    const result = await files.delete(keys, { concurrency: 16 });
+    deleted += result.deleted.length;
+    if (result.errors?.length) {
+      throw result.errors[0].error;
     }
-  } while (truncated);
-  for (const keysForDeletion of keysMarkedForDeletion) {
-    await storage.delete(keysForDeletion.keys);
   }
+
+  return { deleted, skipped };
 }

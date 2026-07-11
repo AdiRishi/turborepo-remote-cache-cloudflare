@@ -2,72 +2,65 @@
 layout: doc
 ---
 
-# 🔑 Storing artifacts in Cloudflare KV
+# Cloudflare KV storage
 
-[Cloudflare KV](https://developers.cloudflare.com/kv/) offers a distributed, high-performance data store ideal for storing build artifacts globally, providing quicker access and improved build efficiency over centralized storage like Cloudflare R2.
+[Cloudflare KV](https://developers.cloudflare.com/kv/) provides globally distributed key-value storage through a native Worker binding. This project retains KV through its own Files SDK adapter.
 
-Follow these steps to store your build artifacts in Cloudflare KV:
+KV is a first-class provider, but it is Cloudflare-only and each artifact is limited to 25 MiB. Choose R2 or S3 when cache artifacts can exceed that limit.
 
-## 1. Create a KV Namespace
+## 1. Create a namespace
 
-A namespace is a container for key-value pairs in Cloudflare KV. You can create a namespace via the [Cloudflare dashboard](https://dash.cloudflare.com/) or using the [Wrangler CLI](https://developers.cloudflare.com/workers/cli-wrangler/commands/#kvnamespace).
-
-### Using the Wrangler CLI
+Create a namespace in the [Cloudflare dashboard](https://dash.cloudflare.com/) or with Wrangler:
 
 ```sh
-wrangler kv:namespace create <YOUR_NAMESPACE>
+pnpm wrangler kv namespace create turborepo-cache --binding KV_STORE --update-config
 ```
 
-This will create a KV namespace and give you the following output
+If you update `wrangler.jsonc` manually, copy the namespace ID returned by Wrangler.
 
-```sh
-wrangler kv:namespace create <YOUR_NAMESPACE>
-🌀  Creating namespace with title <YOUR_WORKER-YOUR_NAMESPACE>
-✨  Success!
-Add the following to your configuration file:
-kv_namespaces = [
-  { binding = <YOUR_BINDING>, id = "e29b263ab50e42ce9b637fa8370175e8" }
-]
-```
+## 2. Bind it as `KV_STORE`
 
-### Using the Cloudflare Dashboard
+Select KV and add its namespace binding:
 
-1. Navigate to the [Cloudflare dashboard](https://dash.cloudflare.com/) and select the `KV` tab on the left-hand side bar.
-2. Click the `Create a namespace` button.
-   ![KV Create Dashboard](https://public-assets.turborepo-remote-cache.dev/cdn-cgi/image/width=960,quality=80,format=auto/images/kv-create-dashboard.jpg)
-3. Enter a name for your namespace and click `Create`.
-
-## 2. Update Your Configuration
-
-Update your `wrangler.jsonc` file to include the KV namespace details.
-
-```jsonc{12-18}
+```jsonc
 {
-  "name": "turborepo-remote-cache",
-  // Other settings...
-
-  // "r2_buckets": [
-  //   {
-  //     "binding": "R2_STORE",
-  //     "bucket_name": "turborepo-cache",
-  //     "preview_bucket_name": "turborepo-cache-preview"
-  //   }
-  // ],
-  "kv_namespaces": [
-    {
-      "binding": "KV_STORE",
-      "id": "ea20b0eb60f44b13b8d013eeace98ca2",
-      "preview_id": "ea20b0eb60f44b13b8d013eeace98ca2"
-    }
-  ]
+    "vars": {
+        "STORAGE_PROVIDER": "kv",
+    },
+    "kv_namespaces": [
+        {
+            "binding": "KV_STORE",
+            "id": "YOUR_NAMESPACE_ID",
+            "preview_id": "YOUR_PREVIEW_NAMESPACE_ID",
+        },
+    ],
 }
 ```
 
-::: info
-If you want to use KV as the store, ensure that the `r2_buckets` section is commented out.
-:::
+An existing deployment may omit `STORAGE_PROVIDER`: `KV_STORE` is detected before `R2_STORE` for compatibility. Explicit selection is clearer and lets both bindings remain configured.
 
-## 3. Deploy Your Worker
+For a fresh KV-only deployment, remove the default `r2_buckets` block after adding `KV_STORE`. This avoids requiring an unused R2 bucket; existing deployments may safely leave both bindings in place.
 
-Once you've updated your Worker script and `wrangler.jsonc` file, deploy your Worker using the Wrangler CLI or your GitHub actions workflow.
-And that's it! Your build artifacts will now be stored in Cloudflare KV.
+## 3. Deploy
+
+```sh
+pnpm deploy
+```
+
+The adapter stores artifact tags with each value, so signed Turborepo caching works without sidecar keys.
+
+## Artifact size and buffering
+
+Cloudflare KV limits a value to 25 MiB. The adapter rejects an artifact that exceeds that boundary.
+
+Files SDK needs an accurate size when it stores a value. The KV adapter therefore buffers streamed artifact uploads while enforcing the same 25 MiB bound. Already-sized in-memory bodies can be written directly. R2 and S3 uploads remain streamed and do not have this KV-specific buffering behavior.
+
+## Retention
+
+KV applies a non-zero `CACHE_RETENTION_HOURS` value as native per-key expiration. Set it to `0` to disable both KV TTL and application cleanup. The legacy `BUCKET_OBJECT_EXPIRATION_HOURS` setting remains a fallback.
+
+Existing KV values remain reachable after upgrading when the same namespace is bound and `STORAGE_PREFIX` remains unset.
+
+## Runtime limitation
+
+The custom KV adapter requires the Cloudflare `KVNamespace` binding API. A Node or other Nitro deployment cannot use credential-based KV access. Use [R2 credential mode](/configuration/r2-storage#credential-mode), [S3](/configuration/s3-storage), or a [custom adapter](/configuration/custom-storage) instead.

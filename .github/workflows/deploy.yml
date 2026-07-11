@@ -29,9 +29,9 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: 'pnpm'
           preCommands: |
-            echo "*** post commands ***"
-            wrangler r2 bucket create turborepo-cache || true
-            echo "******"
+            if grep -Eq '"STORAGE_PROVIDER"[[:space:]]*:[[:space:]]*"r2"' wrangler.jsonc; then
+              wrangler r2 bucket create turborepo-cache || true
+            fi
           secrets: |
             TURBO_TOKEN
-          command: deploy
+          command: deploy --config .output/server/wrangler.json

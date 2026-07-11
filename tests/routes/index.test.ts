@@ -1,24 +1,15 @@
-import { createExecutionContext } from 'cloudflare:test';
-import { env } from 'cloudflare:workers';
-import { describe, beforeEach, test, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { Env } from '~/index';
 import { app } from '~/routes';
 
+import { createTestAppContext } from '../helpers/app';
+
 describe('Homepage route', () => {
-  let workerEnv: Env;
-  let ctx: ExecutionContext;
+  test('returns the project landing page', async () => {
+    const { bindings } = createTestAppContext();
+    const response = await app.fetch(new Request('http://localhost/'), bindings);
 
-  beforeEach(() => {
-    workerEnv = env;
-    ctx = createExecutionContext();
-  });
-
-  test('should return a 200 status code', async () => {
-    const request = new Request('http://localhost/', {
-      method: 'GET',
-    });
-    const response = await app.fetch(request, workerEnv, ctx);
     expect(response.status).toBe(200);
+    expect(await response.text()).toContain('Turborepo Remote Cache');
   });
 });

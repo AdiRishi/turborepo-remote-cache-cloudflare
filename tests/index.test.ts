@@ -1,10 +1,14 @@
-import { createExecutionContext } from 'cloudflare:test';
+import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
-import { expect, it, describe, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type { Env } from '~/index';
 
 import { deleteOldCache } from '~/crons/deleteOldCache';
-import { Env, workerHandler } from '~/index';
+import worker, { workerHandler } from '~/index';
 import { app } from '~/routes';
+
+import { createTestAppContext } from './helpers/app';
 
 vi.mock('~/crons/deleteOldCache', async (importActual) => {
   const actual = await importActual<typeof import('~/crons/deleteOldCache')>();
@@ -13,64 +17,119 @@ vi.mock('~/crons/deleteOldCache', async (importActual) => {
     deleteOldCache: vi.fn<typeof actual.deleteOldCache>(),
   };
 });
+
 const deleteOldCacheMock = vi.mocked(deleteOldCache);
+const workerEnv: Env = {
+  CACHE_RETENTION_HOURS: env.CACHE_RETENTION_HOURS,
+  R2_STORE: env.R2_STORE,
+  STORAGE_PROVIDER: env.STORAGE_PROVIDER,
+  TURBO_TOKEN: env.TURBO_TOKEN,
+};
+
+class TestScheduledEvent extends Event {
+  readonly cron = '0 3 * * *';
+  readonly scheduledTime = Date.now();
+
+  constructor() {
+    super('scheduled');
+  }
+
+  noRetry(): void {}
+
+  waitUntil(_promise: Promise<unknown>): void {}
+}
 
 describe('remote-cache worker', () => {
-  let workerEnv: Env;
-  let ctx: ExecutionContext;
-
   beforeEach(() => {
-    workerEnv = env;
-    ctx = createExecutionContext();
+    deleteOldCacheMock.mockReset().mockResolvedValue({ deleted: 0, skipped: 0 });
   });
 
-  it('should respond to the ping route via invoking the worker handler', async () => {
+  it('responds to ping through the compatibility worker handler', async () => {
     const response = await workerHandler.fetch(
       new Request('https://turborepo-remote-cache.com/ping'),
       workerEnv,
-      ctx,
+      createExecutionContext(),
     );
-    expect(response).toBeTruthy();
+
     expect(response.status).toBe(200);
-    const text = await response.text();
-    expect(text).toBe('pong');
+    expect(await response.text()).toBe('pong');
   });
 
-  it('should respond to the ping route via invoking the app', async () => {
-    const request = new Request('http://localhost/ping');
-    const res = await app.fetch(request, workerEnv, ctx);
-    expect(await res.text()).toBe('pong');
+  it('responds through the generated Cloudflare environment boundary', async () => {
+    const response = await worker.fetch(
+      new Request('https://turborepo-remote-cache.com/ping'),
+      env,
+      createExecutionContext(),
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe('pong');
   });
 
-  it('should respond to the throw-exception route via invoking the app', async () => {
-    const request = new Request('http://localhost/throw-exception');
-    const res = await app.fetch(request, workerEnv, ctx);
-    expect(res.status).toBe(500);
-    expect(await res.json()).toEqual({
-      error: 'Expected error',
-    });
+  it('responds to ping through the Hono app', async () => {
+    const { bindings } = createTestAppContext();
+    const response = await app.fetch(new Request('http://localhost/ping'), bindings);
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe('pong');
   });
 
-  it('should throw a 500 error when the storage manager is not configured correctly', async () => {
-    const badEnv = { ...workerEnv, R2_STORE: undefined, KV_STORE: undefined };
-    const res = await workerHandler.fetch(new Request('http://localhost/ping'), badEnv, ctx);
-    expect(res.status).toBe(500);
-    expect((await res.text()).includes('Storage options not configured correctly')).toBe(true);
+  it('maps an unhandled route exception to a JSON 500 response', async () => {
+    const { bindings } = createTestAppContext();
+    const response = await app.fetch(new Request('http://localhost/throw-exception'), bindings);
+
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({ error: 'Expected error' });
+  });
+
+  it('returns a useful 500 when no storage provider is configured', async () => {
+    const badEnv: Env = {
+      TURBO_TOKEN: 'test-token',
+    };
+    const response = await workerHandler.fetch(
+      new Request('http://localhost/ping'),
+      badEnv,
+      createExecutionContext(),
+    );
+
+    expect(response.status).toBe(500);
+    expect(await response.text()).toContain('Storage options not configured correctly');
   });
 });
 
 describe('remote-cache scheduled event', () => {
-  let workerEnv: Env;
-  let ctx: ExecutionContext;
-
   beforeEach(() => {
-    workerEnv = env;
-    ctx = createExecutionContext();
+    deleteOldCacheMock.mockReset().mockResolvedValue({ deleted: 0, skipped: 0 });
   });
 
-  it('should call deleteOldCache', async () => {
-    // @ts-expect-error - missing properties for the scheduled event
-    await workerHandler.scheduled({ scheduledTime: Date.now() }, workerEnv, ctx);
-    expect(deleteOldCacheMock).toHaveBeenCalled();
+  it('runs retention with the configured storage and default retention window', async () => {
+    const ctx = createExecutionContext();
+
+    workerHandler.scheduled(new TestScheduledEvent(), workerEnv, ctx);
+    await waitOnExecutionContext(ctx);
+
+    expect(deleteOldCacheMock).toHaveBeenCalledOnce();
+    expect(deleteOldCacheMock).toHaveBeenCalledWith(expect.anything(), 720);
+  });
+
+  it('logs and rethrows retention failures', async () => {
+    const error = new Error('retention failed');
+    const consoleErrorMock = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    deleteOldCacheMock.mockRejectedValueOnce(error);
+
+    try {
+      const ctx = createExecutionContext();
+      workerHandler.scheduled(new TestScheduledEvent(), workerEnv, ctx);
+
+      await expect(waitOnExecutionContext(ctx)).rejects.toBe(error);
+      expect(consoleErrorMock).toHaveBeenCalledWith(
+        JSON.stringify({
+          message: 'Failed to delete expired cache entries',
+          error: 'retention failed',
+        }),
+      );
+    } finally {
+      consoleErrorMock.mockRestore();
+    }
   });
 });

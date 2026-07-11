@@ -1,10 +1,9 @@
-import { createExecutionContext, reset } from 'cloudflare:test';
-import { env } from 'cloudflare:workers';
-import { describe, afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { deleteOldCache } from '~/crons/deleteOldCache';
-import { Env, workerHandler } from '~/index';
-import { StorageManager } from '~/storage';
+import { app } from '~/routes';
+
+import { createTestAppContext, withAuthorization, type TestAppContext } from '../helpers/app';
 
 vi.mock('~/crons/deleteOldCache', async (importActual) => {
   const actual = await importActual<typeof import('~/crons/deleteOldCache')>();
@@ -13,163 +12,143 @@ vi.mock('~/crons/deleteOldCache', async (importActual) => {
     deleteOldCache: vi.fn<typeof actual.deleteOldCache>(),
   };
 });
+
 const deleteOldCacheMock = vi.mocked(deleteOldCache);
 
-describe('/internal Routes', () => {
-  let workerEnv: Env;
-  let ctx: ExecutionContext;
-  const app = workerHandler;
-
-  beforeEach(async () => {
-    await reset();
+const internalRequest = (path: string, init: RequestInit = {}, authorized = true): Request =>
+  new Request(`http://localhost/internal/${path}`, {
+    ...init,
+    headers: authorized ? withAuthorization(init.headers) : new Headers(init.headers),
   });
 
-  describe('/internal/delete-old-cache route', () => {
-    beforeEach(() => {
-      workerEnv = env;
-      workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
-      ctx = createExecutionContext();
-    });
+describe('/internal routes', () => {
+  let context: TestAppContext;
 
-    afterEach(() => {
-      vi.clearAllMocks();
-      vi.restoreAllMocks();
-    });
+  beforeEach(() => {
+    context = createTestAppContext();
+    deleteOldCacheMock.mockReset().mockResolvedValue({ deleted: 0, skipped: 0 });
+  });
 
-    test('should invoke the deleteOldCache method', async () => {
-      const request = new Request('http://localhost/internal/delete-expired-objects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
-        },
-        body: JSON.stringify({}),
-      });
-      const response = await app.fetch(request, workerEnv, ctx);
+  describe('POST /internal/delete-expired-objects', () => {
+    test('runs retention with the configured default window', async () => {
+      const response = await app.fetch(
+        internalRequest('delete-expired-objects', {
+          body: JSON.stringify({}),
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+        }),
+        context.bindings,
+      );
+
       expect(response.status).toBe(200);
-      expect(deleteOldCacheMock).toHaveBeenCalledOnce();
+      expect(await response.json()).toEqual({ success: true });
+      expect(deleteOldCacheMock).toHaveBeenCalledWith(context.files, 720);
     });
 
-    test('should pass through custom expiration hours to deleteOldCache', async () => {
-      const request = new Request('http://localhost/internal/delete-expired-objects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
-        },
-        body: JSON.stringify({ expireInHours: 100 }),
-      });
-      const response = await app.fetch(request, workerEnv, ctx);
+    test('passes an explicit retention window through to the cleanup service', async () => {
+      const response = await app.fetch(
+        internalRequest('delete-expired-objects', {
+          body: JSON.stringify({ expireInHours: 100 }),
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+        }),
+        context.bindings,
+      );
+
       expect(response.status).toBe(200);
-      expect(deleteOldCacheMock).toHaveBeenCalledWith({
-        ...workerEnv,
-        BUCKET_OBJECT_EXPIRATION_HOURS: 100,
-      });
+      expect(deleteOldCacheMock).toHaveBeenCalledWith(context.files, 100);
     });
 
-    test('should return 401 if no auth token is provided', async () => {
-      const request = new Request('http://localhost/internal/delete-expired-objects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({}),
-      });
-      const response = await app.fetch(request, workerEnv, ctx);
+    test('rejects a negative retention window without running cleanup', async () => {
+      const response = await app.fetch(
+        internalRequest('delete-expired-objects', {
+          body: JSON.stringify({ expireInHours: -1 }),
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+        }),
+        context.bindings,
+      );
+
+      expect(response.status).toBe(400);
+      expect(deleteOldCacheMock).not.toHaveBeenCalled();
+    });
+
+    test('does not run cleanup without authentication', async () => {
+      const response = await app.fetch(
+        internalRequest(
+          'delete-expired-objects',
+          {
+            body: JSON.stringify({}),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+          },
+          false,
+        ),
+        context.bindings,
+      );
+
       expect(response.status).toBe(401);
       expect(deleteOldCacheMock).not.toHaveBeenCalled();
     });
   });
 
-  describe('/internal/populate-random-objects route', () => {
-    beforeEach(() => {
-      workerEnv = env;
-      ctx = createExecutionContext();
-    });
+  describe('POST /internal/populate-random-objects', () => {
+    test('adds the requested number of objects through Files SDK', async () => {
+      const response = await app.fetch(
+        internalRequest('populate-random-objects', {
+          body: JSON.stringify({ count: 10 }),
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+        }),
+        context.bindings,
+      );
 
-    afterEach(() => {
-      vi.clearAllMocks();
-      vi.restoreAllMocks();
-    });
-
-    test('should successfully add random objects to R2', async () => {
-      const request = new Request('http://localhost/internal/populate-random-objects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
-        },
-        body: JSON.stringify({ count: 10 }),
-      });
-      const response = await app.fetch(request, workerEnv, ctx);
       expect(response.status).toBe(200);
-
-      const list = await workerEnv.STORAGE_MANAGER!.getActiveStorage().list();
-      expect(list.keys.length).toBe(10);
+      expect((await context.files.list()).items).toHaveLength(10);
     });
 
-    test('should return 401 if no auth token is provided', async () => {
-      const request = new Request('http://localhost/internal/populate-random-objects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ count: 10 }),
-      });
-      const response = await app.fetch(request, workerEnv, ctx);
+    test('does not write anything without authentication', async () => {
+      const response = await app.fetch(
+        internalRequest(
+          'populate-random-objects',
+          {
+            body: JSON.stringify({ count: 10 }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+          },
+          false,
+        ),
+        context.bindings,
+      );
+
       expect(response.status).toBe(401);
-      const list = await workerEnv.STORAGE_MANAGER!.getActiveStorage().list();
-      expect(list.keys.length).toBe(0);
+      expect((await context.files.list()).items).toHaveLength(0);
     });
   });
 
-  describe('/internal/count-objects route', () => {
-    beforeEach(() => {
-      workerEnv = env;
-      workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
-      ctx = createExecutionContext();
-    });
+  describe('GET /internal/count-objects', () => {
+    test('returns zero when storage is empty', async () => {
+      const response = await app.fetch(internalRequest('count-objects'), context.bindings);
 
-    afterEach(() => {
-      vi.clearAllMocks();
-      vi.restoreAllMocks();
-    });
-
-    test('should return the number of objects in R2 when bucket is empty', async () => {
-      const request = new Request('http://localhost/internal/count-objects', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
-        },
-      });
-      const response = await app.fetch(request, workerEnv, ctx);
       expect(response.status).toBe(200);
       expect(await response.json()).toEqual({ count: 0 });
     });
 
-    test('should return the number of objects in R2 when bucket is not empty', async () => {
-      await workerEnv.STORAGE_MANAGER!.getActiveStorage().write('key', 'value');
-      const request = new Request('http://localhost/internal/count-objects', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${workerEnv.TURBO_TOKEN}`,
-        },
-      });
-      const response = await app.fetch(request, workerEnv, ctx);
+    test('counts objects across Files SDK storage', async () => {
+      await context.files.upload('key', 'value');
+
+      const response = await app.fetch(internalRequest('count-objects'), context.bindings);
+
       expect(response.status).toBe(200);
       expect(await response.json()).toEqual({ count: 1 });
     });
 
-    test('should return 401 if no auth token is provided', async () => {
-      const request = new Request('http://localhost/internal/count-objects', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const response = await app.fetch(request, workerEnv, ctx);
+    test('rejects unauthenticated requests', async () => {
+      const response = await app.fetch(
+        internalRequest('count-objects', {}, false),
+        context.bindings,
+      );
+
       expect(response.status).toBe(401);
     });
   });

@@ -2,3 +2,9 @@ allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
+
+peerDependencyRules:
+  allowedVersions:
+    # openapi-typescript 7 declares TypeScript 5, but api:check exercises its
+    # Node/AST path on TypeScript 6. Remove this once upstream widens the peer.
+    'openapi-typescript>typescript': '^6.0.0'

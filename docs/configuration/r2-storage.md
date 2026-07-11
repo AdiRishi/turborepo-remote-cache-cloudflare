@@ -2,80 +2,80 @@
 layout: doc
 ---
 
-# 🪣 Storing artifacts in Cloudflare R2
+# Cloudflare R2 storage
 
-[Cloudflare R2](https://developers.cloudflare.com/r2/) offers scalable, low-cost object storage ideal for storing build artifacts globally. With R2, you can leverage Cloudflare's global network for quick access and efficient management of your build artifacts.
+[Cloudflare R2](https://developers.cloudflare.com/r2/) is the default provider. Cloudflare Workers can access it through a native binding, while other Nitro targets can use R2's S3-compatible API credentials.
 
-Follow these steps to store your build artifacts in Cloudflare R2:
+R2 persists artifact metadata and supports signed Turborepo caching.
 
-## 1. Create an R2 Bucket
+## Native binding on Cloudflare Workers
 
-An R2 bucket is a container for objects in Cloudflare R2. You can create a bucket via the [Cloudflare dashboard](https://dash.cloudflare.com/) or using the [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update)
+### 1. Create a bucket
 
-### Using the Wrangler CLI
+The included Wrangler configuration expects a bucket named `turborepo-cache`:
 
 ```sh
-wrangler r2 bucket create YOUR_BUCKET_NAME
+pnpm wrangler r2 bucket create turborepo-cache
 ```
 
-::: tip
-Using the Wrangler CLI to create a bucket will result in the bucket being **created** in a **region closest to you**.
+You can also create the bucket in the [Cloudflare dashboard](https://dash.cloudflare.com/) and choose a location hint appropriate for most cache clients.
 
-It is worth considering the region in which you create your bucket, as workers spun up father away from the bucket's region will experience higher latency.
+### 2. Bind it as `R2_STORE`
 
-**In order to create a bucket in a specific region, you will have to use the Cloudflare dashboard.**
-:::
+Keep or add the native binding in `wrangler.jsonc`:
 
-::: tip
-If you have true multi-region requirements, consider using Cloudflare KV as the store. Read the [next page](/configuration/kv-storage) to find out how.
-:::
-
-### Using the Cloudflare Dashboard
-
-1. Navigate to the [cloudflare dashboard](https://dash.cloudflare.com/) and select the `R2` tab on the left-hand side bar.
-2. Click the `Create Bucket` button.
-3. Enter a name for your bucket and select the region in which you would like to create the bucket.
-   ![R2 Create Dashboard](https://public-assets.turborepo-remote-cache.dev/cdn-cgi/image/width=960,quality=80,format=auto/images/r2-create-bucket-dashboard.jpg)
-4. Click `Create Bucket`.
-
-::: tip
-Try picking a region closest to where the bulk of your API requests will be coming from. E.g if you want to optimize for requests coming from Github actions in the US, pick a US region.
-
-You can find the list of regions and their codes [here](https://developers.cloudflare.com/r2/reference/data-location/#available-hints).
-:::
-
-## 2. Update Your Configuration
-
-Update your `wrangler.jsonc` file to include the R2 bucket details.
-
-```jsonc{5-11}
+```jsonc
 {
-  "name": "turborepo-remote-cache",
-  // Other settings...
-
-  "r2_buckets": [
-    {
-      "binding": "R2_STORE",
-      "bucket_name": "your-bucket-name",
-      "preview_bucket_name": "your-preview-bucket-name"
-    }
-  ],
-
-  // "kv_namespaces": [
-  //   {
-  //     "binding": "KV_STORE",
-  //     "id": "ea20b0eb60f44b13b8d013eeace98ca2",
-  //     "preview_id": "ea20b0eb60f44b13b8d013eeace98ca2"
-  //   }
-  // ]
+    "vars": {
+        "STORAGE_PROVIDER": "r2",
+    },
+    "r2_buckets": [
+        {
+            "binding": "R2_STORE",
+            "bucket_name": "turborepo-cache",
+            "preview_bucket_name": "turborepo-cache-preview",
+        },
+    ],
 }
 ```
 
-::: info
-If you want to use R2 as the store, ensure that the `kv_namespaces` section is commented out.
-:::
+`STORAGE_PROVIDER=r2` is explicit but optional when `R2_STORE` is the only legacy storage binding. If `KV_STORE` is also present and no provider is selected, compatibility auto-detection chooses KV.
 
-## 3. Deploy Your Worker
+You do not need to comment out an unused KV binding. Provider selection decides which storage is active.
 
-Once you've updated your Worker script and `wrangler.jsonc` file, deploy your Worker using the Wrangler CLI or your GitHub actions workflow.
-And that's it! Your build artifacts will now be stored in Cloudflare R2.
+### 3. Deploy
+
+```sh
+pnpm deploy
+```
+
+The native binding does not require an R2 API access key.
+
+Native-binding uploads must include `Content-Length`; Turborepo sends this header for cache artifacts. A chunked client without a known length receives the API's structured `400 bad_request` response because buffering an unbounded R2 artifact inside a Worker is unsafe.
+
+## Credential mode
+
+Use credential mode when R2 is selected outside Cloudflare Workers or when a deployment cannot expose an `R2_STORE` binding:
+
+```dotenv
+STORAGE_PROVIDER=r2
+R2_BUCKET=turborepo-cache
+R2_ACCOUNT_ID=YOUR_CLOUDFLARE_ACCOUNT_ID
+R2_ACCESS_KEY_ID=YOUR_R2_ACCESS_KEY_ID
+R2_SECRET_ACCESS_KEY=YOUR_R2_SECRET_ACCESS_KEY
+```
+
+Create an R2 API token with access to the chosen bucket. Treat both credential values as secrets. On Cloudflare, add them using Wrangler rather than committing them:
+
+```sh
+echo "YOUR_R2_ACCESS_KEY_ID" | pnpm wrangler secret put R2_ACCESS_KEY_ID
+echo "YOUR_R2_SECRET_ACCESS_KEY" | pnpm wrangler secret put R2_SECRET_ACCESS_KEY
+```
+
+`R2_BUCKET` and `R2_ACCOUNT_ID` may be ordinary runtime variables. The adapter derives the R2 endpoint from the account ID.
+
+## Retention and existing artifacts
+
+The `cache:delete-expired` Nitro task removes R2 objects older than `CACHE_RETENTION_HOURS`. Set the value to `0` to make cleanup a no-op. `BUCKET_OBJECT_EXPIRATION_HOURS` remains a compatibility fallback.
+
+Existing objects remain reachable after upgrading as long as the same bucket and object keys are used. Leave `STORAGE_PREFIX` unset to preserve legacy keys. Changing to credential mode does not itself migrate objects; its credentials must point at the same bucket if the existing cache should remain warm.

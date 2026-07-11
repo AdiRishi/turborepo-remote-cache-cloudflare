@@ -18,7 +18,7 @@ To set up the repository on your local machine, follow these steps:
 
 Before submitting a pull request, ensure you adhere to the following:
 
-1. Run lint and test commands to check for any errors. You can do this by running `pnpm lint` and `pnpm test`.
+1. Run `pnpm api:check`, `pnpm cf-typegen --check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm test:turbo` to check generated contracts, formatting, types, unit behavior, and the real client flow.
 2. Write unit tests for any changes you make. This helps maintain the quality of the code and ensures that your changes don't accidentally break anything.
 3. Always sign your commits. This confirms that the changes come from a trusted source. Read [this documentation](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification) to learn how to sign commits.
 

@@ -3,29 +3,29 @@
 layout: home
 
 hero:
-    name: Turbo Remote Cache
-    text: For Cloudflare
-    tagline: Highly performant remote cache for Cloudflare Workers. Completely free and open source.
+    name: Turborepo Remote Cache
+    text: Cloudflare-first, deploy anywhere.
+    tagline: A straightforward self-hosted cache with Cloudflare defaults, portable Nitro builds, and flexible Files SDK storage.
     image: https://public-assets.turborepo-remote-cache.dev/cdn-cgi/image/width=320,quality=80,format=auto/images/logo.png
     actions:
         - theme: brand
-          text: Get Started
+          text: Deploy on Cloudflare
           link: /introduction/getting-started
         - theme: alt
           text: View on GitHub
           link: https://github.com/AdiRishi/turborepo-remote-cache-cloudflare
 
 features:
-    - icon: 🚀
-      title: Faster Builds
-      details: Harness the power of remote caching to significantly speed up your builds
-    - icon: 🌐
-      title: Independence from Vercel
-      details: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
+    - icon: ☁️
+      title: Cloudflare-first
+      details: Clone, create an R2 bucket, and deploy with Wrangler. Cloudflare Workers remains the default and best-supported path.
     - icon: 🪣
-      title: Multiple Storage Options
-      details: Choose between R2 or KV storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
-    - icon: 💰
-      title: Affordable Start
-      details: With Cloudflare Workers' generous free tier and zero egress fees, you can make up to 100,000 requests every day at no cost.
+      title: Flexible storage
+      details: Select R2, KV, or S3 using environment configuration, with no application code changes.
+    - icon: 🌍
+      title: Deploy anywhere
+      details: Nitro provides portable builds for Node and other supported deployment presets.
+    - icon: 🧩
+      title: Extensible by design
+      details: Use a typed configuration escape hatch for another Files SDK adapter without growing the built-in provider registry.
 ---

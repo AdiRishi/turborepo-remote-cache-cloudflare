@@ -2,53 +2,58 @@
 layout: doc
 ---
 
-# ▲ Setting up remote caching in your Turborepo project
+# Set up Turborepo
 
-Here's my recommended approach for setting up remote caching in your Turborepo project. You can read more about this topic in the [official Turborepo documentation](https://turbo.build/repo/docs/core-concepts/remote-caching).
+After deploying the cache, configure each Turborepo repository that should use it. See [Turborepo's remote caching documentation](https://turborepo.dev/docs/core-concepts/remote-caching) for the underlying client behavior.
 
-## Step 1: Update `turbo.json`
+## 1. Enable signed caching
 
-Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)
+Add artifact signature validation to the repository's `turbo.json`:
 
 ```json
 {
-    "remoteCache": { "signature": true }
+    "remoteCache": {
+        "signature": true
+    }
 }
 ```
 
-## Step 2: Install `dotenv-cli`
+Signed caching prevents a client from accepting an artifact whose tag does not match its contents. R2, KV, and S3 all support the metadata needed to persist that tag.
 
-Install the `dotenv-cli` npm package:
+::: warning Custom storage metadata
+A custom Files SDK adapter must persist and return metadata to support signed caching and optional artifact metadata such as task duration or source hashes. If it cannot, plain cache operations remain available, but metadata-bearing uploads are rejected. The server does not create metadata sidecar objects.
+:::
+
+## 2. Install `dotenv-cli`
+
+Install `dotenv-cli` in the Turborepo repository that will use the cache:
 
 ```sh
-# You may have to add -W if you are installing this on your workspace root
+# Add -W when installing at a pnpm workspace root if required.
 pnpm add -D dotenv-cli
 ```
 
-## Step 3: Create a `.env` File
+## 3. Configure client environment variables
 
-Create a `.env` file at your project root with the following content:
+Create a `.env` file at the Turborepo repository root:
 
-```
-TURBO_API=YOUR_API_URL # Remember to remove the trailing slash
+```dotenv
+TURBO_API=https://YOUR_CACHE_DOMAIN
 TURBO_TEAM=team_my_team_name
-TURBO_TOKEN=SECRET # The turbo token must be a valid Bearer auth token
-TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
+TURBO_TOKEN=YOUR_SECRET
+TURBO_REMOTE_CACHE_SIGNATURE_KEY=YOUR_SIGNATURE_SECRET
 ```
 
-Keep the following in mind
+- Do not add a trailing slash to `TURBO_API`.
+- `TURBO_TEAM` must begin with `team_`.
+- `TURBO_TOKEN` must match the server's bearer token.
+- Keep the cache token and signature key secret, add `.env` to `.gitignore`, and provide the same values securely to CI.
 
-- Replace `SECRET` and `YOUR_API_URL` with your chosen values.
-- Turborepo requires that the `TURBO_API` value must not end with a trailing slash
-- The `TURBO_TEAM` value must begin with `team_`
-- Remember to add the `.env` file to `.gitignore`
-- If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
+`TURBO_TOKEN` authenticates requests to the remote cache. `TURBO_REMOTE_CACHE_SIGNATURE_KEY` signs and verifies artifacts in the Turborepo client; it does not need to match `TURBO_TOKEN`.
 
-## Step 4: Modify Turbo Commands
+## 4. Load the environment for Turbo commands
 
-Load the `.env` file prior to execution. Instead of running a command like `turbo run build` directly, use `dotenv -- turbo run build`. This loads everything in our `.env` file into the process's environment variables.
-
-Here's how to modify your scripts in `package.json` to use dotenv-cli:
+Use `dotenv --` before each Turbo command. For example:
 
 ```json
 {
@@ -61,23 +66,4 @@ Here's how to modify your scripts in `package.json` to use dotenv-cli:
 }
 ```
 
-And that's it 🎉🎉
-
-Whenever you run a turbo command you will see `Remote cache enabled` in it's log output
-
-```
-pnpm lint
-
-$ dotenv -- turbo run lint
-• Packages in scope: turborepo-project, webapp, docs
-• Running lint in 3 packages
-• Remote caching enabled
-
-...output
-
- Tasks:    3 successful, 3 total
-Cached:    3 cached, 3 total
-  Time:    1.174s >>> FULL TURBO
-
-✨  Done in 3.54s.
-```
+The next run should report `Remote caching enabled`. Run a cacheable task twice to confirm that the second invocation restores its output from the remote cache.
