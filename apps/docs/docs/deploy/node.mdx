@@ -1,0 +1,68 @@
+---
+title: Node.js, Bun, and Deno
+description: Run the server as a long-running Node.js, Bun, or Deno process with an S3-compatible bucket, and keep the daily expiry task in the process.
+---
+
+The server runs as one process and stores artifacts in an [S3-compatible bucket](/storage/s3) or through a [custom adapter](/storage/custom-adapter).
+
+## Build and start
+
+<Tabs>
+<Tab title="Node.js">
+
+```sh
+NITRO_PRESET=node_server pnpm build --filter=@turborepo-remote-cache/server
+cd apps/server
+pnpm start
+```
+
+`pnpm start` runs `node .output/server/index.mjs`.
+
+</Tab>
+<Tab title="Bun">
+
+```sh
+NITRO_PRESET=bun pnpm build --filter=@turborepo-remote-cache/server
+cd apps/server
+bun run ./.output/server/index.mjs
+```
+
+</Tab>
+<Tab title="Deno">
+
+```sh
+NITRO_PRESET=deno_server pnpm build --filter=@turborepo-remote-cache/server
+cd apps/server
+deno run --allow-net --allow-read --allow-env .output/server/index.mjs
+```
+
+</Tab>
+</Tabs>
+
+The build is self-contained. To deploy it, copy `apps/server/.output` to the machine or image that runs it.
+
+## Configure the server
+
+Set the variables in the process environment:
+
+```sh
+TURBO_TOKEN=<your token>
+PORT=3000
+S3_BUCKET=turborepo-cache
+S3_ENDPOINT=https://s3.us-east-1.amazonaws.com
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=<access key ID>
+S3_SECRET_ACCESS_KEY=<secret access key>
+```
+
+The server listens on `PORT`, or on `3000` when it's unset. `HOST` sets the address it binds to. [Configuration](/configuration) lists every variable.
+
+Check it with `curl http://localhost:3000/ping`, which answers `pong`.
+
+## The expiry task
+
+The server schedules `cache:delete-expired` inside its own process, daily at 03:00 UTC. It runs only while the process is up, so a server that is stopped at that time skips that day's run. If you run several copies behind a load balancer, each copy runs the task, and the later runs find nothing to delete.
+
+## Put it behind HTTPS
+
+`turbo` sends the token in every request, so serve the cache over HTTPS. Run the server behind a reverse proxy or load balancer that terminates TLS, and set `TURBO_API` to the HTTPS address.

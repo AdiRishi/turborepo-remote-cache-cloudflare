@@ -1,0 +1,39 @@
+---
+title: Introduction
+description: What Turborepo Remote Cache is, how turbo uses it to share task outputs, and which platforms and storage it runs on.
+---
+
+Turborepo Remote Cache is an open-source server for the [Turborepo Remote Cache API](https://turborepo.dev/docs/core-concepts/remote-caching#remote-cache-api). You host it yourself, so build artifacts stay in storage you own and `turbo` needs no Vercel account. It runs on Cloudflare Workers by default and on any platform that [Nitro](https://nitro.build) builds for.
+
+## How turbo uses the cache
+
+`turbo` hashes the inputs of every task it runs. Before it runs a task, it asks the cache for an artifact with that hash:
+
+1. On a hit, `turbo` downloads the artifact, restores the task's outputs and logs, and skips the task.
+2. On a miss, `turbo` runs the task, packs its outputs into an artifact, and uploads it.
+
+The next machine that runs the same task with the same inputs gets a hit, whether it's a teammate's laptop or a CI runner. The server only stores and returns artifacts. `turbo` decides what to cache, and with [signatures](/connect-turbo#sign-artifacts) turned on, it verifies every artifact it downloads.
+
+## What the server stores
+
+Each artifact is one object, keyed by team and hash (`<team>/<hash>`). The team comes from the `teamId` or `slug` that `turbo` sends, and requests without either use `team_default_team`. The server also keeps the artifact headers that `turbo` uploads, such as the task duration and the signature of a signed artifact.
+
+A daily task deletes artifacts older than `BUCKET_OBJECT_EXPIRATION_HOURS`, which is 720 hours (30 days) by default. [Retention and expiry](/retention) explains how to change it.
+
+## One token for every client
+
+Every client authenticates with the same bearer token, the server's `TURBO_TOKEN`. Teams separate artifacts, but they don't restrict access. Anyone with the token can read and write the artifacts of every team. Give the token only to people and CI jobs that you trust to write to your cache, and use a separate deployment for each group that must stay apart.
+
+## Where it runs
+
+Cloudflare Workers is the default build and the setup this project tests first. Every platform serves the same API.
+
+| Platform               | Built-in storage           | Daily expiry               | Guide                                     |
+| ---------------------- | -------------------------- | -------------------------- | ----------------------------------------- |
+| Cloudflare Workers     | R2, KV, or S3-compatible   | Cron trigger               | [Get started on Cloudflare](/get-started) |
+| Node.js, Bun, and Deno | S3-compatible              | Runs in the server process | [Node.js, Bun, and Deno](/deploy/node)    |
+| Vercel                 | S3-compatible              | Vercel Cron Jobs           | [Vercel](/deploy/vercel)                  |
+| Netlify                | S3-compatible              | External scheduler         | [Netlify](/deploy/netlify)                |
+| AWS Lambda             | Amazon S3 or S3-compatible | External scheduler         | [AWS Lambda](/deploy/aws-lambda)          |
+
+Any other storage that has a [Files SDK](https://files-sdk.dev) adapter works through the [custom adapter hook](/storage/custom-adapter).

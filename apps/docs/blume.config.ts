@@ -7,19 +7,24 @@ import serverPackage from '../server/package.json' with { type: 'json' };
 const repositoryUrl = 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare';
 const changelogUrl = `${repositoryUrl}/blob/master/apps/server/CHANGELOG.md`;
 
-// The VitePress site also served every page at `<route>.html`.
-const vitepressHtmlRoutes = [
-  '/introduction/getting-started',
-  '/introduction/setup-turborepo',
-  '/configuration/project-configuration',
-  '/configuration/r2-storage',
-  '/configuration/kv-storage',
-];
+const deployment =
+  process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true'
+    ? { site: 'https://cloudflare.turborepo-remote-cache.dev' }
+    : { site: 'https://adirishi.github.io', base: '/turborepo-remote-cache-cloudflare' };
+
+// Pages that moved. The VitePress site also served every page at `<route>.html`.
+const movedPages: Record<string, string> = {
+  '/introduction/getting-started': '/get-started',
+  '/introduction/setup-turborepo': '/connect-turbo',
+  '/configuration/project-configuration': '/retention',
+  '/configuration/r2-storage': '/storage/r2',
+  '/configuration/kv-storage': '/storage/kv',
+};
 
 export default defineConfig({
   title: 'Turborepo Remote Cache',
   description:
-    'An implementation of the turborepo-remote-cache server custom made for Cloudflare Workers',
+    'Self-host the Turborepo remote cache on Cloudflare Workers, Node.js, Vercel, or AWS Lambda, with artifacts in R2, KV, or any S3-compatible bucket.',
   logo: { image: 'node_modules/@turborepo-remote-cache/brand/assets/lockup.svg', text: '' },
   theme: {
     accent: { light: '#8f5b00', dark: '#ffb224' },
@@ -60,10 +65,10 @@ export default defineConfig({
       { label: 'Contributing', href: `${repositoryUrl}/blob/master/.github/CONTRIBUTING.md` },
     ],
   },
-  redirects: vitepressHtmlRoutes.map((route) => ({ from: `${route}.html`, to: route })),
+  redirects: Object.entries(movedPages).flatMap(([from, to]) => [
+    { from, to },
+    { from: `${from}.html`, to },
+  ]),
   analytics: [googleAnalytics({ id: 'G-4FKXFQBLZR' })],
-  deployment:
-    process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true'
-      ? { site: 'https://cloudflare.turborepo-remote-cache.dev' }
-      : { site: 'https://adirishi.github.io', base: '/turborepo-remote-cache-cloudflare' },
+  deployment,
 });

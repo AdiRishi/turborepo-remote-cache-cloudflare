@@ -1,0 +1,90 @@
+---
+title: Retention and expiry
+description: How the daily cache:delete-expired task removes old artifacts, how to change the retention period, and how to run expiry on demand.
+---
+
+## The retention period
+
+`BUCKET_OBJECT_EXPIRATION_HOURS` sets how long the server keeps an artifact. It's a whole number of hours, at least `1`, and defaults to `720` (30 days).
+
+An artifact's age counts from when it was uploaded. Downloading it doesn't reset the age, so even an artifact that every build uses expires on schedule. The next run that needs it misses, rebuilds the task, and uploads a fresh copy.
+
+To change the period on Cloudflare Workers, edit `vars` in `apps/server/wrangler.jsonc` and deploy:
+
+```jsonc apps/server/wrangler.jsonc
+{
+    "vars": {
+        "BUCKET_OBJECT_EXPIRATION_HOURS": 168,
+    },
+}
+```
+
+On other platforms, set `BUCKET_OBJECT_EXPIRATION_HOURS` in the server's environment.
+
+With [KV storage](/storage/kv), the same value is also each entry's TTL, which KV applies when the server writes the entry.
+
+## The daily task
+
+The `cache:delete-expired` task runs every day at 03:00 UTC. It lists every object in the store and deletes the ones older than `BUCKET_OBJECT_EXPIRATION_HOURS`. It also deletes any object whose upload time the store doesn't report.
+
+:::warning
+The task deletes old objects of every kind, not only artifacts. Give the cache a bucket or namespace of its own.
+:::
+
+Each platform runs the task in its own way, and some don't run it at all. [The expiry task on each platform](/deploy#the-expiry-task-on-each-platform) lists them.
+
+To change the schedule, edit `scheduledTasks` in `apps/server/nitro.config.ts` and rebuild. The key is a cron expression in UTC:
+
+```ts apps/server/nitro.config.ts
+scheduledTasks: {
+  '0 3 * * *': ['cache:delete-expired'],
+},
+```
+
+To stop the task, remove the entry. Artifacts then stay until you delete them, except in KV, where the TTL still applies.
+
+## Run the task on demand
+
+`POST /internal/delete-expired-objects` runs the same deletion and returns how many artifacts it deleted. Use it on platforms without a scheduler, or to clear the cache:
+
+```sh
+curl -X POST https://cache.example.com/internal/delete-expired-objects \
+  -H "Authorization: Bearer <your token>" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```json
+{ "deleted": 42 }
+```
+
+The request needs the `TURBO_TOKEN` bearer token and a JSON body. `{}` uses `BUCKET_OBJECT_EXPIRATION_HOURS`. To use another age for this one run, send `expireInHours`, a number of hours that is `0` or more:
+
+```sh
+curl -X POST https://cache.example.com/internal/delete-expired-objects \
+  -H "Authorization: Bearer <your token>" \
+  -H "Content-Type: application/json" \
+  -d '{"expireInHours": 0}'
+```
+
+`"expireInHours": 0` deletes every artifact. A request without a JSON body, or with a negative `expireInHours`, returns a `400` error.
+
+### Schedule it from GitHub Actions
+
+On a platform that doesn't run the task, a scheduled workflow can call the endpoint:
+
+```yaml .github/workflows/cache-expiry.yml
+on:
+    schedule:
+        - cron: '0 3 * * *'
+
+jobs:
+    expire:
+        runs-on: ubuntu-latest
+        steps:
+            - run: |
+                  curl --fail -X POST "${{ vars.TURBO_API }}/internal/delete-expired-objects" \
+                    -H "Authorization: Bearer ${{ secrets.TURBO_TOKEN }}" \
+                    -H "Content-Type: application/json" \
+                    -d '{}'
+```

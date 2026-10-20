@@ -1,6 +1,6 @@
 import { defineMeta } from 'blume';
 
 export default defineMeta({
-  order: 1,
-  pages: ['getting-started', 'setup-turborepo'],
+  order: 3,
+  pages: ['r2', 'kv', 's3', 'custom-adapter'],
 });

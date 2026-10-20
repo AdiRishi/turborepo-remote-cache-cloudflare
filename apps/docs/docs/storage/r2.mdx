@@ -1,0 +1,44 @@
+---
+title: Cloudflare R2
+description: Store artifacts in a Cloudflare R2 bucket, the default for Workers, and choose the bucket's name and location.
+sidebar:
+    label: Cloudflare R2
+---
+
+The Worker reads and writes artifacts through an `R2_STORE` binding, with one object per artifact.
+
+## Configure the binding
+
+`apps/server/wrangler.jsonc` binds a bucket named `turborepo-cache`:
+
+```jsonc apps/server/wrangler.jsonc
+{
+    "r2_buckets": [
+        {
+            "binding": "R2_STORE",
+            "bucket_name": "turborepo-cache",
+            "preview_bucket_name": "turborepo-cache-preview",
+        },
+    ],
+}
+```
+
+When the bucket doesn't exist, `wrangler deploy` creates it. To use another bucket, change `bucket_name` and deploy again. Keep the binding name `R2_STORE`, because the server looks for that name.
+
+## Choose where the bucket lives
+
+Without a location hint, R2 creates a bucket in the region closest to the request that creates it. With automatic creation, that request comes from the machine or CI runner that runs the first deploy. To pick the location yourself, create the bucket before the first deploy:
+
+```sh
+pnpm --filter @turborepo-remote-cache/server exec wrangler r2 bucket create turborepo-cache --location enam
+```
+
+Choose the hint closest to most of your builds, such as your CI region. Cloudflare lists the hints in [Data location](https://developers.cloudflare.com/r2/reference/data-location/#location-hints). To move the cache to another location later, create a bucket there and change `bucket_name`. The new bucket starts empty.
+
+## Expiry
+
+The daily expiry task lists the bucket and deletes artifacts older than `BUCKET_OBJECT_EXPIRATION_HOURS`. [Retention and expiry](/retention) covers the schedule and the on-demand endpoint.
+
+## Use R2 from another platform
+
+A server outside Cloudflare can store artifacts in R2 through R2's S3-compatible API. [S3-compatible storage](/storage/s3#cloudflare-r2-over-the-s3-api) shows the variables.
