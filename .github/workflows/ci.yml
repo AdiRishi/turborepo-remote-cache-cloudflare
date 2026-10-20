@@ -6,23 +6,31 @@ on:
   pull_request:
     branches: [master]
 
+permissions:
+  contents: read
+
 jobs:
   check:
     name: Check correctness
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_REMOTE_CACHE_SIGNATURE_KEY: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: pnpm/setup@v3
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: .nvmrc
+          cache: true
+          install: false
 
-      - run: pnpm install
-      - run: pnpm lint
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec turbo run lint
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
 
       - name: Coveralls Coverage Report
         uses: coverallsapp/github-action@v2
+        with:
+          file: apps/server/coverage/clover.xml

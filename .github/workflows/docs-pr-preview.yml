@@ -11,6 +11,8 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   DOCS_CLOUDFLARE_DEPLOYMENT: true
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_REMOTE_CACHE_SIGNATURE_KEY: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
 
 jobs:
   check:
@@ -18,28 +20,29 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: pnpm/setup@v3
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: .nvmrc
+          cache: true
+          install: false
 
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm docs:build
 
       - name: Deploy vitepress docs
         id: deploy-docs
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
-          packageManager: 'pnpm'
-          command: pages deploy docs/.vitepress/dist/ --project-name=cloudflare-turbo-cache-docs
+          packageManager: pnpm
+          workingDirectory: apps/server
+          command: pages deploy ../docs/.vitepress/dist/ --project-name=cloudflare-turbo-cache-docs
 
       - name: Comment with deploy link
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const deploymentUrl = process.env.DEPLOYMENT_URL;

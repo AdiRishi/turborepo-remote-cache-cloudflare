@@ -11,16 +11,19 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_REMOTE_CACHE_SIGNATURE_KEY: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
     steps:
       - name: Create Github Token as Changesets-Bot
         id: create_token
-        uses: tibdex/github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
-          app_id: ${{ secrets.CHANGESETS_RELEASE_APP_ID }}
-          private_key: ${{ secrets.CHANGESETS_RELEASE_PRIVATE_KEY }}
+          app-id: ${{ secrets.CHANGESETS_RELEASE_APP_ID }}
+          private-key: ${{ secrets.CHANGESETS_RELEASE_PRIVATE_KEY }}
 
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ steps.create_token.outputs.token }}
           fetch-depth: 0
@@ -33,24 +36,22 @@ jobs:
           git config --global user.email "152388490+changesets-release-app[bot]@users.noreply.github.com"
 
       - name: Setup pnpm and node
-        uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+        uses: pnpm/setup@v3
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: .nvmrc
+          cache: true
+          install: false
 
       - name: Install Dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - name: Build package
         run: pnpm build
 
       - name: Changesets Release
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          commit: 'chore(release): Release latest changesets'
-          title: 'chore(release): Release latest changesets'
-          setupGitUser: false
-          createGithubReleases: true
-          publish: pnpm changeset tag
-        env:
-          GITHUB_TOKEN: ${{ steps.create_token.outputs.token }}
+          github-token: ${{ steps.create_token.outputs.token }}
+          commit-message: 'chore(release): Release latest changesets'
+          pr-title: 'chore(release): Release latest changesets'
+          create-github-releases: true
+          publish-script: pnpm changeset git-tag
