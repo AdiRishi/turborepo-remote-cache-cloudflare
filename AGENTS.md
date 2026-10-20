@@ -7,7 +7,7 @@ An open-source Turborepo remote cache server for Cloudflare Workers. It stores b
 pnpm workspace orchestrated by Turborepo:
 
 - `apps/server` (`@turborepo-remote-cache/server`): the Worker, its tests, and `wrangler.jsonc`.
-- `apps/docs` (`@turborepo-remote-cache/docs`): the VitePress documentation site.
+- `apps/docs` (`@turborepo-remote-cache/docs`): the Blume documentation site.
 - `packages/*`: reserved for shared workspace packages; empty today.
 
 Root holds shared tooling: `turbo.json`, `tsconfig.base.json` (every package extends it), `oxlint.config.ts`, and `oxfmt.config.ts`.
@@ -24,6 +24,9 @@ pnpm typecheck
 pnpm test          # Vitest with coverage, in apps/server
 pnpm build
 pnpm docs:build
+
+# Check docs links, anchors, and redirects
+pnpm --filter @turborepo-remote-cache/docs exec blume validate --strict
 
 # One test file
 pnpm --filter @turborepo-remote-cache/server exec vitest run tests/routes/v8/artifacts.test.ts
@@ -112,3 +115,11 @@ Tests mirror the source tree under `apps/server/tests/`. Use unique IDs (`Math.r
 ## Documentation
 
 Docs live in `apps/docs`. Every functional or configuration change updates the matching docs page in the same PR.
+
+The site is built with [Blume](https://useblume.dev). Its own docs ship in `apps/docs/node_modules/blume/docs`. Read them instead of answering from memory.
+
+- Pages are `.mdx` files under `apps/docs/docs/`. The file path is the route, and the `meta.ts` in each folder sets the sidebar order.
+- Frontmatter is strict: a key Blume doesn't know fails the build. The `title` renders as the page H1, so the body starts at `##`.
+- Write callouts as `:::tip` … `:::`, with no space after the colons. `::: tip` renders as literal text.
+- `blume.config.ts` reads the version from `apps/server/package.json`, so `apps/docs/turbo.json` lists that file as an input. List any other file or env var the docs build reads there too.
+- The site shows no "Last updated" dates. Blume reads them from Git history, which Turborepo doesn't hash, so a cache hit would replay stale dates.
