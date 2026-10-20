@@ -11,6 +11,7 @@
   "devDependencies": {
     "@types/node": "^24.19.2",
     "blume": "^2.2.4",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "wrangler": "^4.151.1"
   }
 }

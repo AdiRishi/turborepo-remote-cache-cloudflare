@@ -32,15 +32,15 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build with VitePress
+      - name: Build with Blume
         run: |
           pnpm docs:build
-          touch apps/docs/.vitepress/dist/.nojekyll
+          touch apps/docs/dist/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: apps/docs/.vitepress/dist
+          path: apps/docs/dist
 
   deploy:
     runs-on: ubuntu-latest

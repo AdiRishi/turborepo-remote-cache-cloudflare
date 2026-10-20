@@ -30,15 +30,15 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm docs:build
 
-      - name: Deploy vitepress docs
+      - name: Deploy Blume docs
         id: deploy-docs
         uses: cloudflare/wrangler-action@v4
         with:
           accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
-          workingDirectory: apps/server
-          command: pages deploy ../docs/.vitepress/dist/ --project-name=cloudflare-turbo-cache-docs
+          workingDirectory: apps/docs
+          command: pages deploy dist --project-name=cloudflare-turbo-cache-docs
 
       - name: Comment with deploy link
         if: github.event_name == 'pull_request'
