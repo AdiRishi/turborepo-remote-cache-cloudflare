@@ -1,5 +1,6 @@
 import { defineConfig } from 'blume';
 import { googleAnalytics } from 'blume/analytics';
+import { openapi } from 'blume/reference';
 
 import serverPackage from '../server/package.json' with { type: 'json' };
 
@@ -38,8 +39,19 @@ export default defineConfig({
     dir: 'apps/docs',
   },
   navigation: {
+    tabs: [
+      { label: 'Docs', path: '/' },
+      { label: 'API reference', path: '/api' },
+    ],
     actions: [{ label: `v${serverPackage.version}`, href: changelogUrl }],
   },
+  reference: [
+    openapi({
+      spec: '../server/openapi/turborepo.openapi.json',
+      overlays: ['./openapi/overlay.yaml'],
+      route: '/api',
+    }),
+  ],
   footer: {
     copyright:
       'Turborepo Remote Cache is an independent, MIT-licensed project. It is not affiliated with Vercel or Cloudflare.',
