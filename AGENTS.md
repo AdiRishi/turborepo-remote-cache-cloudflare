@@ -73,8 +73,12 @@ Docs live in `apps/docs`. Every functional or configuration change updates the m
 
 The site is built with [Blume](https://useblume.dev). Its own docs ship in `apps/docs/node_modules/blume/docs`. Read them instead of answering from memory.
 
-- Pages are `.mdx` files under `apps/docs/docs/`. The file path is the route, and the `meta.ts` in each folder sets the sidebar order.
-- Frontmatter is strict: a key Blume doesn't know fails the build. The `title` renders as the page H1, so the body starts at `##`.
+- Pages are `.mdx` files under `apps/docs/docs/`. The file path is the route, and a parenthesized folder such as `(get-started)` groups pages without adding a URL segment. The `meta.ts` in each folder sets the sidebar order.
+- Frontmatter is strict: a key Blume doesn't know fails the build. The `title` renders as the page H1, and the `description` renders below it, so don't repeat the description in the first paragraph.
 - Write callouts as `:::tip` … `:::`, with no space after the colons. `::: tip` renders as literal text.
-- `blume.config.ts` reads the version from `apps/server/package.json`, so `apps/docs/turbo.json` lists that file as an input. List any other file or env var the docs build reads there too.
+- The home page is the custom page `apps/docs/pages/index.astro`, not Markdown.
+- The brand comes from `packages/brand`: `theme.css` imports its Blume tokens, `logo` points at its lockup, and `apps/docs/public` holds symlinks to its favicon and touch icon.
+- The API reference under `/api` renders the vendored spec in `apps/server/openapi/`. Fix spec problems in `apps/docs/openapi/overlay.yaml`, never in the vendored file.
+- The docs build reads `apps/server/package.json` (the version) and the vendored spec, so `apps/docs/turbo.json` lists both as inputs. List any other file or env var the docs build reads there too. The brand package reaches the hash through `transit`.
+- When you move a page, add a redirect in `blume.config.ts`.
 - The site shows no "Last updated" dates. Blume reads them from Git history, which Turborepo doesn't hash, so a cache hit would replay stale dates.
