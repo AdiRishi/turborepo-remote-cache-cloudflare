@@ -31,7 +31,7 @@ describe('storage-manager', () => {
 
   test('getActiveStorage() throws if no storage is available', () => {
     const emptyEnv = { ...workerEnv, R2_STORE: undefined, KV_STORE: undefined };
-    expect(() => new StorageManager(emptyEnv)).toThrowError('No storage provided');
+    expect(() => new StorageManager(emptyEnv)).toThrow('No storage provided');
   });
 
   test('getActiveStorage() returns kv if both are available', () => {

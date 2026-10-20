@@ -32,11 +32,11 @@ export class StorageManager {
     return this.storageToUse;
   }
 
-  public static async readableStreamToText(stream: ReadableStream): Promise<string> {
-    return await new Response(stream).text();
+  public static readableStreamToText(stream: ReadableStream): Promise<string> {
+    return new Response(stream).text();
   }
-  public static async readableStreamToBuffer(stream: ReadableStream): Promise<ArrayBuffer> {
-    return await new Response(stream).arrayBuffer();
+  public static readableStreamToBuffer(stream: ReadableStream): Promise<ArrayBuffer> {
+    return new Response(stream).arrayBuffer();
   }
   public static textToReadableStream(text: string): ReadableStream {
     return new Response(text).body!;

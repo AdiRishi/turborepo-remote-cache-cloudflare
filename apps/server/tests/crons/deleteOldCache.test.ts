@@ -88,7 +88,8 @@ describe('deleteOldCache', () => {
 
     test('should not call delete with no keys', async () => {
       const spy = vi.spyOn(storage, 'delete');
-      isDateOlderThanMock.mockReturnValue(false); // Make sure no objects are marked for deletion
+      // Make sure no objects are marked for deletion
+      isDateOlderThanMock.mockReturnValue(false);
       await deleteOldCache(workerEnv);
       expect(spy).not.toHaveBeenCalled();
     });
@@ -151,7 +152,8 @@ describe('deleteOldCache', () => {
 
     test('should not call delete with no keys', async () => {
       const spy = vi.spyOn(storage, 'delete');
-      isDateOlderThanMock.mockReturnValue(false); // Make sure no objects are marked for deletion
+      // Make sure no objects are marked for deletion
+      isDateOlderThanMock.mockReturnValue(false);
       await deleteOldCache(workerEnv);
       expect(spy).not.toHaveBeenCalled();
     });

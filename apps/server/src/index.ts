@@ -14,16 +14,15 @@ export type Env = Omit<
 };
 
 export const workerHandler = {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  fetch(request: Request, env: Env, ctx: ExecutionContext): Response | Promise<Response> {
     try {
-      const storageManager = new StorageManager(env);
-      env.STORAGE_MANAGER = storageManager;
-      return app.fetch(request, env, ctx);
+      env.STORAGE_MANAGER = new StorageManager(env);
     } catch (e: unknown) {
       return new Response(`Storage options not configured correctly: ${String(e)}`, {
         status: 500,
       });
     }
+    return app.fetch(request, env, ctx);
   },
   async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext) {
     const storageManager = new StorageManager(env);
