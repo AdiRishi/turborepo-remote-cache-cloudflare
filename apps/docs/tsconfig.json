@@ -1,4 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": [".vitepress/**/*"]
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["blume.config.ts", "docs/**/meta.ts"]
 }

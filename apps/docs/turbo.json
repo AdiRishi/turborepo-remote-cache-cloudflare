@@ -5,7 +5,10 @@
     "build": {
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/apps/server/package.json"],
       "env": ["DOCS_CLOUDFLARE_DEPLOYMENT"],
-      "outputs": [".vitepress/dist/**"]
+      "outputs": ["dist/**"]
+    },
+    "typecheck": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/apps/server/package.json"]
     }
   }
 }

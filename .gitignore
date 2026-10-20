@@ -6,8 +6,6 @@ dist/
 .output/
 .nitro/
 .blume/
-**/.vitepress/dist
-**/.vitepress/cache
 
 # Tool caches
 .turbo/
