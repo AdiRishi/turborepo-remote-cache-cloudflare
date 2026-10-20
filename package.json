@@ -27,6 +27,7 @@
   "type": "module",
   "scripts": {
     "build": "dotenv -e .env.turbo.local -- turbo run build",
+    "deploy": "pnpm --filter @turborepo-remote-cache/server run deploy",
     "dev": "dotenv -e .env.turbo.local -- turbo run dev",
     "docs:build": "dotenv -e .env.turbo.local -- turbo run build --filter=@turborepo-remote-cache/docs",
     "docs:dev": "dotenv -e .env.turbo.local -- turbo run dev --filter=@turborepo-remote-cache/docs",

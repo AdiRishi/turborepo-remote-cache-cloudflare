@@ -35,31 +35,33 @@ If you're a Turborepo user, this project offers compelling advantages:
 
 ## ⚡️ Quick start
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/tree/master/apps/server)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
+
+The button deploys the repository root, because the server depends on a package elsewhere in the workspace. Keep the build command (`pnpm run build`) and deploy command (`pnpm run deploy`) it suggests, then set the `TURBO_TOKEN` secret on the new Worker.
 
 ### Deploy Using the CLI
 
-This project already comes with [wrangler](https://developers.cloudflare.com/workers/wrangler/) (cloudflare's CLI tool for managing works) installed and configured, so all you need to do is clone this repository and run `pnpm run deploy` from `apps/server`.
+The server in `apps/server` is a [Nitro](https://nitro.build) app that builds for Cloudflare Workers by default. [Wrangler](https://developers.cloudflare.com/workers/wrangler/) deploys the build and creates the `turborepo-cache` R2 bucket on the first deploy.
 
 ```sh
 # 1. Clone the repository
 git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
+cd turborepo-remote-cache-cloudflare
 
 # 2. Install packages
 pnpm install
 
-# 3. Move into the server app
-cd apps/server
+# 3. Build the Worker
+pnpm build --filter=@turborepo-remote-cache/server
 
-# 4. Create the R2 bucket for storage
-pnpm wrangler r2 bucket create turborepo-cache
-
-# 5. Publish the project
+# 4. Deploy it
 pnpm run deploy
 
-# 6. Set a Bearer auth token
-echo "SECRET" | pnpm wrangler secret put TURBO_TOKEN
+# 5. Set a Bearer auth token
+echo "SECRET" | pnpm --filter @turborepo-remote-cache/server exec wrangler secret put TURBO_TOKEN
 ```
+
+To run the server on another platform, such as Node.js with an S3-compatible bucket, build it with `NITRO_PRESET` set to that platform. The [documentation](https://adirishi.github.io/turborepo-remote-cache-cloudflare) covers every storage option and platform.
 
 ## ⚙️ Configuration
 
@@ -75,10 +77,11 @@ For those who have forked this repository, feel free to delete the [release.yml]
 
 ### Automatic deletion of old cache files
 
-This project sets up a [cron trigger](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for Cloudflare workers, which automatically deletes old cache files within the bound R2 bucket. This behavior can be customized:
+The server runs a `cache:delete-expired` task every day at 3 AM UTC. It deletes artifacts older than `BUCKET_OBJECT_EXPIRATION_HOURS` (720 hours, or 30 days, by default). On Cloudflare Workers the task runs as a [cron trigger](https://developers.cloudflare.com/workers/configuration/cron-triggers/). This behavior can be customized:
 
-- To disable the automatic deletion, remove the [triggers] configuration in [wrangler.jsonc](./apps/server/wrangler.jsonc)
-- To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.jsonc](./apps/server/wrangler.jsonc) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
+- To change the schedule or turn it off, edit `scheduledTasks` in [nitro.config.ts](./apps/server/nitro.config.ts).
+- To change the retention period, set `BUCKET_OBJECT_EXPIRATION_HOURS` in [wrangler.jsonc](./apps/server/wrangler.jsonc) or as a [Worker environment variable](https://developers.cloudflare.com/workers/configuration/environment-variables/).
+- On platforms without scheduled tasks, call `POST /internal/delete-expired-objects` with the bearer token from any scheduler.
 
 ## ▲ Setting up remote caching in your Turborepo project
 
