@@ -1,12 +1,12 @@
 ---
-layout: doc
+title: Setting up remote caching in your Turborepo project
+sidebar:
+    label: Set up Turborepo
 ---
-
-# ▲ Setting up remote caching in your Turborepo project
 
 Here's my recommended approach for setting up remote caching in your Turborepo project. You can read more about this topic in the [official Turborepo documentation](https://turbo.build/repo/docs/core-concepts/remote-caching).
 
-## Step 1: Update `turbo.json`
+## Step 1: Update `turbo.json` [#step-1-update-turbo-json]
 
 Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)
 
@@ -25,11 +25,11 @@ Install the `dotenv-cli` npm package:
 pnpm add -D dotenv-cli
 ```
 
-## Step 3: Create a `.env` File
+## Step 3: Create a `.env` file
 
 Create a `.env` file at your project root with the following content:
 
-```
+```dotenv
 TURBO_API=YOUR_API_URL # Remember to remove the trailing slash
 TURBO_TEAM=team_my_team_name
 TURBO_TOKEN=SECRET # The turbo token must be a valid Bearer auth token
@@ -42,9 +42,9 @@ Keep the following in mind
 - Turborepo requires that the `TURBO_API` value must not end with a trailing slash
 - The `TURBO_TEAM` value must begin with `team_`
 - Remember to add the `.env` file to `.gitignore`
-- If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
+- If you are building your project in some remote CI tool (like GitHub Actions) you need to make these environment variables available to your build script
 
-## Step 4: Modify Turbo Commands
+## Step 4: Modify turbo commands
 
 Load the `.env` file prior to execution. Instead of running a command like `turbo run build` directly, use `dotenv -- turbo run build`. This loads everything in our `.env` file into the process's environment variables.
 
@@ -61,11 +61,11 @@ Here's how to modify your scripts in `package.json` to use dotenv-cli:
 }
 ```
 
-And that's it 🎉🎉
+And that's it!
 
-Whenever you run a turbo command you will see `Remote cache enabled` in it's log output
+Whenever you run a turbo command you will see `Remote caching enabled` in its log output
 
-```
+```text
 pnpm lint
 
 $ dotenv -- turbo run lint

@@ -1,14 +1,14 @@
 ---
-layout: doc
+title: Storing artifacts in Cloudflare R2
+sidebar:
+    label: R2 storage
 ---
-
-# 🪣 Storing artifacts in Cloudflare R2
 
 [Cloudflare R2](https://developers.cloudflare.com/r2/) offers scalable, low-cost object storage ideal for storing build artifacts globally. With R2, you can leverage Cloudflare's global network for quick access and efficient management of your build artifacts.
 
 Follow these steps to store your build artifacts in Cloudflare R2:
 
-## 1. Create an R2 Bucket
+## 1. Create an R2 bucket [#_1-create-an-r2-bucket]
 
 An R2 bucket is a container for objects in Cloudflare R2. You can create a bucket via the [Cloudflare dashboard](https://dash.cloudflare.com/) or using the [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update)
 
@@ -18,64 +18,64 @@ An R2 bucket is a container for objects in Cloudflare R2. You can create a bucke
 wrangler r2 bucket create YOUR_BUCKET_NAME
 ```
 
-::: tip
+:::tip
 Using the Wrangler CLI to create a bucket will result in the bucket being **created** in a **region closest to you**.
 
-It is worth considering the region in which you create your bucket, as workers spun up father away from the bucket's region will experience higher latency.
+It is worth considering the region in which you create your bucket, as workers spun up farther away from the bucket's region will experience higher latency.
 
 **In order to create a bucket in a specific region, you will have to use the Cloudflare dashboard.**
 :::
 
-::: tip
+:::tip
 If you have true multi-region requirements, consider using Cloudflare KV as the store. Read the [next page](/configuration/kv-storage) to find out how.
 :::
 
-### Using the Cloudflare Dashboard
+### Using the Cloudflare dashboard
 
-1. Navigate to the [cloudflare dashboard](https://dash.cloudflare.com/) and select the `R2` tab on the left-hand side bar.
+1. Navigate to the [Cloudflare dashboard](https://dash.cloudflare.com/) and select the `R2` tab on the left-hand side bar.
 2. Click the `Create Bucket` button.
 3. Enter a name for your bucket and select the region in which you would like to create the bucket.
    ![R2 Create Dashboard](https://public-assets.turborepo-remote-cache.dev/cdn-cgi/image/width=960,quality=80,format=auto/images/r2-create-bucket-dashboard.jpg)
 4. Click `Create Bucket`.
 
-::: tip
-Try picking a region closest to where the bulk of your API requests will be coming from. E.g if you want to optimize for requests coming from Github actions in the US, pick a US region.
+:::tip
+Try picking a region closest to where the bulk of your API requests will be coming from. For example, if you want to optimize for requests coming from GitHub Actions in the US, pick a US region.
 
-You can find the list of regions and their codes [here](https://developers.cloudflare.com/r2/reference/data-location/#available-hints).
+You can find the list of regions and their codes in the [R2 location hints reference](https://developers.cloudflare.com/r2/reference/data-location/#available-hints).
 :::
 
-## 2. Update Your Configuration
+## 2. Update your configuration [#_2-update-your-configuration]
 
 Update your `wrangler.jsonc` file to include the R2 bucket details.
 
-```jsonc{5-11}
+```jsonc {5-11}
 {
-  "name": "turborepo-remote-cache",
-  // Other settings...
+    "name": "turborepo-remote-cache",
+    // Other settings...
 
-  "r2_buckets": [
-    {
-      "binding": "R2_STORE",
-      "bucket_name": "your-bucket-name",
-      "preview_bucket_name": "your-preview-bucket-name"
-    }
-  ],
+    "r2_buckets": [
+        {
+            "binding": "R2_STORE",
+            "bucket_name": "your-bucket-name",
+            "preview_bucket_name": "your-preview-bucket-name",
+        },
+    ],
 
-  // "kv_namespaces": [
-  //   {
-  //     "binding": "KV_STORE",
-  //     "id": "ea20b0eb60f44b13b8d013eeace98ca2",
-  //     "preview_id": "ea20b0eb60f44b13b8d013eeace98ca2"
-  //   }
-  // ]
+    // "kv_namespaces": [
+    //   {
+    //     "binding": "KV_STORE",
+    //     "id": "ea20b0eb60f44b13b8d013eeace98ca2",
+    //     "preview_id": "ea20b0eb60f44b13b8d013eeace98ca2"
+    //   }
+    // ]
 }
 ```
 
-::: info
+:::info
 If you want to use R2 as the store, ensure that the `kv_namespaces` section is commented out.
 :::
 
-## 3. Deploy Your Worker
+## 3. Deploy your Worker [#_3-deploy-your-worker]
 
-Once you've updated your Worker script and `wrangler.jsonc` file, deploy your Worker using the Wrangler CLI or your GitHub actions workflow.
+Once you've updated your Worker script and `wrangler.jsonc` file, deploy your Worker using the Wrangler CLI or your GitHub Actions workflow.
 And that's it! Your build artifacts will now be stored in Cloudflare R2.

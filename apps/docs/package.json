@@ -3,13 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vitepress build",
-    "dev": "vitepress dev",
-    "preview": "vitepress preview",
+    "build": "blume build",
+    "dev": "blume dev",
+    "preview": "blume preview",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "typescript": "^7.0.2",
-    "vitepress": "2.0.0-alpha.20"
+    "@types/node": "^24.19.2",
+    "blume": "^2.2.4",
+    "typescript": "^7.0.2"
   }
 }
