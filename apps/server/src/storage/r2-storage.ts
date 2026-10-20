@@ -1,4 +1,4 @@
-import { StorageInterface, ListFilterOptions, Metadata, WritableValue } from './interface';
+import type { StorageInterface, ListFilterOptions, Metadata, WritableValue } from './interface';
 
 export class R2Storage implements StorageInterface {
   private R2_STORE: R2Bucket;

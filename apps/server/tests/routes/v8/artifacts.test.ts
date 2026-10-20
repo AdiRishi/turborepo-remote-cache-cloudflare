@@ -1,8 +1,10 @@
 import { createExecutionContext, reset, waitOnExecutionContext } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
-import { describe, beforeEach, expect, test } from 'vitest';
+import { afterEach, describe, beforeEach, expect, test } from 'vitest';
 
-import { Env, workerHandler } from '~/index';
+import type { Env } from '~/index';
+
+import { workerHandler } from '~/index';
 import { DEFAULT_TEAM_ID } from '~/routes/v8/artifacts';
 import { StorageManager } from '~/storage';
 
@@ -19,6 +21,39 @@ describe('v8 Artifacts API', () => {
     await reset();
   });
 
+  afterEach(async () => {
+    await waitOnExecutionContext(ctx);
+  });
+
+  function createArtifactGetRequest(url: string) {
+    return new Request(url, {
+      headers: { Authorization: 'Bearer ' + workerEnv.TURBO_TOKEN },
+      method: 'GET',
+    });
+  }
+
+  function createArtifactPutRequest(url: string, includeTag = false) {
+    const request = new Request(url, {
+      headers: {
+        Authorization: 'Bearer ' + workerEnv.TURBO_TOKEN,
+        'Content-Type': 'application/octet-stream',
+      },
+      method: 'PUT',
+      body: artifactContent,
+    });
+    if (includeTag) {
+      request.headers.set('x-artifact-tag', artifactTag);
+    }
+    return request;
+  }
+
+  function createArtifactHeadRequest(url: string) {
+    return new Request(url, {
+      headers: { Authorization: 'Bearer ' + workerEnv.TURBO_TOKEN },
+      method: 'HEAD',
+    });
+  }
+
   describe('GET artifact endpoint', () => {
     beforeEach(async () => {
       workerEnv = env;
@@ -30,13 +65,6 @@ describe('v8 Artifacts API', () => {
         { artifactTag },
       );
     });
-
-    function createArtifactGetRequest(url: string) {
-      return new Request(url, {
-        headers: { Authorization: 'Bearer ' + workerEnv.TURBO_TOKEN },
-        method: 'GET',
-      });
-    }
 
     test('should use the default team ID when none is provided', async () => {
       let request = createArtifactGetRequest(`http://localhost/v8/artifacts/${artifactId}`);
@@ -146,21 +174,6 @@ describe('v8 Artifacts API', () => {
       ctx = createExecutionContext();
     });
 
-    function createArtifactPutRequest(url: string, includeTag = false) {
-      const request = new Request(url, {
-        headers: {
-          Authorization: 'Bearer ' + workerEnv.TURBO_TOKEN,
-          'Content-Type': 'application/octet-stream',
-        },
-        method: 'PUT',
-        body: artifactContent,
-      });
-      if (includeTag) {
-        request.headers.set('x-artifact-tag', artifactTag);
-      }
-      return request;
-    }
-
     test('should use the default team ID when none is provided', async () => {
       const request = createArtifactPutRequest(`http://localhost/v8/artifacts/${artifactId}`);
       const res = await app.fetch(request, workerEnv, ctx);
@@ -238,13 +251,6 @@ describe('v8 Artifacts API', () => {
         { artifactTag },
       );
     });
-
-    function createArtifactHeadRequest(url: string) {
-      return new Request(url, {
-        headers: { Authorization: 'Bearer ' + workerEnv.TURBO_TOKEN },
-        method: 'HEAD',
-      });
-    }
 
     test('should use the default team ID when none is provided', async () => {
       let request = createArtifactHeadRequest(`http://localhost/v8/artifacts/${artifactId}`);

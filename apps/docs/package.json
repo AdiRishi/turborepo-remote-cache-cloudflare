@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "typescript": "^6.0.3",
-    "vitepress": "2.0.0-alpha.16"
+    "typescript": "^7.0.2",
+    "vitepress": "2.0.0-alpha.20"
   }
 }

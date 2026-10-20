@@ -1,5 +1,6 @@
-import { Env } from '..';
-import { StorageInterface } from './interface';
+import type { Env } from '..';
+import type { StorageInterface } from './interface';
+
 import { KvStorage } from './kv-storage';
 import { R2Storage } from './r2-storage';
 

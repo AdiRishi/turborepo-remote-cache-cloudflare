@@ -28,7 +28,8 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "docs": "turbo run build --filter=@turborepo-remote-cache/docs",
+    "docs:build": "turbo run build --filter=@turborepo-remote-cache/docs",
+    "docs:dev": "turbo run dev --filter=@turborepo-remote-cache/docs",
     "format": "oxfmt .",
     "lint": "oxlint --quiet && oxfmt --check .",
     "lint:fix": "oxlint --fix",
@@ -36,15 +37,15 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.7.0",
-    "@changesets/cli": "^2.31.0",
-    "oxfmt": "^0.54.0",
-    "oxlint": "^1.69.0",
-    "oxlint-tsgolint": "^0.23.0",
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "oxlint-tsgolint": "^7.0.2004",
     "turbo": "^2.11.9"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
-  "packageManager": "pnpm@11.6.0"
+  "packageManager": "pnpm@12.14.0"
 }

@@ -1,5 +1,6 @@
-import { Env } from '..';
-import { ListResultWithMetadata } from '../storage';
+import type { Env } from '..';
+import type { ListResultWithMetadata } from '../storage';
+
 import { isDateOlderThan } from '../utils/date';
 
 // Cursor size should be kept below 1000 to avoid limits on bulk operations

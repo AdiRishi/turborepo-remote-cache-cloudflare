@@ -14,23 +14,22 @@
     "test": "vitest run --coverage",
     "test:ui": "vitest --coverage --ui",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc -b"
   },
   "dependencies": {
     "@hono/valibot-validator": "^0.6.1",
-    "hono": "^4.12.25",
-    "valibot": "^1.4.1"
+    "hono": "^4.13.13",
+    "valibot": "^1.5.0"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.40.2",
-    "@cloudflare/vitest-pool-workers": "^0.16.15",
-    "@vitest/coverage-istanbul": "^4.1.8",
-    "@vitest/ui": "^4.1.8",
-    "miniflare": "^4.20260611.0",
-    "rollup-plugin-visualizer": "^7.0.1",
-    "typescript": "^6.0.3",
-    "vite": "^8.0.16",
-    "vitest": "^4.1.8",
-    "wrangler": "^4.100.0"
+    "@cloudflare/vite-plugin": "^1.64.0",
+    "@cloudflare/vitest-plugin": "^1.4.4",
+    "@types/node": "^24.19.2",
+    "@vitest/coverage-istanbul": "^5.0.5",
+    "@vitest/ui": "^5.0.5",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.151.1"
   }
 }

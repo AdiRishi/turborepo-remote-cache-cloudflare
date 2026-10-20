@@ -43,7 +43,7 @@ internalRouter.post(
     const promises = [];
     for (let i = 0; i < count; i++) {
       const key = `random-data/${crypto.randomUUID()}`;
-      promises.push(storage.write(key, emojis[Math.floor(Math.random() * emojis.length)]));
+      promises.push(storage.write(key, emojis[Math.floor(Math.random() * emojis.length)]!));
     }
     await Promise.all(promises);
 

@@ -2,7 +2,8 @@ import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { Hono } from 'hono/tiny';
 
-import { Env } from '..';
+import type { Env } from '..';
+
 import { internalRouter } from './internal';
 import { v8App } from './v8';
 

@@ -2,8 +2,10 @@ import { createExecutionContext } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { expect, it, describe, vi, beforeEach } from 'vitest';
 
+import type { Env } from '~/index';
+
 import { deleteOldCache } from '~/crons/deleteOldCache';
-import { Env, workerHandler } from '~/index';
+import { workerHandler } from '~/index';
 import { app } from '~/routes';
 
 vi.mock('~/crons/deleteOldCache', async (importActual) => {

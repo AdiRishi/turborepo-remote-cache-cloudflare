@@ -2,7 +2,8 @@ import { reset } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { beforeEach, afterEach, describe, test, expect, vi } from 'vitest';
 
-import { Env } from '~/index';
+import type { Env } from '~/index';
+
 import { StorageManager } from '~/storage';
 import { KvStorage } from '~/storage/kv-storage';
 
@@ -124,7 +125,7 @@ describe('kv-storage', () => {
     });
 
     test('can write ArrayBuffer value', async () => {
-      const buffer = new TextEncoder().encode('value1').buffer;
+      const buffer = new TextEncoder().encode('value1').slice().buffer;
       await storage.write('key1', buffer);
       const result = await storage.read('key1');
       const dataAsBuffer = await StorageManager.readableStreamToBuffer(result!);

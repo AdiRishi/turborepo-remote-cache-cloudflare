@@ -2,7 +2,8 @@ import { reset } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { beforeEach, afterEach, describe, test, expect, vi } from 'vitest';
 
-import { Env } from '~/index';
+import type { Env } from '~/index';
+
 import { StorageManager } from '~/storage';
 import { R2Storage } from '~/storage/r2-storage';
 
@@ -123,7 +124,7 @@ describe('r2-storage', () => {
     });
 
     test('can write ArrayBuffer value', async () => {
-      const buffer = new TextEncoder().encode('value1').buffer;
+      const buffer = new TextEncoder().encode('value1').slice().buffer;
       await storage.write('key1', buffer);
       const result = await storage.read('key1');
       const dataAsBuffer = await StorageManager.readableStreamToBuffer(result!);

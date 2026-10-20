@@ -2,9 +2,11 @@ import { reset } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { describe, test, expect, afterEach, beforeEach, vi } from 'vitest';
 
+import type { Env } from '~/index';
+import type { StorageInterface } from '~/storage';
+
 import { CURSOR_SIZE, deleteOldCache } from '~/crons/deleteOldCache';
-import { Env } from '~/index';
-import { KvStorage, R2Storage, StorageInterface, StorageManager } from '~/storage';
+import { KvStorage, R2Storage, StorageManager } from '~/storage';
 import { isDateOlderThan } from '~/utils/date';
 
 vi.mock('~/utils/date', async (importActual) => {
