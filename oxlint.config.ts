@@ -37,7 +37,7 @@ export default defineConfig({
     'typescript/strict-boolean-expressions': 'off',
     'unicorn/no-useless-undefined': 'off',
   },
-  ignorePatterns: ['**/worker-configuration.d.ts'],
+  ignorePatterns: ['**/worker-configuration.d.ts', 'apps/server/openapi/turborepo.ts'],
   overrides: [
     {
       files: ['**/tests/**/*.ts'],

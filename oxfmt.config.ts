@@ -16,5 +16,17 @@ export default defineConfig({
   sortPackageJson: {
     sortScripts: true,
   },
-  ignorePatterns: ['pnpm-lock.yaml', '**/CHANGELOG.md', '**/worker-configuration.d.ts'],
+  ignorePatterns: [
+    'pnpm-lock.yaml',
+    '**/CHANGELOG.md',
+    '**/worker-configuration.d.ts',
+    'apps/server/openapi/turborepo.*',
+  ],
+  overrides: [
+    {
+      // Nitro parses Wrangler config as strict JSONC, which rejects trailing commas.
+      files: ['**/wrangler.jsonc'],
+      options: { trailingComma: 'none' },
+    },
+  ],
 });
