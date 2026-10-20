@@ -6,4 +6,10 @@ export default defineConfig({
   compatibilityDate: '2026-06-15',
   errorHandler: './server/error.ts',
   noExternals: true,
+  experimental: {
+    tasks: true,
+  },
+  scheduledTasks: {
+    '0 3 * * *': ['cache:delete-expired'],
+  },
 });

@@ -1,10 +1,17 @@
 import type { H3Event } from 'nitro';
+import type { TaskContext } from 'nitro/types';
 import type { CloudflareEnv } from 'srvx';
 
 declare module 'srvx' {
   interface CloudflareEnv {
     KV_STORE?: KVNamespace;
     R2_STORE?: R2Bucket;
+  }
+}
+
+declare module 'nitro/types' {
+  interface TaskContext {
+    cloudflare?: { env: CloudflareEnv; context: ExecutionContext };
   }
 }
 
@@ -22,3 +29,6 @@ const processEnv = (): PlatformEnv => ({
 
 export const eventEnv = (event: H3Event): PlatformEnv =>
   event.req.runtime?.cloudflare?.env ?? processEnv();
+
+export const taskEnv = (context: TaskContext): PlatformEnv =>
+  context.cloudflare?.env ?? processEnv();
