@@ -15,6 +15,19 @@ import { eventEnv } from './env';
 export type CustomAdapter = (env: PlatformEnv) => Adapter | undefined;
 
 const SECONDS_PER_HOUR = 3600;
+const R2_DELETE_BATCH_SIZE = 1000;
+
+// Files SDK's binding adapter deletes one key per call, and every binding call counts against the
+// Worker's subrequest limit, so bulk deletes go through R2's own multi-key delete.
+const r2Binding = (binding: R2Bucket): Adapter => ({
+  ...r2({ binding }),
+  async deleteMany(keys) {
+    for (let start = 0; start < keys.length; start += R2_DELETE_BATCH_SIZE) {
+      await binding.delete(keys.slice(start, start + R2_DELETE_BATCH_SIZE));
+    }
+    return { results: keys };
+  },
+});
 
 export const resolveAdapter = (env: PlatformEnv): Adapter => {
   const custom = customAdapter(env);
@@ -28,7 +41,7 @@ export const resolveAdapter = (env: PlatformEnv): Adapter => {
     });
   }
   if (env.R2_STORE) {
-    return r2({ binding: env.R2_STORE });
+    return r2Binding(env.R2_STORE);
   }
   const s3 = readS3Options(env);
   if (s3) {
