@@ -187,4 +187,4 @@ Icons come from `lucide-react` with `absoluteStrokeWidth` and `strokeWidth={1.5}
 
 ## Docs on Blume
 
-Use `blume-theme.css` for the token overrides, plus the `blume.config.ts` block in its header comment. Accent text is `#8f5b00` on light pages and `#ffb224` on dark ones, which clears 4.5:1. The `action` color is always bright amber with dark ink. Override the `Logo` layout slot with the inlined `lockup.svg`. The docs footer says the project is independent and not affiliated with Vercel or Cloudflare.
+Use `blume-theme.css` for the token overrides, plus the `blume.config.ts` block in its header comment. Accent text is `#8f5b00` on light pages and `#ffb224` on dark ones, which clears 4.5:1. The `action` color is always bright amber with dark ink. Set `logo` to `lockup.svg`; Blume inlines it so it follows the text color. Blume's full-width layout ignores layout-slot overrides, so do not override the `Logo` slot. The docs footer says the project is independent and not affiliated with Vercel or Cloudflare.

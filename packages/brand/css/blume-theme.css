@@ -5,7 +5,7 @@
  *
  *   theme: {
  *     accent: { light: "#8f5b00", dark: "#ffb224" },
- *     action: { light: "#ffb224", dark: "#ffb224" },
+ *     action: "#ffb224",
  *     radius: "md",
  *     mode: "system",
  *     fonts: {
