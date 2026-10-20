@@ -8,7 +8,7 @@ pnpm workspace orchestrated by Turborepo:
 
 - `apps/server` (`@turborepo-remote-cache/server`): the Worker, its tests, and `wrangler.jsonc`.
 - `apps/docs` (`@turborepo-remote-cache/docs`): the VitePress documentation site.
-- `packages/*`: reserved for shared workspace packages; empty today.
+- `packages/files-sdk-kv` (`@turborepo-remote-cache/files-sdk-kv`): a Cloudflare Workers KV adapter for Files SDK. Keep Turborepo and app logic out of it so it can be published or upstreamed. Its tests run in workerd against Miniflare KV.
 
 Root holds shared tooling: `turbo.json`, `tsconfig.base.json` (every package extends it), `oxlint.config.ts`, and `oxfmt.config.ts`.
 
@@ -21,7 +21,7 @@ pnpm install
 pnpm lint          # oxlint (fails on any finding) + oxfmt --check
 pnpm lint:fix      # oxlint --fix + oxfmt
 pnpm typecheck
-pnpm test          # Vitest with coverage, in apps/server
+pnpm test          # Vitest with coverage, in apps/server and packages/files-sdk-kv
 pnpm build
 pnpm docs:build
 
