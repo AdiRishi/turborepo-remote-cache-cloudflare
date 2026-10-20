@@ -1,0 +1,172 @@
+/*
+ * Turborepo Remote Cache theme for shadcn/ui on Tailwind CSS v4.
+ *
+ *   @import 'tailwindcss';
+ *   @import '@turborepo-remote-cache/brand/tokens.css';
+ *
+ * Variable names follow shadcn's theme contract. The extra brand and chart roles
+ * are registered in @theme inline, so `bg-brand`, `text-brand-text` and
+ * `fill-chart-remote` work as utilities. Load Host Grotesk and Martian Mono
+ * (wdth 75..112.5) from Google Fonts or self-host them.
+ */
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+    --radius: 0.5rem;
+
+    --background: #f5f6f8;
+    --foreground: #0e1013;
+    --card: #ffffff;
+    --card-foreground: #0e1013;
+    --popover: #ffffff;
+    --popover-foreground: #0e1013;
+    --primary: #ffb224;
+    --primary-foreground: #1a1405;
+    --secondary: #edeff2;
+    --secondary-foreground: #0e1013;
+    --muted: #edeff2;
+    --muted-foreground: #5c6370;
+    --accent: #edeff2;
+    --accent-foreground: #0e1013;
+    --destructive: #d93a2f;
+    --border: #e2e5e9;
+    --input: #d6dae0;
+    --ring: #b57500;
+
+    --brand: #ffb224;
+    --brand-text: #8f5b00;
+    --success: #12804a;
+    --code: #f7f8fa;
+
+    --chart-1: #cc8400; /* remote hit, time saved */
+    --chart-2: #6a6ee0; /* local hit */
+    --chart-3: #a9aeb7; /* miss */
+    --chart-4: #f5e6c8; /* meter track (amber ramp) */
+    --chart-5: #c9cdd3; /* axis baseline */
+    --chart-grid: #eceef1;
+
+    --sidebar: #ffffff;
+    --sidebar-foreground: #0e1013;
+    --sidebar-primary: #ffb224;
+    --sidebar-primary-foreground: #1a1405;
+    --sidebar-accent: #edeff2;
+    --sidebar-accent-foreground: #0e1013;
+    --sidebar-border: #e2e5e9;
+    --sidebar-ring: #b57500;
+}
+
+.dark {
+    --background: #0b0c0e;
+    --foreground: #ecedef;
+    --card: #111317;
+    --card-foreground: #ecedef;
+    --popover: #16181c;
+    --popover-foreground: #ecedef;
+    --primary: #ffb224;
+    --primary-foreground: #1a1405;
+    --secondary: #1c1f24;
+    --secondary-foreground: #ecedef;
+    --muted: #181a1f;
+    --muted-foreground: #8c929c;
+    --accent: #1c1f24;
+    --accent-foreground: #ecedef;
+    --destructive: #f0574c;
+    --border: #23262c;
+    --input: #2d3138;
+    --ring: #ffb224;
+
+    --brand: #ffb224;
+    --brand-text: #ffc452;
+    --success: #45c486;
+    --code: #0e1013;
+
+    --chart-1: #cb8315;
+    --chart-2: #8a82e9;
+    --chart-3: #4a4f59;
+    --chart-4: #3a2d14;
+    --chart-5: #33373e;
+    --chart-grid: #1d2025;
+
+    --sidebar: #111317;
+    --sidebar-foreground: #ecedef;
+    --sidebar-primary: #ffb224;
+    --sidebar-primary-foreground: #1a1405;
+    --sidebar-accent: #1c1f24;
+    --sidebar-accent-foreground: #ecedef;
+    --sidebar-border: #23262c;
+    --sidebar-ring: #ffb224;
+}
+
+@theme inline {
+    --font-sans: 'Host Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'Martian Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-brand: var(--brand);
+    --color-brand-text: var(--brand-text);
+    --color-success: var(--success);
+    --color-code: var(--code);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-chart-grid: var(--chart-grid);
+    --color-chart-remote: var(--chart-1);
+    --color-chart-local: var(--chart-2);
+    --color-chart-miss: var(--chart-3);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+    body {
+        @apply bg-background text-foreground font-sans;
+    }
+    code,
+    kbd,
+    pre,
+    samp {
+        font-stretch: 87.5%;
+    }
+}
+
+/* Numbers that are data: KPI values, table cells, axis ticks. */
+@utility num {
+    font-family: var(--font-mono);
+    font-stretch: 87.5%;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+}

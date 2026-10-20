@@ -237,6 +237,18 @@ importers:
         specifier: ^4.151.1
         version: 4.151.1(@types/node@24.19.2)
 
+  packages/brand:
+    devDependencies:
+      '@types/node':
+        specifier: ^24.19.2
+        version: 24.19.2
+      sharp:
+        specifier: ^0.35.5
+        version: 0.35.5(@types/node@24.19.2)
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+
 packages:
 
   '@babel/code-frame@8.0.6':
