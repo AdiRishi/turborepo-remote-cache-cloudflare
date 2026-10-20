@@ -7,6 +7,36 @@ settings:
 importers:
 
   .:
+    devDependencies:
+      '@changesets/changelog-github':
+        specifier: ^0.7.0
+        version: 0.7.0
+      '@changesets/cli':
+        specifier: ^2.31.0
+        version: 2.31.0
+      oxfmt:
+        specifier: ^0.54.0
+        version: 0.54.0
+      oxlint:
+        specifier: ^1.69.0
+        version: 1.69.0(oxlint-tsgolint@0.23.0)
+      oxlint-tsgolint:
+        specifier: ^0.23.0
+        version: 0.23.0
+      turbo:
+        specifier: ^2.11.9
+        version: 2.11.9
+
+  apps/docs:
+    devDependencies:
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitepress:
+        specifier: 2.0.0-alpha.16
+        version: 2.0.0-alpha.16(lightningcss@1.32.0)(postcss@8.5.15)(typescript@6.0.3)
+
+  apps/server:
     dependencies:
       '@hono/valibot-validator':
         specifier: ^0.6.1
@@ -18,12 +48,6 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1(typescript@6.0.3)
     devDependencies:
-      '@changesets/changelog-github':
-        specifier: ^0.7.0
-        version: 0.7.0
-      '@changesets/cli':
-        specifier: ^2.31.0
-        version: 2.31.0
       '@cloudflare/vite-plugin':
         specifier: ^1.40.2
         version: 1.40.2(vite@8.0.16(esbuild@0.27.7))(workerd@1.20260611.1)(wrangler@4.100.0)
@@ -39,15 +63,6 @@ importers:
       miniflare:
         specifier: ^4.20260611.0
         version: 4.20260611.0
-      oxfmt:
-        specifier: ^0.54.0
-        version: 0.54.0
-      oxlint:
-        specifier: ^1.69.0
-        version: 1.69.0(oxlint-tsgolint@0.23.0)
-      oxlint-tsgolint:
-        specifier: ^0.23.0
-        version: 0.23.0
       rollup-plugin-visualizer:
         specifier: ^7.0.1
         version: 7.0.1(rolldown@1.0.3)(rollup@4.62.0)
@@ -57,9 +72,6 @@ importers:
       vite:
         specifier: ^8.0.16
         version: 8.0.16(esbuild@0.27.7)
-      vitepress:
-        specifier: 2.0.0-alpha.16
-        version: 2.0.0-alpha.16(lightningcss@1.32.0)(postcss@8.5.15)(typescript@6.0.3)
       vitest:
         specifier: ^4.1.8
         version: 4.1.8(@vitest/coverage-istanbul@4.1.8)(@vitest/ui@4.1.8)(vite@8.0.16(esbuild@0.27.7))
@@ -223,6 +235,7 @@ packages:
 
   '@cloudflare/vitest-pool-workers@0.16.15':
     resolution: {integrity: sha512-R0kZhIm4uSxOeTWPHY9xYIFPGRBEHPzl/n9BbHZSY/gk0n16uDU7T1JZe372oTF+diXG1uVBWqiiRc7Hxstdow==}
+    deprecated: '@cloudflare/vitest-pool-workers has been renamed to @cloudflare/vitest-plugin. This package will not receive future updates.'
     peerDependencies:
       '@vitest/runner': ^4.1.0
       '@vitest/snapshot': ^4.1.0
@@ -1375,6 +1388,36 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
+  '@turbo/darwin-64@2.11.9':
+    resolution: {integrity: sha512-OkW+EESJjo248CThWe9DfuUqzGcRwHe1DXKWRw9DSZ0lMkocKbbwNMjWVCiO+WNBcARDM0ibu0c9SbuIe4mw6w==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@turbo/darwin-arm64@2.11.9':
+    resolution: {integrity: sha512-NIbFEogMaIyOi2egLH7XtuW0DXmPOpydnanyB3rw/WXCPYl1OAFRPHPGixIaakGnfNLey8LMmKemgNtqtFKdcg==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@turbo/linux-64@2.11.9':
+    resolution: {integrity: sha512-RkD/Atqqek2WNnYJlmPogZpXjAW+cSsPXDn7E0mufSNN86ClXCSKme/BBYMeIvPoFZ4egPJLF+JpYkuuNkMYhg==}
+    cpu: [x64]
+    os: [android, linux]
+
+  '@turbo/linux-arm64@2.11.9':
+    resolution: {integrity: sha512-iW/0YGS9D9YlgD4ad2IEEolD9PuNJGdkEI650AELLln8YaGsloiH8QyTUnajjxPufMuY/eWRWxO+PMBYsGvVlA==}
+    cpu: [arm64]
+    os: [android, linux]
+
+  '@turbo/windows-64@2.11.9':
+    resolution: {integrity: sha512-rg/kuQmSm9m/z8W5HYHLMSnTbLDXBs/9liVZh9YnfkGYm0DlFj2SV9/0fQy/EpJTq81O36kMb7p8Fmt9f67ocA==}
+    cpu: [x64]
+    os: [win32]
+
+  '@turbo/windows-arm64@2.11.9':
+    resolution: {integrity: sha512-PgjBpLPW/WDsKzeBmNuw2QHtPxT/PtcloN3rHFTqVyMsqkLlyHVJbSusuhYoYFdi08lZ9Stryw66UOuPg/yW0w==}
+    cpu: [arm64]
+    os: [win32]
+
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
 
@@ -2411,6 +2454,10 @@ packages:
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
+  turbo@2.11.9:
+    resolution: {integrity: sha512-k2ev5dv9OgP2pJwaPuydkZdid+haX2U5TDGcPtpAz0gb0nbRR3eXY/cpfrlvHih52YRTxWIcRVKc0ri3C2Scrg==}
+    hasBin: true
 
   typescript@6.0.3:
     resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
@@ -3679,6 +3726,24 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
+  '@turbo/darwin-64@2.11.9':
+    optional: true
+
+  '@turbo/darwin-arm64@2.11.9':
+    optional: true
+
+  '@turbo/linux-64@2.11.9':
+    optional: true
+
+  '@turbo/linux-arm64@2.11.9':
+    optional: true
+
+  '@turbo/windows-64@2.11.9':
+    optional: true
+
+  '@turbo/windows-arm64@2.11.9':
+    optional: true
+
   '@tybys/wasm-util@0.10.2':
     dependencies:
       tslib: 2.8.1
@@ -4743,6 +4808,15 @@ snapshots:
 
   tslib@2.8.1:
     optional: true
+
+  turbo@2.11.9:
+    optionalDependencies:
+      '@turbo/darwin-64': 2.11.9
+      '@turbo/darwin-arm64': 2.11.9
+      '@turbo/linux-64': 2.11.9
+      '@turbo/linux-arm64': 2.11.9
+      '@turbo/windows-64': 2.11.9
+      '@turbo/windows-arm64': 2.11.9
 
   typescript@6.0.3: {}
 

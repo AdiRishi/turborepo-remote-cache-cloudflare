@@ -1,0 +1,15 @@
+{
+  "name": "@turborepo-remote-cache/docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vitepress build",
+    "dev": "vitepress dev",
+    "preview": "vitepress preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitepress": "2.0.0-alpha.16"
+  }
+}

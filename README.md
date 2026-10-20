@@ -35,11 +35,11 @@ If you're a Turborepo user, this project offers compelling advantages:
 
 ## ⚡️ Quick start
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/tree/master/apps/server)
 
 ### Deploy Using the CLI
 
-This project already comes with [wrangler](https://developers.cloudflare.com/workers/wrangler/) (cloudflare's CLI tool for managing works) installed and configured, so all you need to do is clone this repository and run `pnpm run deploy`.
+This project already comes with [wrangler](https://developers.cloudflare.com/workers/wrangler/) (cloudflare's CLI tool for managing works) installed and configured, so all you need to do is clone this repository and run `pnpm run deploy` from `apps/server`.
 
 ```sh
 # 1. Clone the repository
@@ -48,13 +48,16 @@ git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
 # 2. Install packages
 pnpm install
 
-# 3. Create the R2 bucket for storage
+# 3. Move into the server app
+cd apps/server
+
+# 4. Create the R2 bucket for storage
 pnpm wrangler r2 bucket create turborepo-cache
 
-# 4. Publish the project
+# 5. Publish the project
 pnpm run deploy
 
-# 5. Set a Bearer auth token
+# 6. Set a Bearer auth token
 echo "SECRET" | pnpm wrangler secret put TURBO_TOKEN
 ```
 
@@ -74,8 +77,8 @@ For those who have forked this repository, feel free to delete the [release.yml]
 
 This project sets up a [cron trigger](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for Cloudflare workers, which automatically deletes old cache files within the bound R2 bucket. This behavior can be customized:
 
-- To disable the automatic deletion, remove the [triggers] configuration in [wrangler.jsonc](./wrangler.jsonc)
-- To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.jsonc](./wrangler.jsonc) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
+- To disable the automatic deletion, remove the [triggers] configuration in [wrangler.jsonc](./apps/server/wrangler.jsonc)
+- To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.jsonc](./apps/server/wrangler.jsonc) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
 
 ## ▲ Setting up remote caching in your Turborepo project
 

@@ -17,14 +17,14 @@
     "coverage/**",
     "dist/**",
     "build/**",
-    "docs/.vitepress/**",
+    "apps/docs/.vitepress/**",
     "functions/*.js",
     "functions/*.js.map",
-    "worker-configuration.d.ts"
+    "**/worker-configuration.d.ts"
   ],
   "overrides": [
     {
-      "files": ["tests/**/*.ts"],
+      "files": ["**/tests/**/*.ts"],
       "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "promise", "node", "vitest"]
     }
   ]

@@ -206,8 +206,8 @@ build
 .turbo
 
 # Vitepress
-docs/.vitepress/dist
-docs/.vitepress/cache
+**/.vitepress/dist
+**/.vitepress/cache
 
 # AI Agents
 .claude/settings.local.json

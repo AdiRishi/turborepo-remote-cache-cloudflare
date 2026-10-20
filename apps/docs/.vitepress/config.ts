@@ -1,4 +1,4 @@
-import projectPackageJson from '../../package.json';
+import projectPackageJson from '../../server/package.json';
 import { defineConfig } from 'vitepress';
 
 const isCloudflareDeployment = process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true';
@@ -22,7 +22,7 @@ export default defineConfig({
     },
     editLink: {
       pattern:
-        'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/edit/master/docs/:path',
+        'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/edit/master/apps/docs/:path',
     },
     // @ts-expect-error - Bug in type definition
     lastUpdated: true,
@@ -34,7 +34,7 @@ export default defineConfig({
         items: [
           {
             text: 'Changelog',
-            link: 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/CHANGELOG.md',
+            link: 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/apps/server/CHANGELOG.md',
           },
           {
             text: 'Contributing',

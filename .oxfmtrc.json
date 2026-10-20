@@ -20,11 +20,11 @@
     "coverage/**",
     "dist/**",
     "build/**",
-    "docs/.vitepress/**",
+    "apps/docs/.vitepress/**",
     "functions/*.js",
     "functions/*.js.map",
     "pnpm-lock.yaml",
-    "CHANGELOG.md",
-    "worker-configuration.d.ts"
+    "**/CHANGELOG.md",
+    "**/worker-configuration.d.ts"
   ]
 }

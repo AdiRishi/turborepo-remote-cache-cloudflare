@@ -1,0 +1,36 @@
+{
+  "name": "@turborepo-remote-cache/server",
+  "version": "4.0.0",
+  "private": true,
+  "description": "An implementation of the turborepo-remote-cache server custom made for Cloudflare Workers",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "cf-typegen": "wrangler types",
+    "deploy": "wrangler deploy",
+    "dev": "vite",
+    "preview": "vite preview",
+    "test": "vitest run --coverage",
+    "test:ui": "vitest --coverage --ui",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/valibot-validator": "^0.6.1",
+    "hono": "^4.12.25",
+    "valibot": "^1.4.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.40.2",
+    "@cloudflare/vitest-pool-workers": "^0.16.15",
+    "@vitest/coverage-istanbul": "^4.1.8",
+    "@vitest/ui": "^4.1.8",
+    "miniflare": "^4.20260611.0",
+    "rollup-plugin-visualizer": "^7.0.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8",
+    "wrangler": "^4.100.0"
+  }
+}
