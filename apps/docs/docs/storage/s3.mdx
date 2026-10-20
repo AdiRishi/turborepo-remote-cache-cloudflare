@@ -1,0 +1,80 @@
+---
+title: S3-compatible storage
+description: Store artifacts in Amazon S3, R2 over its S3 API, MinIO, or any other S3-compatible bucket, on every platform the server runs on.
+sidebar:
+    label: S3-compatible
+---
+
+Setting `S3_BUCKET` turns on this backend.
+
+## Variables
+
+| Variable               | Required | Description                                                                                         |
+| ---------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| `S3_BUCKET`            | Yes      | The bucket name.                                                                                    |
+| `S3_ENDPOINT`          | Yes      | The S3 API endpoint, such as `https://s3.us-east-1.amazonaws.com`. The server uses only its origin. |
+| `S3_REGION`            | No       | The signing region. Defaults to `AWS_REGION`, then `AWS_DEFAULT_REGION`, then `us-east-1`.          |
+| `S3_ACCESS_KEY_ID`     | No       | The access key ID.                                                                                  |
+| `S3_SECRET_ACCESS_KEY` | No       | The secret access key.                                                                              |
+| `S3_SESSION_TOKEN`     | No       | A session token for temporary credentials.                                                          |
+| `S3_FORCE_PATH_STYLE`  | No       | `true` sends requests to `<endpoint>/<bucket>` instead of `<bucket>.<endpoint>`.                    |
+
+When `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` are both unset, the server reads `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN` from the process environment. Nothing else supplies credentials: the server doesn't read AWS profiles or SSO, and it gets role credentials only from those variables.
+
+`S3_ENDPOINT` must be a URL, and `S3_BUCKET` can't be empty. A wrong value makes every cache request fail with a `500` error, and the server logs `Invalid server configuration:` with the reason.
+
+## Examples
+
+### Amazon S3
+
+```sh
+S3_BUCKET=my-turborepo-cache
+S3_ENDPOINT=https://s3.us-east-1.amazonaws.com
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=<access key ID>
+S3_SECRET_ACCESS_KEY=<secret access key>
+```
+
+The credentials need `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject`, and `s3:ListBucket` on the bucket. The daily expiry task lists and deletes objects.
+
+### Cloudflare R2 over the S3 API
+
+Create an [R2 API token](https://developers.cloudflare.com/r2/api/tokens/) with read and write access to the bucket, then set:
+
+```sh
+S3_BUCKET=turborepo-cache
+S3_ENDPOINT=https://<account ID>.r2.cloudflarestorage.com
+S3_REGION=auto
+S3_ACCESS_KEY_ID=<access key ID>
+S3_SECRET_ACCESS_KEY=<secret access key>
+```
+
+On Cloudflare Workers, bind the bucket as `R2_STORE` instead. A binding needs no credentials.
+
+### MinIO and other self-hosted stores
+
+Most self-hosted stores have no per-bucket hostnames, so turn on path-style requests:
+
+```sh
+S3_BUCKET=turborepo-cache
+S3_ENDPOINT=http://minio.internal:9000
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=<access key>
+S3_SECRET_ACCESS_KEY=<secret key>
+S3_FORCE_PATH_STYLE=true
+```
+
+If every artifact reads as missing on a new setup, check `S3_FORCE_PATH_STYLE` first.
+
+## Use S3 on Cloudflare Workers
+
+A binding wins over the `S3_*` variables, so remove the `r2_buckets` entry from `apps/server/wrangler.jsonc`. Then set `S3_BUCKET`, `S3_ENDPOINT`, and `S3_REGION` as variables and the keys as secrets:
+
+```sh
+pnpm --filter @turborepo-remote-cache/server exec wrangler secret put S3_ACCESS_KEY_ID
+pnpm --filter @turborepo-remote-cache/server exec wrangler secret put S3_SECRET_ACCESS_KEY
+```
+
+## Large artifacts
+
+The server buffers each upload in memory and sends it to the bucket in one request. On a server with little memory, such as a Worker, a very large artifact can fail to upload. Serverless platforms also cap request sizes, which the [platform guides](/deploy) list.

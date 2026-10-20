@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@turborepo-remote-cache/brand": "workspace:*",
     "@types/node": "^24.19.2",
     "blume": "^2.2.4",
     "typescript": "^7.0.2",

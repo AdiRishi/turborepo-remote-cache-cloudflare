@@ -1,0 +1,24 @@
+overlay: 1.0.0
+info:
+  title: Turborepo Remote Cache API for this server
+  version: 1.0.0
+actions:
+  - target: $.info
+    update:
+      description: |
+        This reference is the official Turborepo Remote Cache specification. The server implements every operation in it.
+
+        Send requests to `https://<your server>/v8`. Every operation needs the `TURBO_TOKEN` value as a bearer token. Artifacts are grouped by the `teamId` or `slug` query parameter, and requests without either use the team `team_default_team`. Errors return a JSON body with a `code` and a `message`.
+
+        The server answers browser requests to `/v8` from any origin, so the Try it panel works against your own deployment. Enter its hostname in the server field.
+  - target: $.servers
+    remove: true
+  - target: $
+    update:
+      servers:
+        - url: https://{host}/v8
+          description: Your Turborepo Remote Cache server
+          variables:
+            host:
+              default: turborepo-remote-cache.example.workers.dev
+              description: The hostname of your deployment

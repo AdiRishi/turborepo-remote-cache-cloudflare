@@ -3,7 +3,11 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/apps/server/package.json"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/apps/server/package.json",
+        "$TURBO_ROOT$/apps/server/openapi/turborepo.openapi.json"
+      ],
       "env": ["DOCS_CLOUDFLARE_DEPLOYMENT"],
       "outputs": ["dist/**"]
     },

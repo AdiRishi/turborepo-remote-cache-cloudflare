@@ -1,0 +1,46 @@
+---
+title: Cloudflare KV
+description: Store artifacts in a Workers KV namespace, with a TTL from BUCKET_OBJECT_EXPIRATION_HOURS and a 25 MiB limit per artifact.
+sidebar:
+    label: Cloudflare KV
+---
+
+Each artifact is one KV entry. The artifact is the value, and its size, upload time, and headers are the entry's metadata.
+
+## Limits
+
+Check these limits before you choose KV:
+
+- An artifact can be at most 25 MiB. The server rejects a larger upload with a `400` error, so that task's outputs never reach the remote cache.
+- KV is eventually consistent. An artifact is readable at once where it was written, but other locations can take 60 seconds or more to see it.
+
+## Bind a namespace
+
+1. Add a `KV_STORE` binding to `apps/server/wrangler.jsonc`, and remove the `r2_buckets` entry unless you still want the bucket:
+
+    ```jsonc apps/server/wrangler.jsonc
+    {
+        "kv_namespaces": [{ "binding": "KV_STORE" }],
+    }
+    ```
+
+    With no `id`, `wrangler deploy` creates the namespace and links it to the Worker. To use a namespace you already have, add its `id`. `wrangler kv namespace create <name>` creates one and prints the `id`.
+
+2. Build and deploy the Worker:
+
+    ```sh
+    pnpm build --filter=@turborepo-remote-cache/server
+    pnpm run deploy
+    ```
+
+When both `KV_STORE` and `R2_STORE` are bound, the server uses KV.
+
+## Expiry
+
+The server writes each artifact with a KV TTL of `BUCKET_OBJECT_EXPIRATION_HOURS`, converted to seconds. KV deletes the entry when the TTL ends, so artifacts expire without the daily task. The daily task also runs and deletes any entry older than that age.
+
+The TTL is fixed when the server writes an entry. After you change `BUCKET_OBJECT_EXPIRATION_HOURS`, entries written earlier keep their old TTL.
+
+## Entries from earlier versions
+
+Version 4 of the server stored KV entries without the metadata that version 5 reads. Version 5 still serves them, but without their signature, so clients that verify signatures treat them as misses. The next daily expiry deletes them, because their age is unknown.

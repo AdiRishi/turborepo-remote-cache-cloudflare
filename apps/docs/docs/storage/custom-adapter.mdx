@@ -1,0 +1,83 @@
+---
+title: Custom storage adapter
+description: Store artifacts anywhere Files SDK has an adapter by returning it from server/custom-adapter.ts, with a worked example on a Node.js server.
+sidebar:
+    label: Custom adapter
+---
+
+When `apps/server/server/custom-adapter.ts` returns a [Files SDK adapter](https://files-sdk.dev), the server uses it for every request, ahead of the bindings and the `S3_*` variables.
+
+## The hook
+
+The file exports one function. It receives the platform environment and returns an adapter, or `undefined` to keep the built-in selection:
+
+```ts apps/server/server/custom-adapter.ts
+import type { CustomAdapter } from './utils/storage';
+
+export const customAdapter: CustomAdapter = () => undefined;
+```
+
+`env` holds the Worker's variables, secrets, and bindings on Cloudflare, and `process.env` on other platforms. The server calls the function for every request, so read configuration from `env` there rather than at import time.
+
+## What an adapter must support
+
+The server relies on three things that not every adapter provides:
+
+- **User metadata.** The server stores the task duration and the signature as metadata on each artifact. An adapter that rejects metadata fails every upload. The Vercel Blob adapter is one of these.
+- **`lastModified` in `list()`.** The expiry task deletes every artifact whose age the store doesn't report. If `list()` returns no `lastModified`, every expiry run deletes all artifacts. The Netlify Blobs adapter is one of these.
+- **Your platform's runtime.** Many adapters use Node.js SDKs that don't run in Workers. Check the adapter's page before you deploy it to Cloudflare.
+
+## Worked example: local disk on a Node.js server
+
+This example stores artifacts on the disk of one Node.js server with the Files SDK `fs` adapter. It suits a single long-running machine with a persistent disk. Files SDK describes `fs` as a development adapter, because it has no replication.
+
+1. Return the adapter when `CACHE_DIR` is set:
+
+    ```ts apps/server/server/custom-adapter.ts
+    import { fs } from 'files-sdk/fs';
+
+    import type { CustomAdapter } from './utils/storage';
+
+    export const customAdapter: CustomAdapter = (env) =>
+        typeof env.CACHE_DIR === 'string' ? fs({ root: env.CACHE_DIR }) : undefined;
+    ```
+
+    `files-sdk` is already a dependency of the server, and `fs` needs no other package.
+
+2. Build the server for Node.js:
+
+    ```sh
+    NITRO_PRESET=node_server pnpm build --filter=@turborepo-remote-cache/server
+    ```
+
+3. Start it with a directory for the artifacts:
+
+    ```sh
+    cd apps/server
+    CACHE_DIR=/var/lib/turborepo-cache TURBO_TOKEN=<your token> PORT=3000 pnpm start
+    ```
+
+4. Run a build twice with `TURBO_API=http://<server>:3000`, as in [Connect turbo](/connect-turbo). The second run reports `cache hit, replaying logs`.
+
+The server writes each artifact to `<CACHE_DIR>/<team>/<hash>`, with a `<hash>.meta.json` file beside it that holds its metadata. The daily expiry task runs in the server process, as on any [Node.js server](/deploy/node).
+
+## Another example: Google Cloud Storage
+
+The GCS adapter needs its SDK. Add it to the server, then return the adapter:
+
+```sh
+pnpm --filter @turborepo-remote-cache/server add @google-cloud/storage
+```
+
+```ts apps/server/server/custom-adapter.ts
+import { gcs } from 'files-sdk/gcs';
+
+import type { CustomAdapter } from './utils/storage';
+
+export const customAdapter: CustomAdapter = (env) =>
+    typeof env.GCS_BUCKET === 'string' ? gcs({ bucket: env.GCS_BUCKET }) : undefined;
+```
+
+The SDK finds credentials through Google's Application Default Credentials.
+
+Import only the adapter you use. The server bundles everything that `custom-adapter.ts` imports.

@@ -1,0 +1,619 @@
+---
+import { withBase } from 'blume/components/islands/base-path.ts';
+import PageLayout from 'blume/components/layout/PageLayout.astro';
+import data from 'blume:data';
+
+const { config } = data;
+
+const deployUrl =
+  'https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare';
+
+const replayed = [
+  { task: 'ui:build', hash: '2d7e0f5ab8c91e46', saved: '1m 02s' },
+  { task: 'docs:build', hash: '9b02e6d1f7c4a318', saved: '1m 31s' },
+  { task: 'web:build', hash: '4f1c9a07d2b3e865', saved: '1m 45s' },
+];
+
+const platforms = [
+  {
+    name: 'Cloudflare Workers',
+    storage: 'R2, KV, or S3-compatible',
+    expiry: 'Cron trigger',
+    href: '/get-started',
+    recommended: true,
+  },
+  {
+    name: 'Node.js, Bun, and Deno',
+    storage: 'S3-compatible or a custom adapter',
+    expiry: 'In the server process',
+    href: '/deploy/node',
+  },
+  {
+    name: 'Vercel',
+    storage: 'S3-compatible',
+    expiry: 'Vercel Cron Jobs',
+    href: '/deploy/vercel',
+  },
+  {
+    name: 'Netlify',
+    storage: 'S3-compatible',
+    expiry: 'External scheduler',
+    href: '/deploy/netlify',
+  },
+  {
+    name: 'AWS Lambda',
+    storage: 'Amazon S3 or S3-compatible',
+    expiry: 'External scheduler',
+    href: '/deploy/aws-lambda',
+  },
+];
+---
+
+<PageLayout
+  site={{ title: config.title, description: config.description }}
+  logo={config.logo}
+  favicon={config.favicon}
+  appleIcon={config.appleIcon}
+  banner={config.banner}
+  analytics={config.analytics}
+  navigation={data.navigation}
+  fontCssVars={data.fontCssVars}
+  themeMode={config.theme.mode}
+  searchEnabled={config.search.enabled}
+  siteUrl={config.site}
+  ogEnabled={config.og.enabled}
+  page={{ title: config.title, description: config.description, route: '/' }}
+>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero-grid">
+      <div>
+        <a class="release" href={withBase('/upgrade-from-v4')}>
+          <b>v5</b>Now builds for Node.js, Vercel, AWS Lambda, and more
+        </a>
+        <h1 id="hero-title">A Turborepo remote cache you host yourself</h1>
+        <p class="lede">
+          An open-source server for the Turborepo Remote Cache API. Deploy it to Cloudflare Workers
+          and R2 with one button, or build it for Node.js, Vercel, AWS Lambda, and other platforms
+          with storage you already run.
+        </p>
+        <div class="ctas">
+          <a class="btn btn-action" href={withBase('/get-started')}>Get started</a>
+          <a class="btn btn-outline" href={deployUrl}>Deploy to Cloudflare Workers</a>
+        </div>
+        <p class="oneliner">
+          <span>Then point turbo at it:</span>
+          <code>turbo login --manual</code>
+        </p>
+      </div>
+
+      <div class="demo">
+        <figure class="term" aria-label="Example turbo output with three remote cache hits">
+          <div class="term-head">
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>ci-runner
+          </div>
+          <pre><span class="muted">$</span> turbo run build
+<span class="muted">   • Packages in scope: docs, ui, web
+   • Running build in 3 packages
+   • Remote caching enabled</span>
+{replayed.map(({ task, hash }) => (
+  <>{'\n'}{task}: <span class="hit">cache hit, replaying logs</span> <span class="muted">{hash}</span></>
+))}
+
+  Tasks:    3 successful, 3 total
+<span class="line-hl"> Cached:    3 cached, 3 total</span>   Time:    1.42s &gt;&gt;&gt; FULL TURBO</pre>
+        </figure>
+        <aside class="stat-card" aria-label="Time saved on this run">
+          <p class="label">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+            Time saved on this run
+          </p>
+          <p class="value">4<span class="unit">m</span> 18<span class="unit">s</span></p>
+          <dl class="tasks">
+            {
+              replayed.map(({ task, saved }) => (
+                <div>
+                  <dt>{task.replace(':build', '')}</dt>
+                  <dd>{saved}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="runs" aria-labelledby="runs-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="runs-title">Where it runs</h2>
+        <p>
+          Every platform serves the same cache API. Cloudflare Workers is the default build, and the
+          only one with built-in R2 and KV storage.
+        </p>
+      </div>
+      <table class="platforms">
+        <thead>
+          <tr>
+            <th scope="col">Platform</th>
+            <th scope="col">Storage</th>
+            <th scope="col">Daily expiry</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            platforms.map(({ name, storage, expiry, href, recommended }) => (
+              <tr class:list={{ first: recommended }}>
+                <td>
+                  <a href={withBase(href)}>{name}</a>
+                  {recommended && <span class="tag">Recommended</span>}
+                </td>
+                <td data-label="Storage">{storage}</td>
+                <td data-label="Daily expiry">{expiry}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  code,
+  pre,
+  .value {
+    font-family: var(--blume-font-mono);
+    font-stretch: 87.5%;
+  }
+
+  .hero {
+    --hit: #8f5b00;
+    --grid: rgb(14 16 19 / 0.06);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-bottom: 1px solid var(--blume-border);
+  }
+
+  :global([data-theme='dark']) .hero {
+    --hit: #ffc452;
+    --grid: rgb(255 255 255 / 0.045);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-position: -1px -1px;
+    mask-image: linear-gradient(to bottom, #000 30%, transparent 95%);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 56px;
+    align-items: center;
+    padding-block: 88px 96px;
+  }
+
+  .release {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 30px;
+    padding: 4px 12px 4px 6px;
+    border: 1px solid var(--blume-border);
+    border-radius: 999px;
+    background: var(--blume-background);
+    color: var(--blume-muted-foreground);
+    font-size: 13px;
+    line-height: 18px;
+    text-decoration: none;
+  }
+
+  .release:hover {
+    color: var(--blume-foreground);
+  }
+
+  .release b {
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--blume-accent);
+    color: var(--blume-accent-foreground);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  h1 {
+    max-width: 13ch;
+    margin: 24px 0 0;
+    font-family: var(--blume-font-display);
+    font-size: clamp(40px, 5.4vw, 64px);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .lede {
+    max-width: 48ch;
+    margin: 20px 0 0;
+    color: var(--blume-muted-foreground);
+    font-size: 18px;
+    line-height: 28px;
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 32px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 18px;
+    border: 1px solid transparent;
+    border-radius: var(--blume-radius);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .btn-action {
+    background: var(--blume-action);
+    color: var(--blume-action-foreground);
+  }
+
+  .btn-action:hover {
+    background: color-mix(in oklab, var(--blume-action) 88%, var(--blume-foreground));
+  }
+
+  .btn-outline {
+    border-color: var(--blume-border);
+    background: var(--blume-background);
+    color: var(--blume-foreground);
+  }
+
+  .btn-outline:hover {
+    background: var(--blume-muted);
+  }
+
+  .oneliner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 28px 0 0;
+    color: var(--blume-muted-foreground);
+    font-size: 13px;
+  }
+
+  .oneliner code {
+    padding: 6px 10px;
+    border: 1px dashed var(--blume-border);
+    border-radius: var(--blume-radius);
+    color: var(--blume-foreground);
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+
+  .demo {
+    position: relative;
+    padding-bottom: 72px;
+  }
+
+  .term {
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--blume-border);
+    border-radius: 12px;
+    background: var(--blume-code-background);
+    box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.35);
+  }
+
+  .term-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 14px;
+    border-bottom: 1px solid var(--blume-border);
+    color: var(--blume-muted-foreground);
+    font-size: 12px;
+  }
+
+  .dots {
+    display: flex;
+    gap: 6px;
+    margin-right: 6px;
+  }
+
+  .dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--blume-border);
+  }
+
+  .term pre {
+    margin: 0;
+    padding: 18px 18px 22px;
+    overflow-x: auto;
+    color: var(--blume-foreground);
+    font-size: 12.5px;
+    line-height: 21px;
+  }
+
+  .muted {
+    color: var(--blume-muted-foreground);
+  }
+
+  .hit {
+    color: var(--hit);
+  }
+
+  .line-hl {
+    display: block;
+    margin: 0 -18px;
+    padding: 0 18px 0 15px;
+    border-left: 3px solid var(--blume-code-highlight-border);
+    background: var(--blume-code-highlight);
+  }
+
+  .stat-card {
+    position: absolute;
+    right: -12px;
+    bottom: 0;
+    width: 260px;
+    padding: 16px 18px;
+    border: 1px solid var(--blume-border);
+    border-radius: 12px;
+    background: var(--blume-background);
+    box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.4);
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--blume-muted-foreground);
+    font-size: 12px;
+  }
+
+  .icon {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .value {
+    margin: 6px 0 0;
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 36px;
+    letter-spacing: -0.045em;
+  }
+
+  .unit {
+    margin-left: 0.05em;
+    color: var(--blume-muted-foreground);
+    font-size: 0.45em;
+    font-weight: 400;
+  }
+
+  .tasks {
+    display: grid;
+    gap: 4px;
+    margin: 10px 0 0;
+    font-size: 12px;
+  }
+
+  .tasks div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .tasks dt {
+    color: var(--blume-muted-foreground);
+  }
+
+  .tasks dd {
+    margin: 0;
+    font-family: var(--blume-font-mono);
+    font-stretch: 87.5%;
+  }
+
+  .runs {
+    padding: 72px 0 96px;
+  }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 56px;
+    align-items: end;
+    margin-bottom: 32px;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--blume-font-display);
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 38px;
+    letter-spacing: -0.04em;
+  }
+
+  .section-head p {
+    max-width: 52ch;
+    margin: 0;
+    color: var(--blume-muted-foreground);
+  }
+
+  .platforms {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+
+  .platforms th {
+    padding: 0 16px 10px 0;
+    border-bottom: 1px solid var(--blume-border);
+    color: var(--blume-muted-foreground);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+  }
+
+  .platforms td {
+    padding: 14px 16px 14px 0;
+    border-bottom: 1px solid var(--blume-border);
+    color: var(--blume-muted-foreground);
+    vertical-align: middle;
+  }
+
+  .platforms td:first-child {
+    color: var(--blume-foreground);
+  }
+
+  .platforms a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .platforms a:hover {
+    text-decoration: underline;
+  }
+
+  .platforms tr.first td {
+    padding-block: 18px;
+  }
+
+  .platforms tr.first td:first-child {
+    font-weight: 600;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    margin-left: 10px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--blume-action);
+    color: var(--blume-action-foreground);
+    font-size: 12px;
+    font-weight: 500;
+    vertical-align: 1px;
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+      padding-block: 56px 64px;
+    }
+
+    .section-head {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .stat-card {
+      right: 12px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .wrap {
+      padding: 0 16px;
+    }
+
+    .hero-grid {
+      padding-block: 40px 56px;
+    }
+
+    .lede {
+      font-size: 17px;
+    }
+
+    .btn {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+
+    .oneliner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .demo {
+      padding-bottom: 0;
+    }
+
+    .stat-card {
+      position: relative;
+      right: auto;
+      width: auto;
+      margin: -28px 16px 0;
+    }
+
+    .runs {
+      padding: 48px 0 64px;
+    }
+
+    .platforms thead {
+      display: none;
+    }
+
+    .platforms,
+    .platforms tbody,
+    .platforms tr,
+    .platforms td {
+      display: block;
+    }
+
+    .platforms tr {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--blume-border);
+    }
+
+    .platforms td,
+    .platforms tr.first td {
+      padding: 0;
+      border: 0;
+    }
+
+    .platforms td + td {
+      margin-top: 2px;
+      font-size: 14px;
+    }
+
+    .platforms td[data-label]::before {
+      content: attr(data-label) ': ';
+    }
+  }
+</style>
