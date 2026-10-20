@@ -5,6 +5,9 @@
     "build": {
       "env": ["NITRO_*", "SERVER_PRESET"],
       "outputs": [".output/**", ".wrangler/deploy/config.json"]
+    },
+    "test": {
+      "env": ["CONTRACT_BASE_URL"]
     }
   }
 }
