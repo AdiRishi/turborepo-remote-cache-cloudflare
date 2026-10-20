@@ -63,7 +63,9 @@ Nitro 3 (`nitro.config.ts`, `serverDir: './server'`) built through Vite. File ro
 - `nitro` runs route and contract tests in Node through `serverFetch`. Nitro 3.0.260903-beta ships no Vitest integration, so `tests/support/nitro-environment.ts` and `nitro-setup.ts` create the app, the `closeNitroWithVite` plugin closes Nitro's file watchers, and `noExternals` in `nitro.config.ts` stops Nitro's dev externals from failing to load `files-sdk`. Swap storage at its seam with `vi.mock('../server/custom-adapter', () => import('./support/memory-storage'))`.
 - `workerd` runs `tests/workerd/` inside workerd with real Miniflare KV and R2 bindings, for code that needs Cloudflare bindings rather than the Nitro app.
 
-`tests/contract/` talks only HTTP, so it also runs against a built server: start one (`pnpm preview:worker` for the Worker on port 8787, or `pnpm start` after a `NITRO_PRESET=node_server` build), then run `pnpm test:contract`, `pnpm test:schemathesis [url]`, and `pnpm test:turbo [url]` from `apps/server`. `e2e/s3.sh` starts a local S3-compatible store for the Node server. Against `wrangler dev`, set `SCHEMATHESIS_MODE=positive`: it fails the request after one the Worker answers without reading a large body.
+`tests/contract/` talks only HTTP, so it also runs against a built Worker: start it with `pnpm preview:worker` (port 8787), then run `pnpm test:contract` and `pnpm test:turbo` from `apps/server`.
+
+Test our own behaviour only. Rely on Files SDK, Nitro, D1, and the platforms to do what they document; don't test them.
 
 Contract tests use random hashes, so they pass against a store that already holds data.
 

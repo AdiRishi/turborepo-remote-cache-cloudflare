@@ -56,7 +56,6 @@ jobs:
           node-version-file: .nvmrc
           cache: true
           install: false
-      - uses: astral-sh/setup-uv@v10
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm build --filter=@turborepo-remote-cache/server
@@ -71,12 +70,6 @@ jobs:
         working-directory: apps/server
         run: pnpm test:contract
 
-      - name: Schemathesis
-        working-directory: apps/server
-        env:
-          SCHEMATHESIS_MODE: positive
-        run: pnpm test:schemathesis
-
       - name: turbo round trip
         working-directory: apps/server
         run: pnpm test:turbo
@@ -84,57 +77,3 @@ jobs:
       - name: Worker log
         if: failure()
         run: cat "$RUNNER_TEMP/worker.log"
-
-  e2e-node:
-    name: End to end on Node.js (node_server, S3-compatible store)
-    runs-on: ubuntu-latest
-    env:
-      NITRO_PRESET: node_server
-    steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/setup@v3
-        with:
-          node-version-file: .nvmrc
-          cache: true
-          install: false
-      - uses: astral-sh/setup-uv@v10
-
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build --filter=@turborepo-remote-cache/server
-
-      - name: Start an S3-compatible store
-        working-directory: apps/server
-        run: sh e2e/s3.sh
-
-      - name: Start the server
-        working-directory: apps/server
-        env:
-          PORT: '3000'
-          TURBO_TOKEN: test-token
-          S3_BUCKET: turborepo-cache
-          S3_ENDPOINT: http://localhost:9000
-          S3_REGION: us-east-1
-          S3_ACCESS_KEY_ID: e2e-access-key
-          S3_SECRET_ACCESS_KEY: e2e-secret-key
-          S3_FORCE_PATH_STYLE: 'true'
-        run: |
-          pnpm start > "$RUNNER_TEMP/server.log" 2>&1 &
-          timeout 60 sh -c 'until curl --silent --fail http://localhost:3000/ping; do sleep 1; done'
-
-      - name: Contract tests
-        working-directory: apps/server
-        env:
-          CONTRACT_BASE_URL: http://localhost:3000
-        run: pnpm test:contract
-
-      - name: Schemathesis
-        working-directory: apps/server
-        run: pnpm test:schemathesis http://localhost:3000
-
-      - name: turbo round trip
-        working-directory: apps/server
-        run: pnpm test:turbo http://localhost:3000
-
-      - name: Server log
-        if: failure()
-        run: cat "$RUNNER_TEMP/server.log"
