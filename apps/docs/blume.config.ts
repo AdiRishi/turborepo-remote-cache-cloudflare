@@ -19,7 +19,18 @@ export default defineConfig({
   title: 'Turborepo Remote Cache',
   description:
     'An implementation of the turborepo-remote-cache server custom made for Cloudflare Workers',
-  logo: 'https://public-assets.turborepo-remote-cache.dev/cdn-cgi/image/width=32,quality=80,format=auto/images/logo.png',
+  logo: { image: 'node_modules/@turborepo-remote-cache/brand/assets/lockup.svg', text: '' },
+  theme: {
+    accent: { light: '#8f5b00', dark: '#ffb224' },
+    action: '#ffb224',
+    radius: 'md',
+    mode: 'system',
+    fonts: {
+      display: { name: 'Host Grotesk', weights: [500, 600, 700] },
+      body: { name: 'Host Grotesk', weights: [400, 500, 600] },
+      mono: { name: 'Martian Mono', weights: [400, 500] },
+    },
+  },
   github: {
     owner: 'AdiRishi',
     repo: 'turborepo-remote-cache-cloudflare',
@@ -30,6 +41,8 @@ export default defineConfig({
     actions: [{ label: `v${serverPackage.version}`, href: changelogUrl }],
   },
   footer: {
+    copyright:
+      'Turborepo Remote Cache is an independent, MIT-licensed project. It is not affiliated with Vercel or Cloudflare.',
     links: [
       { label: 'Changelog', href: changelogUrl },
       { label: 'Contributing', href: `${repositoryUrl}/blob/master/.github/CONTRIBUTING.md` },

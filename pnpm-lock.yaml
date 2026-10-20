@@ -193,6 +193,9 @@ importers:
 
   apps/docs:
     devDependencies:
+      '@turborepo-remote-cache/brand':
+        specifier: workspace:*
+        version: link:../../packages/brand
       '@types/node':
         specifier: ^24.19.2
         version: 24.19.2

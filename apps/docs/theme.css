@@ -1,0 +1,20 @@
+@import '@turborepo-remote-cache/brand/blume-theme.css';
+
+/* The header lockup is 22 px tall. Under 760 px wide, the brand shows only the mark. */
+[data-blume-header] a[aria-label] > span[aria-hidden='true'] {
+    height: 22px;
+}
+
+[data-blume-header] a[aria-label] > span[aria-hidden='true'] > svg {
+    flex-shrink: 0;
+    max-width: none;
+    height: 22px;
+}
+
+@media (max-width: 759px) {
+    [data-blume-header] a[aria-label] > span[aria-hidden='true'] {
+        width: 18px;
+        overflow: hidden;
+        justify-content: flex-start;
+    }
+}
