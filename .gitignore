@@ -12,6 +12,8 @@ dist/
 .wrangler/
 coverage/
 *.tsbuildinfo
+.hypothesis/
+.schemathesis/
 
 # Logs
 *.log

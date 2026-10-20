@@ -26,6 +26,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build --filter=@turborepo-remote-cache/server
 
+      # Wrangler creates the R2 bucket named in wrangler.jsonc on the first deploy.
       - name: Deploy
         uses: cloudflare/wrangler-action@v4
         env:
@@ -35,10 +36,6 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: apps/server
-          preCommands: |
-            echo "*** post commands ***"
-            wrangler r2 bucket create turborepo-cache || true
-            echo "******"
           secrets: |
             TURBO_TOKEN
           command: deploy

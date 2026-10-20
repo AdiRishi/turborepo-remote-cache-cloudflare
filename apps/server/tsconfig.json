@@ -1,4 +1,7 @@
 {
-  "files": [],
-  "references": [{ "path": "./tsconfig.worker.json" }, { "path": "./tsconfig.node.json" }]
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["./worker-configuration.d.ts", "node"]
+  },
+  "include": ["server", "tests", "openapi", "nitro.config.ts", "vite.config.ts"]
 }
