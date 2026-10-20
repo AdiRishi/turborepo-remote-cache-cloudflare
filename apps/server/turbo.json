@@ -1,0 +1,10 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["CLOUDFLARE_ENV"],
+      "outputs": ["dist/**", "!dist/**/.dev.vars", ".wrangler/deploy/config.json"]
+    }
+  }
+}

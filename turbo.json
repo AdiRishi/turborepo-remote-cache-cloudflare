@@ -1,6 +1,12 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "stream",
+  "globalDependencies": [".nvmrc", "tsconfig.base.json"],
+  "remoteCache": {
+    "apiUrl": "https://turbo-cache.adishwar-rishi.com",
+    "teamId": "team_turborepo-remote-cache-cloudflare",
+    "signature": true
+  },
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -17,6 +23,7 @@
     "dev": {
       "cache": false,
       "persistent": true
-    }
+    },
+    "//#lint": {}
   }
 }
