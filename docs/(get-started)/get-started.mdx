@@ -105,7 +105,7 @@ Then run a task twice, such as `turbo run build`. [Connect turbo](/connect-turbo
 
 ## Deploy from GitHub Actions
 
-The repository's [deploy workflow](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/deploy.yml) builds and deploys the Worker on every push to `master`. To run it in your copy, add these repository secrets:
+The repository's [CI workflow](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/ci.yml) deploys the Worker on every push to `master`, once the checks and end-to-end tests pass. To run it in your copy, delete the `release`, `docs-cloudflare`, and `docs-github-pages` jobs, which publish this project's releases and docs, and add these repository secrets:
 
 - `CLOUDFLARE_API_TOKEN`: a Cloudflare API token that can edit Workers and R2.
 - `CLOUDFLARE_ACCOUNT_ID`: your Cloudflare account ID.

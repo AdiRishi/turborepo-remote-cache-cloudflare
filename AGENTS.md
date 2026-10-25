@@ -40,6 +40,12 @@ This repo uses its own deployed server as its Turborepo remote cache (`remoteCac
 
 A cache hit replays outputs instead of running the task, so declare everything that changes a task's result in `turbo.json`: env vars under `env`, files outside the package under `inputs`, produced files under `outputs`. Workspace packages without a build step are hashed into their dependents through the `transit` task.
 
+## CI
+
+All of CI is one workflow, `.github/workflows/ci.yml`, whose jobs form a single graph: checks and the end-to-end run on every push and pull request, docs previews on pull requests, and deploys and releases on `master`. Add new work as a job in that graph rather than as a new workflow, and start each job with `actions/checkout` followed by `./.github/actions/setup`, which installs Node.js, pnpm, and the dependencies.
+
+The `master` ruleset requires the checks `Check correctness`, `Build and deploy Docs`, and `dependency-review` by name. Renaming those jobs means updating the ruleset too.
+
 ## TypeScript
 
 TypeScript 7. Type-aware Oxlint (`oxlint-tsgolint`) also requires TypeScript 7 and rejects legacy tsconfig options such as `baseUrl`; use `paths` relative to the tsconfig instead.

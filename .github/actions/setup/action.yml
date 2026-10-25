@@ -1,0 +1,14 @@
+name: Setup
+description: Install Node.js from .nvmrc, pnpm, and the workspace dependencies. Run after actions/checkout.
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/setup@v3
+      with:
+        node-version-file: .nvmrc
+        cache: true
+        install: false
+
+    - run: pnpm install --frozen-lockfile
+      shell: bash
