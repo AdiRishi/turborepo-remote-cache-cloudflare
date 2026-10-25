@@ -7,18 +7,18 @@ sidebar:
 
 The server stores artifacts through [Files SDK](https://files-sdk.dev). It has three built-in backends and a hook for any other Files SDK adapter.
 
-| Backend                                   | Configure it with                              | Runs on                |
-| ----------------------------------------- | ---------------------------------------------- | ---------------------- |
-| [Cloudflare R2](/storage/r2)              | An `R2_STORE` binding                          | Cloudflare Workers     |
-| [Cloudflare KV](/storage/kv)              | A `KV_STORE` binding                           | Cloudflare Workers     |
-| [S3-compatible bucket](/storage/s3)       | `S3_BUCKET`, `S3_ENDPOINT`, and credentials    | Every platform         |
-| [Custom adapter](/storage/custom-adapter) | Code in `apps/server/server/custom-adapter.ts` | Depends on the adapter |
+| Backend                                   | Configure it with                           | Runs on                |
+| ----------------------------------------- | ------------------------------------------- | ---------------------- |
+| [Cloudflare R2](/storage/r2)              | An `R2_STORE` binding                       | Cloudflare Workers     |
+| [Cloudflare KV](/storage/kv)              | A `KV_STORE` binding                        | Cloudflare Workers     |
+| [S3-compatible bucket](/storage/s3)       | `S3_BUCKET`, `S3_ENDPOINT`, and credentials | Every platform         |
+| [Custom adapter](/storage/custom-adapter) | Code in `apps/server/src/custom-adapter.ts` | Depends on the adapter |
 
 ## How the server picks a backend
 
 For every request, the server takes the first backend in this list that is configured:
 
-1. The adapter that `server/custom-adapter.ts` returns, when it returns one.
+1. The adapter that `src/custom-adapter.ts` returns, when it returns one.
 2. The `KV_STORE` binding.
 3. The `R2_STORE` binding.
 4. The `S3_*` variables, when `S3_BUCKET` is set.
@@ -30,7 +30,7 @@ When both `KV_STORE` and `R2_STORE` are bound, artifacts go to KV. A binding als
 With no backend, or with an invalid configuration, every cache request fails with a `500` error, and the server logs the reason:
 
 ```text
-Invalid server configuration: no artifact storage. Bind KV_STORE or R2_STORE on Cloudflare, set S3_BUCKET and S3_ENDPOINT, or return an adapter from server/custom-adapter.ts.
+Invalid server configuration: no artifact storage. Bind KV_STORE or R2_STORE on Cloudflare, set S3_BUCKET and S3_ENDPOINT, or return an adapter from src/custom-adapter.ts.
 ```
 
 The response body doesn't include the reason, so check the platform's logs.

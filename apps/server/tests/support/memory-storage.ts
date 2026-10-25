@@ -1,7 +1,7 @@
 import { Files } from 'files-sdk';
 import { memory } from 'files-sdk/memory';
 
-import type { CustomAdapter } from '../../server/utils/storage';
+import type { CustomAdapter } from '../../src/utils/storage';
 
 export const adapter = memory();
 

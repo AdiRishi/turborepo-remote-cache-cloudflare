@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { authorized, randomHash } from './support/client';
 import { storage } from './support/memory-storage';
 
-vi.mock('../server/custom-adapter', () => import('./support/memory-storage'));
+vi.mock('../src/custom-adapter', () => import('./support/memory-storage'));
 
 describe('artifacts written before this version', () => {
   test('serves an R2 artifact from the previous server, which stored only the tag', async () => {

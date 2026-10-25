@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { authorized, randomHash, readError, uploadArtifact } from '../support/client';
 
-vi.mock('../../server/custom-adapter', () => import('../support/memory-storage'));
+vi.mock('../../src/custom-adapter', () => import('../support/memory-storage'));
 
 const postJson = (path: string, body: unknown, headers: Record<string, string> = {}) =>
   authorized(path, {

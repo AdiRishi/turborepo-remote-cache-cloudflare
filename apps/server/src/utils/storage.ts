@@ -48,7 +48,7 @@ export const resolveAdapter = (env: PlatformEnv): Adapter => {
     return s3Fetch(s3);
   }
   throw configError(
-    'no artifact storage. Bind KV_STORE or R2_STORE on Cloudflare, set S3_BUCKET and S3_ENDPOINT, or return an adapter from server/custom-adapter.ts.',
+    'no artifact storage. Bind KV_STORE or R2_STORE on Cloudflare, set S3_BUCKET and S3_ENDPOINT, or return an adapter from src/custom-adapter.ts.',
   );
 };
 

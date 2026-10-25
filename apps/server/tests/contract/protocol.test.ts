@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { authorized, randomHash, readError, send } from '../support/client';
 
-vi.mock('../../server/custom-adapter', () => import('../support/memory-storage'));
+vi.mock('../../src/custom-adapter', () => import('../support/memory-storage'));
 
 const CREDENTIALS = [
   ['no Authorization header', {}],
@@ -75,7 +75,7 @@ describe('CORS', () => {
 
 describe('routing', () => {
   test.each(['/v8/unknown', '/v8/artifacts/abc/extra', '/internal/count-objects'])(
-    'answers the unknown API path %s with a JSON 404, not the dashboard',
+    'answers the unknown API path %s with a JSON 404',
     async (path) => {
       const response = await authorized(path);
       expect(response.status).toBe(404);
@@ -90,10 +90,12 @@ describe('routing', () => {
     expect((await readError(response)).code).toBe('not_found');
   });
 
-  test('serves the dashboard placeholder at the root without authentication', async () => {
-    const response = await send('/');
-    expect(response.status).toBe(200);
-    expect(response.headers.get('content-type')).toContain('text/html');
+  test('redirects the root to the documentation', async () => {
+    const response = await send('/', { redirect: 'manual' });
+    expect(response.status).toBe(302);
+    expect(response.headers.get('location')).toBe(
+      'https://adirishi.github.io/turborepo-remote-cache-cloudflare',
+    );
   });
 
   test('serves the health check without authentication', async () => {

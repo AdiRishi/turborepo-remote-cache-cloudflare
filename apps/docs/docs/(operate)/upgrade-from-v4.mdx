@@ -12,7 +12,7 @@ In version 4, the Worker lived at the repository root, with `wrangler.jsonc` and
 | Version 4                            | Version 5                                         |
 | ------------------------------------ | ------------------------------------------------- |
 | `wrangler.jsonc`                     | `apps/server/wrangler.jsonc`                      |
-| `src/`                               | `apps/server/server/`                             |
+| `src/`                               | `apps/server/src/`                                |
 | `triggers.crons` in `wrangler.jsonc` | `scheduledTasks` in `apps/server/nitro.config.ts` |
 
 Copy any changes you made to `wrangler.jsonc`, such as a bucket name, a KV namespace, or the retention period, into `apps/server/wrangler.jsonc`. Leave out `triggers`, because the build generates the cron trigger from `scheduledTasks`. The `ENVIRONMENT` variable is gone.

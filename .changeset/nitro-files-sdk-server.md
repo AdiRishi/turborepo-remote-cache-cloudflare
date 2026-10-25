@@ -3,7 +3,7 @@
 '@turborepo-remote-cache/files-sdk-kv': minor
 ---
 
-Rebuild the server on Nitro and Files SDK. It still deploys to Cloudflare Workers by default, and now also builds for any Nitro preset (`NITRO_PRESET`), with storage in a KV namespace, an R2 bucket, any S3-compatible bucket, or any Files SDK adapter returned from `server/custom-adapter.ts`.
+Rebuild the server on Nitro and Files SDK. It still deploys to Cloudflare Workers by default, and now also builds for any Nitro preset (`NITRO_PRESET`), with storage in a KV namespace, an R2 bucket, any S3-compatible bucket, or any Files SDK adapter returned from `src/custom-adapter.ts`.
 
 Existing deployments keep their `TURBO_TOKEN`, `BUCKET_OBJECT_EXPIRATION_HOURS`, `R2_STORE`, and `KV_STORE` configuration, and existing R2 artifacts stay readable.
 

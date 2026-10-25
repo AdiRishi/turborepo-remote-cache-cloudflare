@@ -8,7 +8,7 @@ import {
   uploadArtifact,
 } from '../support/client';
 
-vi.mock('../../server/custom-adapter', () => import('../support/memory-storage'));
+vi.mock('../../src/custom-adapter', () => import('../support/memory-storage'));
 
 const randomBytes = (length: number) => crypto.getRandomValues(new Uint8Array(length));
 

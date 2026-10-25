@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { authorized, randomHash } from './support/client';
 import { adapter, storage } from './support/memory-storage';
 
-vi.mock('../server/custom-adapter', () => import('./support/memory-storage'));
+vi.mock('../src/custom-adapter', () => import('./support/memory-storage'));
 
 const HOUR = 3_600_000;
 const START = new Date('2026-01-01T00:00:00Z').getTime();

@@ -1,7 +1,6 @@
 import type { Nitro } from 'nitro/types';
 import type { Plugin } from 'vite';
 
-import { cloudflareTest } from '@cloudflare/vitest-plugin';
 import { nitro } from 'nitro/vite';
 import { defineConfig } from 'vitest/config';
 
@@ -25,39 +24,14 @@ export default defineConfig({
   test: {
     coverage: {
       provider: 'istanbul',
-      include: ['server/**'],
+      include: ['src/**'],
       reporter: ['text', 'html', 'clover', 'json'],
     },
-    projects: [
-      {
-        extends: true,
-        test: {
-          name: 'nitro',
-          include: ['tests/**/*.test.ts'],
-          exclude: ['tests/workerd/**'],
-          environment: './tests/support/nitro-environment.ts',
-          setupFiles: ['./tests/support/nitro-setup.ts'],
-          env: {
-            TURBO_TOKEN: 'test-token',
-          },
-        },
-      },
-      {
-        plugins: [
-          cloudflareTest({
-            miniflare: {
-              compatibilityDate: '2026-06-15',
-              compatibilityFlags: ['nodejs_compat'],
-              kvNamespaces: ['KV_STORE'],
-              r2Buckets: ['R2_STORE'],
-            },
-          }),
-        ],
-        test: {
-          name: 'workerd',
-          include: ['tests/workerd/**/*.test.ts'],
-        },
-      },
-    ],
+    include: ['tests/**/*.test.ts'],
+    environment: './tests/support/nitro-environment.ts',
+    setupFiles: ['./tests/support/nitro-setup.ts'],
+    env: {
+      TURBO_TOKEN: 'test-token',
+    },
   },
 });

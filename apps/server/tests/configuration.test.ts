@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 
 import { authorized } from './support/client';
 
-vi.mock('../server/custom-adapter', () => import('./support/memory-storage'));
+vi.mock('../src/custom-adapter', () => import('./support/memory-storage'));
 
 afterEach(() => {
   vi.unstubAllEnvs();

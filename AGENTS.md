@@ -49,23 +49,20 @@ TypeScript 7. Type-aware Oxlint (`oxlint-tsgolint`) also requires TypeScript 7 a
 
 ## Server (`apps/server`)
 
-Nitro 3 (`nitro.config.ts`, `serverDir: './server'`) built through Vite. File routes live under `server/routes/`; `server/middleware/` adds CORS for `/v8/**` and bearer auth for `/v8/**` and `/internal/**`; `server/error.ts` renders every error as the spec's `{ code, message }`. The catch-all routes under `/v8` and `/internal` keep unknown API paths from falling through to the `index.html` renderer.
+Nitro 3 (`nitro.config.ts`, `serverDir: './src'`) built through Vite. File routes live under `src/routes/`; `src/middleware/` adds CORS for `/v8/**` and bearer auth for `/v8/**` and `/internal/**`; `src/error.ts` renders every error, including Nitro's own 404s, as the spec's `{ code, message }`. `/` redirects to the documentation.
 
-- **Platform env.** `server/utils/env.ts` is the one place that knows where configuration comes from: the Worker env on Cloudflare (`event.req.runtime.cloudflare.env`, or the task context in scheduled tasks), `process.env` elsewhere. Variable names predate Nitro, so they bypass `runtimeConfig`.
-- **Storage.** `server/utils/storage.ts` resolves one Files SDK adapter per request: `server/custom-adapter.ts` if it returns one, then a `KV_STORE` binding, then an `R2_STORE` binding, then the `S3_*` variables. Keys are `{team}/{hash}`. Artifact metadata uses the keys `artifactTag`, `artifactDuration`, `artifactSha`, and `artifactDirtyHash`, read case-insensitively because S3-compatible stores lowercase them.
+- **Platform env.** `src/utils/env.ts` is the one place that knows where configuration comes from: the Worker env on Cloudflare (`event.req.runtime.cloudflare.env`, or the task context in scheduled tasks), `process.env` elsewhere. Variable names predate Nitro, so they bypass `runtimeConfig`.
+- **Storage.** `src/utils/storage.ts` resolves one Files SDK adapter per request: `src/custom-adapter.ts` if it returns one, then a `KV_STORE` binding, then an `R2_STORE` binding, then the `S3_*` variables. Keys are `{team}/{hash}`. Artifact metadata uses the keys `artifactTag`, `artifactDuration`, `artifactSha`, and `artifactDirtyHash`, read case-insensitively because S3-compatible stores lowercase them.
 - **Spec.** `openapi/turborepo.openapi.json` is the official spec, vendored unmodified; `openapi/turborepo.ts` is generated from it. Refresh both with `pnpm spec:sync`, and type request schemas and response bodies against the generated types with `satisfies`.
-- **Expiry.** The `cache:delete-expired` task (`server/tasks/`) runs on the `scheduledTasks` cron, and `POST /internal/delete-expired-objects` runs the same deletion on demand.
+- **Expiry.** The `cache:delete-expired` task (`src/tasks/`) runs on the `scheduledTasks` cron, and `POST /internal/delete-expired-objects` runs the same deletion on demand.
 
 ## Testing
 
-`apps/server` has two Vitest projects in `vite.config.ts`:
-
-- `nitro` runs route and contract tests in Node through `serverFetch`. Nitro 3.0.260903-beta ships no Vitest integration, so `tests/support/nitro-environment.ts` and `nitro-setup.ts` create the app, the `closeNitroWithVite` plugin closes Nitro's file watchers, and `noExternals` in `nitro.config.ts` stops Nitro's dev externals from failing to load `files-sdk`. Swap storage at its seam with `vi.mock('../server/custom-adapter', () => import('./support/memory-storage'))`.
-- `workerd` runs `tests/workerd/` inside workerd with real Miniflare KV and R2 bindings, for code that needs Cloudflare bindings rather than the Nitro app.
+`apps/server` tests run in Node through Nitro's `serverFetch`. Nitro 3.0.260903-beta ships no Vitest integration, so `tests/support/nitro-environment.ts` and `nitro-setup.ts` create the app, the `closeNitroWithVite` plugin in `vite.config.ts` closes Nitro's file watchers, and `noExternals` in `nitro.config.ts` stops Nitro's dev externals from failing to load `files-sdk`. Swap storage at its seam with `vi.mock('../src/custom-adapter', () => import('./support/memory-storage'))`.
 
 `tests/contract/` talks only HTTP, so it also runs against a built Worker: start it with `pnpm preview:worker` (port 8787), then run `pnpm test:contract` and `pnpm test:turbo` from `apps/server`.
 
-Test our own behaviour only. Rely on Files SDK, Nitro, D1, and the platforms to do what they document; don't test them.
+Test our own behaviour only. Rely on Files SDK, Nitro, and the platforms to do what they document; don't test them.
 
 Contract tests use random hashes, so they pass against a store that already holds data.
 
