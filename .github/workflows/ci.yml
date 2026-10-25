@@ -44,6 +44,11 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Build docs
+        run: |
+          pnpm docs:build
+          pnpm exec blume validate --strict
+
       - name: Check spec types
         working-directory: apps/server
         run: |
