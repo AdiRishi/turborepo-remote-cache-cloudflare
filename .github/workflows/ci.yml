@@ -37,6 +37,10 @@ jobs:
           pnpm spec:types
           git diff --exit-code -- openapi
 
+      - name: Check the generated Worker types match wrangler.jsonc
+        working-directory: apps/server
+        run: pnpm exec wrangler types --check
+
       - name: Check the Worker bundle
         working-directory: apps/server
         run: pnpm exec wrangler deploy --dry-run
