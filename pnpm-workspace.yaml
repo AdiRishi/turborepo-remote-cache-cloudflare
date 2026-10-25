@@ -6,6 +6,3 @@ allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
-
-overrides:
-  '@types/node': ^24.19.2

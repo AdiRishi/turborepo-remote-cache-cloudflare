@@ -29,7 +29,7 @@ const r2Binding = (binding: R2Bucket): Adapter => ({
   },
 });
 
-export const resolveAdapter = (env: PlatformEnv): Adapter => {
+const resolveAdapter = (env: PlatformEnv): Adapter => {
   const custom = customAdapter(env);
   if (custom) {
     return custom;
