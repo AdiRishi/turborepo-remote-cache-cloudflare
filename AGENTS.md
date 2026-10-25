@@ -44,7 +44,7 @@ A cache hit replays outputs instead of running the task, so declare everything t
 
 All of CI is one workflow, `.github/workflows/ci.yml`, whose jobs form a single graph: checks and the end-to-end run on every push and pull request, docs previews on pull requests, and deploys and releases on `master`. Add new work as a job in that graph rather than as a new workflow, and start each job with `actions/checkout` followed by `./.github/actions/setup`, which installs Node.js, pnpm, and the dependencies.
 
-The `master` ruleset requires the checks `Check correctness`, `Build and deploy Docs`, and `dependency-review` by name. Renaming those jobs means updating the ruleset too.
+The `master` ruleset requires the checks `Verify`, `Docs · Cloudflare Pages`, and `Dependency review` by name. Renaming those jobs means updating the ruleset too.
 
 ## TypeScript
 
