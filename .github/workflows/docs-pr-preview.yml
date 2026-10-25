@@ -11,8 +11,6 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   DOCS_CLOUDFLARE_DEPLOYMENT: true
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_REMOTE_CACHE_SIGNATURE_KEY: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
 
 jobs:
   check:
@@ -37,8 +35,8 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
-          workingDirectory: apps/docs
-          command: pages deploy dist --project-name=cloudflare-turbo-cache-docs
+          workingDirectory: apps/server
+          command: pages deploy ../../dist --project-name=cloudflare-turbo-cache-docs
 
       - name: Comment with deploy link
         if: github.event_name == 'pull_request'

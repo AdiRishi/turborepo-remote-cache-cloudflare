@@ -1,18 +1,7 @@
 import { defineConfig } from 'oxlint';
 
 export default defineConfig({
-  plugins: [
-    'eslint',
-    'typescript',
-    'unicorn',
-    'oxc',
-    'import',
-    'promise',
-    'node',
-    'vitest',
-    'react',
-    'jsx-a11y',
-  ],
+  plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'import', 'promise', 'node', 'vitest'],
   categories: {
     correctness: 'error',
     suspicious: 'error',
@@ -29,7 +18,6 @@ export default defineConfig({
     'eslint/no-await-in-loop': 'off',
     'eslint/no-warning-comments': 'off',
     'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
-    'react/react-in-jsx-scope': 'off',
     'typescript/consistent-type-imports': ['error', { disallowTypeAnnotations: false }],
     'typescript/no-explicit-any': 'error',
     'typescript/no-import-type-side-effects': 'error',

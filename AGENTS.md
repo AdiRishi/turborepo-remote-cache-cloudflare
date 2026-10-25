@@ -7,15 +7,13 @@ An open-source Turborepo remote cache server. It runs on Cloudflare Workers by d
 pnpm workspace orchestrated by Turborepo:
 
 - `apps/server` (`@turborepo-remote-cache/server`): the Nitro server, its tests, `wrangler.jsonc`, and the vendored Remote Cache OpenAPI spec.
-- `apps/docs` (`@turborepo-remote-cache/docs`): the Blume documentation site.
-- `packages/brand` (`@turborepo-remote-cache/brand`): the marks, lockups, app icons, and theme tokens for the dashboard and docs. `packages/brand/DESIGN.md` is the design reference.
 - `packages/files-sdk-kv` (`@turborepo-remote-cache/files-sdk-kv`): a Cloudflare Workers KV adapter for Files SDK. Keep Turborepo and app logic out of it so it can be published or upstreamed. Its tests run in workerd against Miniflare KV.
 
-Root holds shared tooling: `turbo.json`, `tsconfig.base.json` (every package extends it), `oxlint.config.ts`, and `oxfmt.config.ts`.
+Root holds shared tooling (`turbo.json`, `tsconfig.base.json`, which every package extends, `oxlint.config.ts`, and `oxfmt.config.ts`) and the Blume documentation site: `blume.config.ts`, `theme.css`, `public/` (favicon, touch icon, and the brand marks in `public/brand/`), and the pages in `docs/`.
 
 ## Commands
 
-Run from the root. `build`, `dev`, `test`, `typecheck`, and `docs:build` go through Turborepo; `lint` and `format` run Oxlint and Oxfmt across the whole repo directly.
+Run from the root. `build`, `dev`, `test`, and `typecheck` go through Turborepo; `lint` and `format` run Oxlint and Oxfmt across the whole repo, and `docs:dev` and `docs:build` run Blume directly.
 
 ```bash
 pnpm install
@@ -24,10 +22,11 @@ pnpm lint:fix      # oxlint --fix + oxfmt
 pnpm typecheck
 pnpm test          # Vitest with coverage, in apps/server and packages/files-sdk-kv
 pnpm build         # apps/server builds for Cloudflare Workers; set NITRO_PRESET for another target
+pnpm docs:dev
 pnpm docs:build
 
 # Check docs links, anchors, and redirects
-pnpm --filter @turborepo-remote-cache/docs exec blume validate --strict
+pnpm exec blume validate --strict
 
 # One test file
 pnpm --filter @turborepo-remote-cache/server exec vitest run tests/contract/artifacts.test.ts
@@ -68,16 +67,14 @@ Contract tests use random hashes, so they pass against a store that already hold
 
 ## Documentation
 
-Docs live in `apps/docs`. Every functional or configuration change updates the matching docs page in the same PR.
+Docs live in `docs/` at the root. Every functional or configuration change updates the matching docs page in the same PR.
 
-The site is built with [Blume](https://useblume.dev). Its own docs ship in `apps/docs/node_modules/blume/docs`. Read them instead of answering from memory.
+The site is built with [Blume](https://useblume.dev). Its own docs ship in `node_modules/blume/docs`. Read them instead of answering from memory.
 
-- Pages are `.mdx` files under `apps/docs/docs/`. The file path is the route, and a parenthesized folder such as `(get-started)` groups pages without adding a URL segment. The `meta.ts` in each folder sets the sidebar order.
+- Pages are `.mdx` files under `docs/`. The file path is the route, and a parenthesized folder such as `(get-started)` groups pages without adding a URL segment. The `meta.ts` in each folder sets the sidebar order.
 - Frontmatter is strict: a key Blume doesn't know fails the build. The `title` renders as the page H1, and the `description` renders below it, so don't repeat the description in the first paragraph.
 - Write callouts as `:::tip` … `:::`, with no space after the colons. `::: tip` renders as literal text.
-- The home page is the custom page `apps/docs/pages/index.astro`, not Markdown.
-- The brand comes from `packages/brand`: `theme.css` imports its Blume tokens, `logo` points at its lockup, and `apps/docs/public` holds symlinks to its favicon and touch icon.
-- The API reference under `/api` renders the vendored spec in `apps/server/openapi/`. Fix spec problems in `apps/docs/openapi/overlay.yaml`, never in the vendored file.
-- The docs build reads `apps/server/package.json` (the version) and the vendored spec, so `apps/docs/turbo.json` lists both as inputs. List any other file or env var the docs build reads there too. The brand package reaches the hash through `transit`.
+- The home page is `docs/index.mdx` in Blume's `custom` mode.
+- The API reference under `/api` renders the vendored spec in `apps/server/openapi/`. Fix spec problems in `docs/openapi-overlay.yaml`, never in the vendored file.
 - When you move a page, add a redirect in `blume.config.ts`.
-- The site shows no "Last updated" dates. Blume reads them from Git history, which Turborepo doesn't hash, so a cache hit would replay stale dates.
+- The site shows no "Last updated" dates: CI builds from a shallow clone, so Blume would read the wrong dates from Git history.

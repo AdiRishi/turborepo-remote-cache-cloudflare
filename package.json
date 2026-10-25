@@ -29,8 +29,8 @@
     "build": "dotenv -e .env.turbo.local -- turbo run build",
     "deploy": "pnpm --filter @turborepo-remote-cache/server run deploy",
     "dev": "dotenv -e .env.turbo.local -- turbo run dev",
-    "docs:build": "dotenv -e .env.turbo.local -- turbo run build --filter=@turborepo-remote-cache/docs",
-    "docs:dev": "dotenv -e .env.turbo.local -- turbo run dev --filter=@turborepo-remote-cache/docs",
+    "docs:build": "blume build",
+    "docs:dev": "blume dev",
     "format": "oxfmt .",
     "lint": "oxlint && oxfmt --check .",
     "lint:fix": "oxlint --fix && oxfmt .",
@@ -40,6 +40,7 @@
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
+    "blume": "^2.2.4",
     "dotenv-cli": "^11.0.0",
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",

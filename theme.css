@@ -1,25 +1,3 @@
-/*
- * Blume theme.css overrides for the docs site. Import it from the docs theme.css
- * (`@import '@turborepo-remote-cache/brand/blume-theme.css';`) or copy it there,
- * and pair it with this blume.config.ts block:
- *
- *   theme: {
- *     accent: { light: "#8f5b00", dark: "#ffb224" },
- *     action: "#ffb224",
- *     radius: "md",
- *     mode: "system",
- *     fonts: {
- *       display: { name: "Host Grotesk", weights: [500, 600, 700] },
- *       body: { name: "Host Grotesk", weights: [400, 500, 600] },
- *       mono: { name: "Martian Mono", weights: [400, 500] },
- *     },
- *   },
- *
- * Blume derives button label colors itself; the overrides below pin them so
- * amber fills always carry dark ink. Override the Logo layout slot with
- * assets/lockup.svg (currentColor) inlined, so the slabs follow the text color.
- */
-
 :root {
     --blume-background: #ffffff;
     --blume-foreground: #0e1013;
@@ -59,4 +37,23 @@
 code,
 pre {
     font-stretch: 87.5%;
+}
+
+/* The header lockup is 22 px tall. Under 760 px wide, the brand shows only the mark. */
+[data-blume-header] a[aria-label] > span[aria-hidden='true'] {
+    height: 22px;
+}
+
+[data-blume-header] a[aria-label] > span[aria-hidden='true'] > svg {
+    flex-shrink: 0;
+    max-width: none;
+    height: 22px;
+}
+
+@media (max-width: 759px) {
+    [data-blume-header] a[aria-label] > span[aria-hidden='true'] {
+        width: 18px;
+        overflow: hidden;
+        justify-content: flex-start;
+    }
 }

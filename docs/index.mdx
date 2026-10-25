@@ -1,0 +1,25 @@
+---
+title: Turborepo Remote Cache
+description: A Turborepo remote cache you host yourself, on Cloudflare Workers or any platform Nitro builds for.
+mode: custom
+sidebar:
+    hidden: true
+---
+
+# A Turborepo remote cache you host yourself
+
+An open-source server for the Turborepo Remote Cache API. Deploy it to Cloudflare Workers and R2 with one button, or build it for Node.js, Vercel, AWS Lambda, and other platforms with storage you already run.
+
+[Get started](/get-started) or [deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare). Then point turbo at it with `turbo login --manual`.
+
+## Where it runs
+
+Every platform serves the same cache API. Cloudflare Workers is the default build, and the only one with built-in R2 and KV storage.
+
+| Platform                                         | Storage                           | Daily expiry          |
+| ------------------------------------------------ | --------------------------------- | --------------------- |
+| [Cloudflare Workers](/get-started) (recommended) | R2, KV, or S3-compatible          | Cron trigger          |
+| [Node.js, Bun, and Deno](/deploy/node)           | S3-compatible or a custom adapter | In the server process |
+| [Vercel](/deploy/vercel)                         | S3-compatible                     | Vercel Cron Jobs      |
+| [Netlify](/deploy/netlify)                       | S3-compatible                     | External scheduler    |
+| [AWS Lambda](/deploy/aws-lambda)                 | Amazon S3 or S3-compatible        | External scheduler    |

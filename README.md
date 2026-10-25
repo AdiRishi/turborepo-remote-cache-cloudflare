@@ -1,8 +1,8 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="packages/brand/assets/lockup-on-dark.svg">
-  <img src="packages/brand/assets/lockup-on-light.svg" alt="Turborepo Remote Cache" width="360">
+  <source media="(prefers-color-scheme: dark)" srcset="public/brand/lockup-on-dark.svg">
+  <img src="public/brand/lockup-on-light.svg" alt="Turborepo Remote Cache" width="360">
 </picture>
 
 <br>
@@ -57,6 +57,6 @@ turbo run build
 
 ## Contributing
 
-See [CONTRIBUTING.md](.github/CONTRIBUTING.md). The repository is a pnpm workspace. The server is in `apps/server`, the documentation site is in `apps/docs`, and shared packages are in `packages/`.
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md). The repository is a pnpm workspace. The server is in `apps/server`, the KV adapter is in `packages/files-sdk-kv`, and the documentation site is in `docs/`.
 
 Turborepo Remote Cache is an independent, MIT-licensed project. It is not affiliated with Vercel or Cloudflare.
