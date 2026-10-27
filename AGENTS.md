@@ -45,7 +45,7 @@ pnpm --filter @turborepo-remote-cache/api exec vitest run tests/contract/artifac
 
 ## Remote cache
 
-This repo uses its own deployed server as its Turborepo remote cache (`remoteCache` in `turbo.json`, signed artifacts). Root scripts load `TURBO_TOKEN` and `TURBO_REMOTE_CACHE_SIGNATURE_KEY` from `.env.turbo.local` (template: `.env.turbo.example`). Without that file, Turborepo uses only the local cache.
+This repo uses its own deployed server as its Turborepo remote cache (`remoteCache` in `turbo.json`, signed artifacts). Root scripts load `TURBO_TOKEN` and `TURBO_REMOTE_CACHE_SIGNATURE_KEY` from `.env.turbo.local` (template: `.env.turbo.example`). Without that file, Turborepo uses only the local cache. New worktrees get a copy of it: the setup script in `t3.json` copies it for T3 Code, and `.worktreeinclude` lists it for Claude Code.
 
 `.env.turbo.local` holds real secrets: never read, print, or commit it.
 
