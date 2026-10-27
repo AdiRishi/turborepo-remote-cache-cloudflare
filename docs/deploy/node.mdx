@@ -11,7 +11,7 @@ The server runs as one process and stores artifacts in an [S3-compatible bucket]
 <Tab title="Node.js">
 
 ```sh
-NITRO_PRESET=node_server pnpm build --filter=@turborepo-remote-cache/server
+NITRO_PRESET=node_server pnpm build
 cd apps/server
 pnpm start
 ```
@@ -22,7 +22,7 @@ pnpm start
 <Tab title="Bun">
 
 ```sh
-NITRO_PRESET=bun pnpm build --filter=@turborepo-remote-cache/server
+NITRO_PRESET=bun pnpm build
 cd apps/server
 bun run ./.output/server/index.mjs
 ```
@@ -31,7 +31,7 @@ bun run ./.output/server/index.mjs
 <Tab title="Deno">
 
 ```sh
-NITRO_PRESET=deno_server pnpm build --filter=@turborepo-remote-cache/server
+NITRO_PRESET=deno_server pnpm build
 cd apps/server
 deno run --allow-net --allow-read --allow-env .output/server/index.mjs
 ```

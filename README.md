@@ -31,7 +31,7 @@ git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
 cd turborepo-remote-cache-cloudflare
 pnpm install
 pnpm --filter @turborepo-remote-cache/server exec wrangler login
-pnpm build --filter=@turborepo-remote-cache/server
+pnpm build
 pnpm run deploy
 pnpm --filter @turborepo-remote-cache/server exec wrangler secret put TURBO_TOKEN
 ```

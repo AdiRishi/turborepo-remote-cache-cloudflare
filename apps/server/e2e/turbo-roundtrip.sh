@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # Builds a fixture repo with the real `turbo` CLI against a running server, twice, with signed
 # artifacts, and asserts that the second run restores the build from the remote cache.
-# Usage: sh e2e/turbo-roundtrip.sh [base URL]   (default http://localhost:8787, token test-token)
+# Called by e2e/run.sh with the base URL of a running server that accepts the token test-token.
 set -eu
 
 e2e_dir="$(cd "$(dirname "$0")" && pwd)"

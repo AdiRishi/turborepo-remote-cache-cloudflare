@@ -27,14 +27,23 @@
   "type": "module",
   "scripts": {
     "build": "dotenv -e .env.turbo.local -- turbo run build",
+    "check": "dotenv -e .env.turbo.local -- turbo run lint typecheck test build",
+    "codegen": "pnpm --filter @turborepo-remote-cache/server run codegen",
+    "codegen:check": "pnpm --filter @turborepo-remote-cache/server run codegen:check",
     "deploy": "pnpm --filter @turborepo-remote-cache/server run deploy",
     "dev": "dotenv -e .env.turbo.local -- turbo run dev",
     "docs:build": "blume build",
     "docs:dev": "blume dev",
+    "docs:preview": "blume preview",
+    "docs:validate": "blume validate --strict",
     "format": "oxfmt .",
     "lint": "oxlint && oxfmt --check .",
     "lint:fix": "oxlint --fix && oxfmt .",
+    "preview": "pnpm --filter @turborepo-remote-cache/server run preview",
+    "spec:sync": "pnpm --filter @turborepo-remote-cache/server run spec:sync",
+    "start": "pnpm --filter @turborepo-remote-cache/server run start",
     "test": "dotenv -e .env.turbo.local -- turbo run test",
+    "test:e2e": "dotenv -e .env.turbo.local -- turbo run test:e2e",
     "typecheck": "dotenv -e .env.turbo.local -- turbo run typecheck"
   },
   "devDependencies": {

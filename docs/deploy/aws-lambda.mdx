@@ -8,7 +8,7 @@ Lambda caps a synchronous request or response at 6 MB, so artifacts larger than 
 ## Build the handler
 
 ```sh
-NITRO_PRESET=aws_lambda pnpm build --filter=@turborepo-remote-cache/server
+NITRO_PRESET=aws_lambda pnpm build
 ```
 
 The handler is the `handler` export of `apps/server/.output/server/index.mjs`. Package the contents of `apps/server/.output/server` as the function code, use a Node.js runtime, and set the function's handler to `index.handler`.

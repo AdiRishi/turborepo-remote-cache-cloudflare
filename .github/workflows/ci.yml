@@ -33,7 +33,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Lint
-        run: pnpm exec turbo run lint
+        run: pnpm lint
 
       - name: Typecheck
         run: pnpm typecheck
@@ -47,17 +47,10 @@ jobs:
       - name: Build docs
         run: |
           pnpm docs:build
-          pnpm exec blume validate --strict
+          pnpm docs:validate
 
-      - name: Check spec types
-        working-directory: apps/server
-        run: |
-          pnpm spec:types
-          git diff --exit-code -- openapi
-
-      - name: Check Worker types
-        working-directory: apps/server
-        run: pnpm exec wrangler types --check
+      - name: Check generated code
+        run: pnpm codegen:check
 
       - name: Check Worker bundle
         working-directory: apps/server
@@ -79,26 +72,8 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
-      - name: Build
-        run: pnpm build --filter=@turborepo-remote-cache/server
-
-      - name: Start Worker
-        working-directory: apps/server
-        run: |
-          pnpm preview:worker > "$RUNNER_TEMP/worker.log" 2>&1 &
-          timeout 60 sh -c 'until curl --silent --fail http://localhost:8787/ping; do sleep 1; done'
-
-      - name: Contract tests
-        working-directory: apps/server
-        run: pnpm test:contract
-
-      - name: Turborepo round trip
-        working-directory: apps/server
-        run: pnpm test:turbo
-
-      - name: Worker log
-        if: failure()
-        run: cat "$RUNNER_TEMP/worker.log"
+      - name: Test end to end
+        run: pnpm test:e2e
 
   dependency-review:
     name: Dependency review
@@ -265,7 +240,6 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Refresh spec
-        working-directory: apps/server
         run: pnpm spec:sync
 
       - name: Compare with vendored spec
