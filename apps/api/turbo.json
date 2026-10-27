@@ -8,6 +8,10 @@
     },
     "test": {
       "env": ["CONTRACT_BASE_URL"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "cache": false
     }
   }
 }

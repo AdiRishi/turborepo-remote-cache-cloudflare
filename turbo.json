@@ -23,10 +23,6 @@
       "outputs": ["coverage/**"],
       "passThroughEnv": ["CI"]
     },
-    "test:e2e": {
-      "dependsOn": ["build"],
-      "cache": false
-    },
     "dev": {
       "cache": false,
       "persistent": true
