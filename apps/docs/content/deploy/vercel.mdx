@@ -8,7 +8,7 @@ Vercel limits a request or response body to 4.5 MB, so artifacts larger than tha
 ## Create the project
 
 1. Import your copy of the repository into Vercel.
-2. Set **Root Directory** to `apps/server`. Keep **Include source files outside of the Root Directory in the Build Step** on, because the server uses a package from `packages/`.
+2. Set **Root Directory** to `apps/api`. Keep **Include source files outside of the Root Directory in the Build Step** on, because the server uses a package from `packages/`.
 3. Keep the default build command, which runs the server's `build` script. Nitro detects the Vercel build environment and builds the `vercel` preset. To make the choice explicit, set the `NITRO_PRESET` environment variable to `vercel`.
 4. Add the environment variables below, then deploy.
 

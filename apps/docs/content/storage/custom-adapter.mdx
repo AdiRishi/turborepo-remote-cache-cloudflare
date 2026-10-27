@@ -5,13 +5,13 @@ sidebar:
     label: Custom adapter
 ---
 
-When `apps/server/src/custom-adapter.ts` returns a [Files SDK adapter](https://files-sdk.dev), the server uses it for every request, ahead of the bindings and the `S3_*` variables.
+When `apps/api/src/custom-adapter.ts` returns a [Files SDK adapter](https://files-sdk.dev), the server uses it for every request, ahead of the bindings and the `S3_*` variables.
 
 ## The hook
 
 The file exports one function. It receives the platform environment and returns an adapter, or `undefined` to keep the built-in selection:
 
-```ts apps/server/src/custom-adapter.ts
+```ts apps/api/src/custom-adapter.ts
 import type { CustomAdapter } from './utils/storage';
 
 export const customAdapter: CustomAdapter = () => undefined;
@@ -33,7 +33,7 @@ This example stores artifacts on the disk of one Node.js server with the Files S
 
 1. Return the adapter when `CACHE_DIR` is set:
 
-    ```ts apps/server/src/custom-adapter.ts
+    ```ts apps/api/src/custom-adapter.ts
     import { fs } from 'files-sdk/fs';
 
     import type { CustomAdapter } from './utils/storage';
@@ -53,7 +53,7 @@ This example stores artifacts on the disk of one Node.js server with the Files S
 3. Start it with a directory for the artifacts:
 
     ```sh
-    cd apps/server
+    cd apps/api
     CACHE_DIR=/var/lib/turborepo-cache TURBO_TOKEN=<your token> PORT=3000 pnpm start
     ```
 
@@ -66,10 +66,10 @@ The server writes each artifact to `<CACHE_DIR>/<team>/<hash>`, with a `<hash>.m
 The GCS adapter needs its SDK. Add it to the server, then return the adapter:
 
 ```sh
-pnpm --filter @turborepo-remote-cache/server add @google-cloud/storage
+pnpm --filter @turborepo-remote-cache/api add @google-cloud/storage
 ```
 
-```ts apps/server/src/custom-adapter.ts
+```ts apps/api/src/custom-adapter.ts
 import { gcs } from 'files-sdk/gcs';
 
 import type { CustomAdapter } from './utils/storage';

@@ -11,7 +11,7 @@ Lambda caps a synchronous request or response at 6 MB, so artifacts larger than 
 NITRO_PRESET=aws_lambda pnpm build
 ```
 
-The handler is the `handler` export of `apps/server/.output/server/index.mjs`. Package the contents of `apps/server/.output/server` as the function code, use a Node.js runtime, and set the function's handler to `index.handler`.
+The handler is the `handler` export of `apps/api/.output/server/index.mjs`. Package the contents of `apps/api/.output/server` as the function code, use a Node.js runtime, and set the function's handler to `index.handler`.
 
 Give the function an HTTPS endpoint that `turbo` can reach, such as a Lambda function URL or an API Gateway HTTP API.
 

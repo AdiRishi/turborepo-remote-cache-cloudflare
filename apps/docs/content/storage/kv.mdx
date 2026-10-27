@@ -16,9 +16,9 @@ Check these limits before you choose KV:
 
 ## Bind a namespace
 
-1. Add a `KV_STORE` binding to `apps/server/wrangler.jsonc`, and remove the `r2_buckets` entry unless you still want the bucket:
+1. Add a `KV_STORE` binding to `apps/api/wrangler.jsonc`, and remove the `r2_buckets` entry unless you still want the bucket:
 
-    ```jsonc apps/server/wrangler.jsonc
+    ```jsonc apps/api/wrangler.jsonc
     {
         "kv_namespaces": [{ "binding": "KV_STORE" }],
     }

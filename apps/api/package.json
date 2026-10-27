@@ -1,5 +1,5 @@
 {
-  "name": "@turborepo-remote-cache/server",
+  "name": "@turborepo-remote-cache/api",
   "version": "4.0.0",
   "private": true,
   "description": "A Turborepo remote cache server for Cloudflare Workers and any Nitro deployment target",

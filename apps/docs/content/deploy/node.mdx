@@ -12,7 +12,7 @@ The server runs as one process and stores artifacts in an [S3-compatible bucket]
 
 ```sh
 NITRO_PRESET=node_server pnpm build
-cd apps/server
+cd apps/api
 pnpm start
 ```
 
@@ -23,7 +23,7 @@ pnpm start
 
 ```sh
 NITRO_PRESET=bun pnpm build
-cd apps/server
+cd apps/api
 bun run ./.output/server/index.mjs
 ```
 
@@ -32,14 +32,14 @@ bun run ./.output/server/index.mjs
 
 ```sh
 NITRO_PRESET=deno_server pnpm build
-cd apps/server
+cd apps/api
 deno run --allow-net --allow-read --allow-env .output/server/index.mjs
 ```
 
 </Tab>
 </Tabs>
 
-The build is self-contained. To deploy it, copy `apps/server/.output` to the machine or image that runs it.
+The build is self-contained. To deploy it, copy `apps/api/.output` to the machine or image that runs it.
 
 ## Configure the server
 

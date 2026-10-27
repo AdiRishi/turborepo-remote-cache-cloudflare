@@ -30,10 +30,10 @@ To deploy from your own machine instead, use Node.js 24 or later and pnpm:
 git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
 cd turborepo-remote-cache-cloudflare
 pnpm install
-pnpm --filter @turborepo-remote-cache/server exec wrangler login
+pnpm --filter @turborepo-remote-cache/api exec wrangler login
 pnpm build
 pnpm run deploy
-pnpm --filter @turborepo-remote-cache/server exec wrangler secret put TURBO_TOKEN
+pnpm --filter @turborepo-remote-cache/api exec wrangler secret put TURBO_TOKEN
 ```
 
 Then point `turbo` at the Worker:
@@ -57,6 +57,6 @@ turbo run build
 
 ## Contributing
 
-See [CONTRIBUTING.md](.github/CONTRIBUTING.md). The repository is a pnpm workspace. The server is in `apps/server`, the KV adapter is in `packages/files-sdk-kv`, and the documentation site is in `apps/docs`.
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md). The repository is a pnpm workspace. The server is in `apps/api`, the KV adapter is in `packages/files-sdk-kv`, and the documentation site is in `apps/docs`.
 
 Turborepo Remote Cache is an independent, MIT-licensed project. It is not affiliated with Vercel or Cloudflare.

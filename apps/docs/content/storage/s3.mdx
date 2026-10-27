@@ -68,11 +68,11 @@ If every artifact reads as missing on a new setup, check `S3_FORCE_PATH_STYLE` f
 
 ## Use S3 on Cloudflare Workers
 
-A binding wins over the `S3_*` variables, so remove the `r2_buckets` entry from `apps/server/wrangler.jsonc`. Then set `S3_BUCKET`, `S3_ENDPOINT`, and `S3_REGION` as variables and the keys as secrets:
+A binding wins over the `S3_*` variables, so remove the `r2_buckets` entry from `apps/api/wrangler.jsonc`. Then set `S3_BUCKET`, `S3_ENDPOINT`, and `S3_REGION` as variables and the keys as secrets:
 
 ```sh
-pnpm --filter @turborepo-remote-cache/server exec wrangler secret put S3_ACCESS_KEY_ID
-pnpm --filter @turborepo-remote-cache/server exec wrangler secret put S3_SECRET_ACCESS_KEY
+pnpm --filter @turborepo-remote-cache/api exec wrangler secret put S3_ACCESS_KEY_ID
+pnpm --filter @turborepo-remote-cache/api exec wrangler secret put S3_SECRET_ACCESS_KEY
 ```
 
 ## Large artifacts

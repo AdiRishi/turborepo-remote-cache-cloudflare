@@ -9,9 +9,9 @@ The Worker reads and writes artifacts through an `R2_STORE` binding, with one ob
 
 ## Configure the binding
 
-`apps/server/wrangler.jsonc` binds a bucket named `turborepo-cache`:
+`apps/api/wrangler.jsonc` binds a bucket named `turborepo-cache`:
 
-```jsonc apps/server/wrangler.jsonc
+```jsonc apps/api/wrangler.jsonc
 {
     "r2_buckets": [
         {
@@ -30,7 +30,7 @@ When the bucket doesn't exist, `wrangler deploy` creates it. To use another buck
 Without a location hint, R2 creates a bucket in the region closest to the request that creates it. With automatic creation, that request comes from the machine or CI runner that runs the first deploy. To pick the location yourself, create the bucket before the first deploy:
 
 ```sh
-pnpm --filter @turborepo-remote-cache/server exec wrangler r2 bucket create turborepo-cache --location enam
+pnpm --filter @turborepo-remote-cache/api exec wrangler r2 bucket create turborepo-cache --location enam
 ```
 
 Choose the hint closest to most of your builds, such as your CI region. Cloudflare lists the hints in [Data location](https://developers.cloudflare.com/r2/reference/data-location/#location-hints). To move the cache to another location later, create a bucket there and change `bucket_name`. The new bucket starts empty.

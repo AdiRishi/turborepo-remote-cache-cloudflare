@@ -1,5 +1,5 @@
 ---
-'@turborepo-remote-cache/server': major
+'@turborepo-remote-cache/api': major
 '@turborepo-remote-cache/files-sdk-kv': minor
 ---
 

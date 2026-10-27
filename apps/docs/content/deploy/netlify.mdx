@@ -9,8 +9,8 @@ Netlify buffers at most 6 MB per request and Base64-encodes binary data inside t
 
 1. Import your copy of the repository into Netlify.
 2. Leave **Base directory** empty, so Netlify installs the whole workspace from the repository root.
-3. Set **Package directory** to `apps/server`.
-4. Set the build command to `pnpm --filter @turborepo-remote-cache/server build` and the publish directory to `apps/server/dist`.
+3. Set **Package directory** to `apps/api`.
+4. Set the build command to `pnpm --filter @turborepo-remote-cache/api build` and the publish directory to `apps/api/dist`.
 5. Add the environment variables below, then deploy.
 
 Nitro detects the Netlify build environment and builds the `netlify` preset. To make the choice explicit, set `NITRO_PRESET` to `netlify`.

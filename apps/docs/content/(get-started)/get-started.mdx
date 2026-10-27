@@ -50,7 +50,7 @@ Use this path to deploy from your own machine. You need [Node.js](https://nodejs
 2. Sign in to Cloudflare:
 
     ```sh
-    pnpm --filter @turborepo-remote-cache/server exec wrangler login
+    pnpm --filter @turborepo-remote-cache/api exec wrangler login
     ```
 
 3. Build the Worker and deploy it:
@@ -65,13 +65,13 @@ Use this path to deploy from your own machine. You need [Node.js](https://nodejs
 4. Set the token:
 
     ```sh
-    pnpm --filter @turborepo-remote-cache/server exec wrangler secret put TURBO_TOKEN
+    pnpm --filter @turborepo-remote-cache/api exec wrangler secret put TURBO_TOKEN
     ```
 
     Wrangler asks for the value. Paste your token.
 
 :::tip
-To create the bucket in a specific location, create it before the first deploy: `pnpm --filter @turborepo-remote-cache/server exec wrangler r2 bucket create turborepo-cache --location weur`. [R2 storage](/storage/r2) lists the options.
+To create the bucket in a specific location, create it before the first deploy: `pnpm --filter @turborepo-remote-cache/api exec wrangler r2 bucket create turborepo-cache --location weur`. [R2 storage](/storage/r2) lists the options.
 :::
 
 ## Check the deployment

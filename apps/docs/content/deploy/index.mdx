@@ -15,15 +15,15 @@ From the repository root, set `NITRO_PRESET` and build the server:
 NITRO_PRESET=node_server pnpm build
 ```
 
-| Platform           | `NITRO_PRESET`                    | Build output in `apps/server` | Guide                                     |
-| ------------------ | --------------------------------- | ----------------------------- | ----------------------------------------- |
-| Cloudflare Workers | `cloudflare_module` (the default) | `.output`                     | [Get started on Cloudflare](/get-started) |
-| Node.js            | `node_server`                     | `.output`                     | [Node.js, Bun, and Deno](/deploy/node)    |
-| Bun                | `bun`                             | `.output`                     | [Node.js, Bun, and Deno](/deploy/node)    |
-| Deno               | `deno_server`                     | `.output`                     | [Node.js, Bun, and Deno](/deploy/node)    |
-| Vercel             | `vercel`, detected on Vercel      | `.vercel/output`              | [Vercel](/deploy/vercel)                  |
-| Netlify            | `netlify`, detected on Netlify    | `.netlify` and `dist`         | [Netlify](/deploy/netlify)                |
-| AWS Lambda         | `aws_lambda`                      | `.output`                     | [AWS Lambda](/deploy/aws-lambda)          |
+| Platform           | `NITRO_PRESET`                    | Build output in `apps/api` | Guide                                     |
+| ------------------ | --------------------------------- | -------------------------- | ----------------------------------------- |
+| Cloudflare Workers | `cloudflare_module` (the default) | `.output`                  | [Get started on Cloudflare](/get-started) |
+| Node.js            | `node_server`                     | `.output`                  | [Node.js, Bun, and Deno](/deploy/node)    |
+| Bun                | `bun`                             | `.output`                  | [Node.js, Bun, and Deno](/deploy/node)    |
+| Deno               | `deno_server`                     | `.output`                  | [Node.js, Bun, and Deno](/deploy/node)    |
+| Vercel             | `vercel`, detected on Vercel      | `.vercel/output`           | [Vercel](/deploy/vercel)                  |
+| Netlify            | `netlify`, detected on Netlify    | `.netlify` and `dist`      | [Netlify](/deploy/netlify)                |
+| AWS Lambda         | `aws_lambda`                      | `.output`                  | [AWS Lambda](/deploy/aws-lambda)          |
 
 Nitro has presets for more platforms. This project tests the Cloudflare and Node.js builds end to end in CI.
 

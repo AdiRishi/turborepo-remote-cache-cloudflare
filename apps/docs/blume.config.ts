@@ -3,10 +3,10 @@ import { googleAnalytics } from 'blume/analytics';
 import { openapi } from 'blume/reference';
 import { fileURLToPath } from 'node:url';
 
-import serverPackage from '../server/package.json' with { type: 'json' };
+import apiPackage from '../api/package.json' with { type: 'json' };
 
 const repositoryUrl = 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare';
-const changelogUrl = `${repositoryUrl}/blob/master/apps/server/CHANGELOG.md`;
+const changelogUrl = `${repositoryUrl}/blob/master/apps/api/CHANGELOG.md`;
 
 const deployment =
   process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true'
@@ -50,7 +50,7 @@ export default defineConfig({
       { label: 'Docs', path: '/' },
       { label: 'API reference', path: '/api' },
     ],
-    actions: [{ label: `v${serverPackage.version}`, href: changelogUrl }],
+    actions: [{ label: `v${apiPackage.version}`, href: changelogUrl }],
   },
   reference: [
     openapi({

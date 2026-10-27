@@ -6,7 +6,7 @@ import type { CustomAdapter } from './utils/storage';
  * Return `undefined` to keep the built-in selection.
  *
  * Import the provider here so the bundle only contains the one you use, and add its SDK to
- * `apps/server/package.json`. For example, Google Cloud Storage (`pnpm add @google-cloud/storage`):
+ * `apps/api/package.json`. For example, Google Cloud Storage (`pnpm add @google-cloud/storage`):
  *
  * ```ts
  * import { gcs } from 'files-sdk/gcs';

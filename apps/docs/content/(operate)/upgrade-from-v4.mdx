@@ -7,15 +7,15 @@ Version 5 rebuilds the server on [Nitro](https://nitro.build) and [Files SDK](ht
 
 ## Move your Wrangler changes
 
-In version 4, the Worker lived at the repository root, with `wrangler.jsonc` and the source in `src/`. In version 5, the repository is a pnpm workspace, and the server lives in `apps/server`:
+In version 4, the Worker lived at the repository root, with `wrangler.jsonc` and the source in `src/`. In version 5, the repository is a pnpm workspace, and the server lives in `apps/api`:
 
-| Version 4                            | Version 5                                         |
-| ------------------------------------ | ------------------------------------------------- |
-| `wrangler.jsonc`                     | `apps/server/wrangler.jsonc`                      |
-| `src/`                               | `apps/server/src/`                                |
-| `triggers.crons` in `wrangler.jsonc` | `scheduledTasks` in `apps/server/nitro.config.ts` |
+| Version 4                            | Version 5                                      |
+| ------------------------------------ | ---------------------------------------------- |
+| `wrangler.jsonc`                     | `apps/api/wrangler.jsonc`                      |
+| `src/`                               | `apps/api/src/`                                |
+| `triggers.crons` in `wrangler.jsonc` | `scheduledTasks` in `apps/api/nitro.config.ts` |
 
-Copy any changes you made to `wrangler.jsonc`, such as a bucket name, a KV namespace, or the retention period, into `apps/server/wrangler.jsonc`. Leave out `triggers`, because the build generates the cron trigger from `scheduledTasks`. The `ENVIRONMENT` variable is gone.
+Copy any changes you made to `wrangler.jsonc`, such as a bucket name, a KV namespace, or the retention period, into `apps/api/wrangler.jsonc`. Leave out `triggers`, because the build generates the cron trigger from `scheduledTasks`. The `ENVIRONMENT` variable is gone.
 
 Build and deploy from the repository root:
 

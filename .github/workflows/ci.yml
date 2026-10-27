@@ -48,13 +48,13 @@ jobs:
         run: pnpm codegen:check
 
       - name: Check Worker bundle
-        working-directory: apps/server
+        working-directory: apps/api
         run: pnpm exec wrangler deploy --dry-run
 
       - name: Upload coverage
         uses: coverallsapp/github-action@v2
         with:
-          files: apps/server/coverage/clover.xml packages/files-sdk-kv/coverage/clover.xml
+          files: apps/api/coverage/clover.xml packages/files-sdk-kv/coverage/clover.xml
 
   e2e:
     name: End-to-end
@@ -166,7 +166,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build
-        run: pnpm build --filter=@turborepo-remote-cache/server
+        run: pnpm build --filter=@turborepo-remote-cache/api
 
       # Wrangler creates the R2 bucket named in wrangler.jsonc on the first deploy.
       - name: Deploy
@@ -177,7 +177,7 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
-          workingDirectory: apps/server
+          workingDirectory: apps/api
           secrets: |
             TURBO_TOKEN
           command: deploy

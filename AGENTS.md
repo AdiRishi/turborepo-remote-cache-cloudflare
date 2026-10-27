@@ -6,7 +6,7 @@ An open-source Turborepo remote cache server. It runs on Cloudflare Workers by d
 
 pnpm workspace orchestrated by Turborepo:
 
-- `apps/server` (`@turborepo-remote-cache/server`): the Nitro server, its tests, and `wrangler.jsonc`.
+- `apps/api` (`@turborepo-remote-cache/api`): the Nitro server, its tests, and `wrangler.jsonc`.
 - `apps/docs` (`@turborepo-remote-cache/docs`): the Blume documentation site. Pages are in `content/`, and the favicon, touch icon, and brand marks are in `public/`.
 - `packages/files-sdk-kv` (`@turborepo-remote-cache/files-sdk-kv`): a Cloudflare Workers KV adapter for Files SDK. Keep Turborepo and app logic out of it so it can be published or upstreamed. Its tests run in workerd against Miniflare KV.
 - `packages/spec` (`@turborepo-remote-cache/spec`): the official Remote Cache OpenAPI spec, vendored unmodified, and the types generated from it. The server imports the types, and the docs render the spec.
@@ -15,7 +15,7 @@ Root holds only shared tooling: `turbo.json`, `tsconfig.base.json` (which every 
 
 ## Commands
 
-Run everything from the root. `build`, `dev`, `typecheck`, `test`, `test:e2e`, and `check` go through Turborepo, so they are cached. `lint` and `format` run their tools directly. `codegen` and `codegen:check` run in every package that has them, `spec:sync` runs in `packages/spec`, `docs:preview` runs in `apps/docs`, and the rest forward to `apps/server`.
+Run everything from the root. `build`, `dev`, `typecheck`, `test`, `test:e2e`, and `check` go through Turborepo, so they are cached. `lint` and `format` run their tools directly. `codegen` and `codegen:check` run in every package that has them, `spec:sync` runs in `packages/spec`, `docs:preview` runs in `apps/docs`, and the rest forward to `apps/api`.
 
 ```bash
 pnpm install
@@ -25,9 +25,9 @@ pnpm lint           # oxlint (fails on any finding) + oxfmt --check
 pnpm lint:fix       # oxlint --fix + oxfmt
 pnpm format
 pnpm typecheck
-pnpm test           # Vitest with coverage in apps/server and packages/files-sdk-kv; blume validate in apps/docs
+pnpm test           # Vitest with coverage in apps/api and packages/files-sdk-kv; blume validate in apps/docs
 pnpm test:e2e       # builds the Worker, runs it, and runs the contract tests and a real turbo round trip
-pnpm build          # apps/server builds for Cloudflare Workers (set NITRO_PRESET for another target); apps/docs builds the site
+pnpm build          # apps/api builds for Cloudflare Workers (set NITRO_PRESET for another target); apps/docs builds the site
 pnpm preview        # the built Worker under wrangler dev, on port 8787
 pnpm start          # the built Node.js server, after a NITRO_PRESET=node_server build
 pnpm deploy         # wrangler deploy of the built Worker
@@ -40,7 +40,7 @@ pnpm docs:preview   # the built docs site
 
 # One package, or one test file
 pnpm build --filter=@turborepo-remote-cache/docs
-pnpm --filter @turborepo-remote-cache/server exec vitest run tests/contract/artifacts.test.ts
+pnpm --filter @turborepo-remote-cache/api exec vitest run tests/contract/artifacts.test.ts
 ```
 
 ## Remote cache
@@ -63,7 +63,7 @@ TypeScript 7. Type-aware Oxlint (`oxlint-tsgolint`) also requires TypeScript 7 a
 
 `openapi-typescript` needs the TypeScript 5 compiler API, so `packages/spec` runs it through `pnpm dlx` with TypeScript 5 pinned beside it.
 
-## Server (`apps/server`)
+## Server (`apps/api`)
 
 Nitro 3 (`nitro.config.ts`, `serverDir: './src'`) built through Vite. File routes live under `src/routes/`; `src/middleware/` adds CORS for `/v8/**` and bearer auth for `/v8/**` and `/internal/**`; `src/error.ts` renders every error, including Nitro's own 404s, as the spec's `{ code, message }`. `/` redirects to the documentation.
 
@@ -75,7 +75,7 @@ Nitro 3 (`nitro.config.ts`, `serverDir: './src'`) built through Vite. File route
 
 ## Testing
 
-`apps/server` tests run in Node through Nitro's `serverFetch`. Nitro 3.0.260903-beta ships no Vitest integration, so `tests/support/nitro-environment.ts` and `nitro-setup.ts` create the app, the `closeNitroWithVite` plugin in `vite.config.ts` closes Nitro's file watchers, and `noExternals` in `nitro.config.ts` stops Nitro's dev externals from failing to load `files-sdk`. Swap storage at its seam with `vi.mock('../src/custom-adapter', () => import('./support/memory-storage'))`.
+`apps/api` tests run in Node through Nitro's `serverFetch`. Nitro 3.0.260903-beta ships no Vitest integration, so `tests/support/nitro-environment.ts` and `nitro-setup.ts` create the app, the `closeNitroWithVite` plugin in `vite.config.ts` closes Nitro's file watchers, and `noExternals` in `nitro.config.ts` stops Nitro's dev externals from failing to load `files-sdk`. Swap storage at its seam with `vi.mock('../src/custom-adapter', () => import('./support/memory-storage'))`.
 
 `tests/contract/` talks only HTTP, so `pnpm test:e2e` also runs it against the built Worker under `wrangler dev`, followed by a real `turbo` round trip (`e2e/turbo-roundtrip.sh`). `e2e/run.sh` starts and stops the Worker and refuses to run while something else holds port 8787.
 
