@@ -1,0 +1,19 @@
+{
+  "name": "@turborepo-remote-cache/docs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The Turborepo Remote Cache documentation site",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "blume build",
+    "dev": "blume dev",
+    "preview": "blume preview",
+    "test": "blume validate --strict"
+  },
+  "devDependencies": {
+    "@turborepo-remote-cache/spec": "workspace:*",
+    "blume": "^2.2.4",
+    "wrangler": "^4.151.1"
+  }
+}

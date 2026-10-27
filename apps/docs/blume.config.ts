@@ -1,8 +1,9 @@
 import { defineConfig } from 'blume';
 import { googleAnalytics } from 'blume/analytics';
 import { openapi } from 'blume/reference';
+import { fileURLToPath } from 'node:url';
 
-import serverPackage from './apps/server/package.json' with { type: 'json' };
+import serverPackage from '../server/package.json' with { type: 'json' };
 
 const repositoryUrl = 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare';
 const changelogUrl = `${repositoryUrl}/blob/master/apps/server/CHANGELOG.md`;
@@ -22,6 +23,7 @@ const movedPages: Record<string, string> = {
 };
 
 export default defineConfig({
+  content: { root: 'content' },
   title: 'Turborepo Remote Cache',
   description:
     'Self-host the Turborepo remote cache on Cloudflare Workers, Node.js, Vercel, or AWS Lambda, with artifacts in R2, KV, or any S3-compatible bucket.',
@@ -41,6 +43,7 @@ export default defineConfig({
     owner: 'AdiRishi',
     repo: 'turborepo-remote-cache-cloudflare',
     branch: 'master',
+    dir: 'apps/docs',
   },
   navigation: {
     tabs: [
@@ -51,8 +54,8 @@ export default defineConfig({
   },
   reference: [
     openapi({
-      spec: './packages/spec/turborepo.openapi.json',
-      overlays: ['./docs/openapi-overlay.yaml'],
+      spec: fileURLToPath(import.meta.resolve('@turborepo-remote-cache/spec/openapi.json')),
+      overlays: ['./openapi-overlay.yaml'],
       route: '/api',
     }),
   ],

@@ -7,26 +7,27 @@ An open-source Turborepo remote cache server. It runs on Cloudflare Workers by d
 pnpm workspace orchestrated by Turborepo:
 
 - `apps/server` (`@turborepo-remote-cache/server`): the Nitro server, its tests, and `wrangler.jsonc`.
+- `apps/docs` (`@turborepo-remote-cache/docs`): the Blume documentation site. Pages are in `content/`, and the favicon, touch icon, and brand marks are in `public/`.
 - `packages/files-sdk-kv` (`@turborepo-remote-cache/files-sdk-kv`): a Cloudflare Workers KV adapter for Files SDK. Keep Turborepo and app logic out of it so it can be published or upstreamed. Its tests run in workerd against Miniflare KV.
 - `packages/spec` (`@turborepo-remote-cache/spec`): the official Remote Cache OpenAPI spec, vendored unmodified, and the types generated from it. The server imports the types, and the docs render the spec.
 
-Root holds shared tooling (`turbo.json`, `tsconfig.base.json`, which every package extends, `oxlint.config.ts`, and `oxfmt.config.ts`) and the Blume documentation site: `blume.config.ts`, `theme.css`, `public/` (favicon, touch icon, and the brand marks in `public/brand/`), and the pages in `docs/`.
+Root holds only shared tooling: `turbo.json`, `tsconfig.base.json` (which every package extends), `oxlint.config.ts`, and `oxfmt.config.ts`.
 
 ## Commands
 
-Run everything from the root. `build`, `dev`, `typecheck`, `test`, `test:e2e`, and `check` go through Turborepo, so they are cached. `lint`, `format`, and the `docs:*` scripts run their tools directly. `codegen` and `codegen:check` run in every package that has them, `spec:sync` runs in `packages/spec`, and the rest forward to `apps/server`.
+Run everything from the root. `build`, `dev`, `typecheck`, `test`, `test:e2e`, and `check` go through Turborepo, so they are cached. `lint` and `format` run their tools directly. `codegen` and `codegen:check` run in every package that has them, `spec:sync` runs in `packages/spec`, `docs:preview` runs in `apps/docs`, and the rest forward to `apps/server`.
 
 ```bash
 pnpm install
-pnpm dev            # the server in development (Nitro through Vite)
+pnpm dev            # the server (Nitro through Vite) and the docs site in development
 pnpm check          # lint, typecheck, test, and build: what CI's Verify job runs
 pnpm lint           # oxlint (fails on any finding) + oxfmt --check
 pnpm lint:fix       # oxlint --fix + oxfmt
 pnpm format
 pnpm typecheck
-pnpm test           # Vitest with coverage, in apps/server and packages/files-sdk-kv
+pnpm test           # Vitest with coverage in apps/server and packages/files-sdk-kv; blume validate in apps/docs
 pnpm test:e2e       # builds the Worker, runs it, and runs the contract tests and a real turbo round trip
-pnpm build          # apps/server builds for Cloudflare Workers; set NITRO_PRESET for another target
+pnpm build          # apps/server builds for Cloudflare Workers (set NITRO_PRESET for another target); apps/docs builds the site
 pnpm preview        # the built Worker under wrangler dev, on port 8787
 pnpm start          # the built Node.js server, after a NITRO_PRESET=node_server build
 pnpm deploy         # wrangler deploy of the built Worker
@@ -35,12 +36,10 @@ pnpm codegen        # regenerate the spec types and the Worker types
 pnpm codegen:check  # fail if either generated file is stale
 pnpm spec:sync      # download the latest Remote Cache spec and regenerate its types
 
-pnpm docs:dev
-pnpm docs:build
-pnpm docs:preview
-pnpm docs:validate  # check docs links, anchors, and redirects
+pnpm docs:preview   # the built docs site
 
-# One test file
+# One package, or one test file
+pnpm build --filter=@turborepo-remote-cache/docs
 pnpm --filter @turborepo-remote-cache/server exec vitest run tests/contract/artifacts.test.ts
 ```
 
@@ -86,14 +85,14 @@ Contract tests use random hashes, so they pass against a store that already hold
 
 ## Documentation
 
-Docs live in `docs/` at the root. Every functional or configuration change updates the matching docs page in the same PR.
+Docs live in `apps/docs`. Every functional or configuration change updates the matching docs page in the same PR.
 
-The site is built with [Blume](https://useblume.dev). Its own docs ship in `node_modules/blume/docs`. Read them instead of answering from memory.
+The site is built with [Blume](https://useblume.dev). Its own docs ship in `apps/docs/node_modules/blume/docs`. Read them instead of answering from memory.
 
-- Pages are `.mdx` files under `docs/`. The file path is the route, and a parenthesized folder such as `(get-started)` groups pages without adding a URL segment. The `meta.ts` in each folder sets the sidebar order.
+- Pages are `.mdx` files under `apps/docs/content/`. The file path is the route, and a parenthesized folder such as `(get-started)` groups pages without adding a URL segment. The `meta.ts` in each folder sets the sidebar order.
 - Frontmatter is strict: a key Blume doesn't know fails the build. The `title` renders as the page H1, and the `description` renders below it, so don't repeat the description in the first paragraph.
 - Write callouts as `:::tip` … `:::`, with no space after the colons. `::: tip` renders as literal text.
-- The home page is `docs/index.mdx` in Blume's `custom` mode.
-- The API reference under `/api` renders the vendored spec in `packages/spec/`. Fix spec problems in `docs/openapi-overlay.yaml`, never in the vendored file.
-- When you move a page, add a redirect in `blume.config.ts`.
+- The home page is `content/index.mdx` in Blume's `custom` mode.
+- The API reference under `/api` renders the vendored spec in `packages/spec/`. Fix spec problems in `apps/docs/openapi-overlay.yaml`, never in the vendored file.
+- When you move a page, add a redirect in `apps/docs/blume.config.ts`.
 - The site shows no "Last updated" dates: CI builds from a shallow clone, so Blume would read the wrong dates from Git history.

@@ -172,9 +172,6 @@ importers:
       '@changesets/cli':
         specifier: ^3.0.3
         version: 3.0.3
-      blume:
-        specifier: ^2.2.4
-        version: 2.2.4(@emnapi/runtime@1.11.3)(@shikijs/themes@4.5.0)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@vercel/functions@3.10.1(ws@8.21.0))(aws4fetch@1.0.20)(csstype@3.2.3)(db0@0.4.1)(esbuild@0.28.2)(prettier@3.9.10)(supports-color@10.2.2)(vite@8.3.4(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vue@3.5.44(typescript@6.0.3))(ws@8.21.0)(yaml@2.9.1)
       dotenv-cli:
         specifier: ^11.0.0
         version: 11.0.0
@@ -190,6 +187,18 @@ importers:
       turbo:
         specifier: ^2.11.9
         version: 2.11.9
+
+  apps/docs:
+    devDependencies:
+      '@turborepo-remote-cache/spec':
+        specifier: workspace:*
+        version: link:../../packages/spec
+      blume:
+        specifier: ^2.2.4
+        version: 2.2.4(@emnapi/runtime@1.11.3)(@shikijs/themes@4.5.0)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@vercel/functions@3.10.1(ws@8.21.0))(aws4fetch@1.0.20)(csstype@3.2.3)(db0@0.4.1)(esbuild@0.28.2)(prettier@3.9.10)(supports-color@10.2.2)(vite@8.3.4(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vue@3.5.44(typescript@6.0.3))(ws@8.21.0)(yaml@2.9.1)
+      wrangler:
+        specifier: ^4.151.1
+        version: 4.151.1(@cloudflare/workers-types@5.20261019.1)(@types/node@22.20.5)
 
   apps/server:
     dependencies:
@@ -9526,6 +9535,19 @@ snapshots:
 
   mimic-fn@2.1.0: {}
 
+  miniflare@5.20261012.1-beta(@types/node@22.20.5):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      sharp: 0.35.5(@types/node@22.20.5)
+      undici: 7.29.1
+      workerd: 1.20261012.1
+      ws: 8.21.0
+      youch: 4.1.0-beta.10
+    transitivePeerDependencies:
+      - '@types/node'
+      - bufferutil
+      - utf-8-validate
+
   miniflare@5.20261012.1-beta(@types/node@24.19.2):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
@@ -10701,6 +10723,24 @@ snapshots:
       '@cloudflare/workerd-linux-64': 1.20261012.1
       '@cloudflare/workerd-linux-arm64': 1.20261012.1
       '@cloudflare/workerd-windows-64': 1.20261012.1
+
+  wrangler@4.151.1(@cloudflare/workers-types@5.20261019.1)(@types/node@22.20.5):
+    dependencies:
+      '@cloudflare/kv-asset-handler': 0.5.0
+      '@cloudflare/unenv-preset': 2.16.2(unenv@2.0.0-rc.24)(workerd@1.20261012.1)
+      blake3-wasm: 2.1.5
+      esbuild: 0.28.2
+      miniflare: 5.20261012.1-beta(@types/node@22.20.5)
+      path-to-regexp: 6.3.0
+      unenv: 2.0.0-rc.24
+      workerd: 1.20261012.1
+    optionalDependencies:
+      '@cloudflare/workers-types': 5.20261019.1
+      fsevents: 2.3.3
+    transitivePeerDependencies:
+      - '@types/node'
+      - bufferutil
+      - utf-8-validate
 
   wrangler@4.151.1(@cloudflare/workers-types@5.20261019.1)(@types/node@24.19.2):
     dependencies:

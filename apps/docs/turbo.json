@@ -1,0 +1,13 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["DOCS_CLOUDFLARE_DEPLOYMENT"],
+      "inputs": ["$TURBO_DEFAULT$", "../server/package.json"]
+    },
+    "test": {
+      "outputs": []
+    }
+  }
+}

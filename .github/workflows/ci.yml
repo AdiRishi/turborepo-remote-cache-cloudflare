@@ -44,11 +44,6 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Build docs
-        run: |
-          pnpm docs:build
-          pnpm docs:validate
-
       - name: Check generated code
         run: pnpm codegen:check
 
@@ -107,7 +102,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build
-        run: pnpm docs:build
+        run: pnpm build --filter=@turborepo-remote-cache/docs
 
       - name: Deploy
         id: deploy
@@ -116,8 +111,8 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
-          workingDirectory: apps/server
-          command: pages deploy ../../dist --project-name=cloudflare-turbo-cache-docs
+          workingDirectory: apps/docs
+          command: pages deploy dist --project-name=cloudflare-turbo-cache-docs
 
   docs-github-pages:
     name: Docs · GitHub Pages
@@ -146,13 +141,13 @@ jobs:
 
       - name: Build
         run: |
-          pnpm docs:build
-          touch dist/.nojekyll
+          pnpm build --filter=@turborepo-remote-cache/docs
+          touch apps/docs/dist/.nojekyll
 
       - name: Upload
         uses: actions/upload-pages-artifact@v5
         with:
-          path: dist
+          path: apps/docs/dist
 
       - name: Deploy
         id: deploy
