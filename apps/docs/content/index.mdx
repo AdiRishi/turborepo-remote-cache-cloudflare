@@ -6,11 +6,19 @@ sidebar:
     hidden: true
 ---
 
+<HomeHero>
+
 # A Turborepo remote cache you host yourself
 
 Every laptop and CI runner on your team shares build outputs through storage you own. Deploy the server to Cloudflare Workers with one button, or build it for Node.js, Vercel, AWS Lambda, and other platforms.
 
-[Get started](/get-started) or [deploy to Cloudflare now](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare).
+[Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) [Read the docs](/introduction)
+
+</HomeHero>
+
+<CacheReplay />
+
+<HomeSection>
 
 ## Why host your own cache
 
@@ -19,17 +27,64 @@ Every laptop and CI runner on your team shares build outputs through storage you
 - **Your choice of storage.** Keep artifacts in R2, Workers KV, any S3-compatible bucket, or anything with a [Files SDK](https://files-sdk.dev) adapter.
 - **Signed artifacts.** The server stores each artifact's signature and returns it unchanged, so `turbo` can reject anything it didn't sign.
 
-<CardGroup cols={2}>
-    <Card title="Deploy to Cloudflare" href="/get-started" icon="rocket">
-        Deploy the Worker with an R2 bucket and set its token.
-    </Card>
-    <Card title="Connect turbo" href="/connect-turbo" icon="plug">
-        Point every machine and CI job at the cache.
-    </Card>
-    <Card title="Choose storage" href="/storage" icon="database">
-        R2, KV, an S3-compatible bucket, or a custom adapter.
-    </Card>
-    <Card title="Deploy elsewhere" href="/deploy" icon="server">
-        Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
-    </Card>
-</CardGroup>
+</HomeSection>
+
+<HomeSection>
+
+## Set it up
+
+<Steps>
+    <Step title="Deploy the Worker">
+        The [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) button copies this repository to your GitHub or GitLab account and deploys it with an R2 bucket. You can also [deploy with Wrangler](/get-started#deploy-with-wrangler).
+    </Step>
+    <Step title="Set a token">
+        Generate a long random token and add it to the Worker as a secret named `TURBO_TOKEN`.
+
+        ```sh
+        openssl rand -hex 32
+        ```
+    </Step>
+    <Step title="Point turbo at the Worker">
+        Set these variables wherever `turbo` runs, then run a build twice. The second run replays every task from your Worker.
+
+        ```sh
+        export TURBO_API=https://turborepo-remote-cache.<your-subdomain>.workers.dev
+        export TURBO_TOKEN=<your token>
+        export TURBO_TEAM=my-team
+        ```
+    </Step>
+
+</Steps>
+
+[Deploy to Cloudflare](/get-started) has every step, and [Connect turbo](/connect-turbo) covers CI and signed artifacts.
+
+</HomeSection>
+
+<HomeSection>
+
+## Run it anywhere
+
+The same server builds for other platforms and stores artifacts wherever you choose.
+
+<Columns cols={2}>
+    <Column>
+        ### Platforms
+
+        - [Cloudflare Workers](/get-started)
+        - [Node.js, Bun, and Deno](/deploy/node)
+        - [Vercel](/deploy/vercel)
+        - [Netlify](/deploy/netlify)
+        - [AWS Lambda](/deploy/aws-lambda)
+    </Column>
+    <Column>
+        ### Storage
+
+        - [Cloudflare R2](/storage/r2)
+        - [Cloudflare KV](/storage/kv)
+        - [S3-compatible storage](/storage/s3)
+        - [A custom Files SDK adapter](/storage/custom-adapter)
+    </Column>
+
+</Columns>
+
+</HomeSection>

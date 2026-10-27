@@ -1,0 +1,82 @@
+---
+// Lays out MDX children: a heading, a lede paragraph, and a paragraph of links shown as buttons.
+---
+
+<section class="home-hero not-prose">
+  <slot />
+</section>
+
+<style>
+  .home-hero {
+    display: grid;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding-top: clamp(1rem, 4vw, 3rem);
+    column-gap: 4rem;
+    align-items: end;
+  }
+
+  .home-hero :global(h1) {
+    margin: 0;
+    color: var(--blume-foreground);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .home-hero :global(p) {
+    max-width: 34rem;
+    margin: 1.75rem 0 0;
+    color: var(--blume-muted-foreground);
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .home-hero :global(p:last-child) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .home-hero :global(p:last-child a) {
+    display: inline-flex;
+    align-items: center;
+    height: 2.75rem;
+    padding: 0 1.25rem;
+    border: 1px solid var(--blume-border);
+    border-radius: 0.5rem;
+    color: var(--blume-foreground);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color 150ms;
+  }
+
+  .home-hero :global(p:last-child a:hover) {
+    border-color: var(--blume-muted-foreground);
+  }
+
+  .home-hero :global(p:last-child a:first-child) {
+    border-color: var(--blume-action);
+    background: var(--blume-action);
+    color: var(--blume-action-foreground);
+  }
+
+  .home-hero :global(p:last-child a:first-child:hover) {
+    border-color: var(--blume-accent);
+  }
+
+  @media (min-width: 64rem) {
+    .home-hero {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      grid-template-rows: 1fr auto;
+    }
+
+    .home-hero :global(h1) {
+      grid-row: 1 / 3;
+    }
+  }
+</style>
