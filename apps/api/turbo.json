@@ -1,15 +1,21 @@
 {
-  "$schema": "https://turborepo.com/schema.json",
+  "$schema": "../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
     "build": {
       "env": ["NITRO_*", "SERVER_PRESET"],
+      "inputs": ["$TURBO_EXTENDS$", "!tests/**", "!e2e/**"],
       "outputs": [".output/**", ".wrangler/deploy/config.json"]
     },
+    "typecheck": {
+      "inputs": ["$TURBO_EXTENDS$", "!e2e/**"]
+    },
     "test": {
-      "env": ["CONTRACT_BASE_URL"]
+      "env": ["CONTRACT_BASE_URL"],
+      "inputs": ["$TURBO_EXTENDS$", "!e2e/**"]
     },
     "test:e2e": {
+      "description": "Runs the contract tests and a real turbo round trip against the built Worker under wrangler dev.",
       "dependsOn": ["build"],
       "cache": false
     }

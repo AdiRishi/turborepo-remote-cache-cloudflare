@@ -49,7 +49,7 @@ This repo uses its own deployed server as its Turborepo remote cache (`remoteCac
 
 `.env.turbo.local` holds real secrets: never read, print, or commit it.
 
-A cache hit replays outputs instead of running the task, so declare everything that changes a task's result in `turbo.json`: env vars under `env`, files outside the package under `inputs`, produced files under `outputs`. Workspace packages without a build step are hashed into their dependents through the `transit` task.
+A cache hit replays outputs instead of running the task, so declare everything that changes a task's result in `turbo.json`: env vars under `env`, files outside the package under `inputs`, produced files under `outputs`. Write `inputs` as `$TURBO_DEFAULT$` (`$TURBO_EXTENDS$` in a package's `turbo.json`) followed by `!` exclusions, so a new file counts until someone excludes it. Workspace packages without a build step are hashed into their dependents through the `transit` task. Tasks depend on `^transit`, not `transit`: the package's own `transit` node hashes every file in it, which would undo the task's exclusions.
 
 ## CI
 
@@ -96,3 +96,14 @@ The site is built with [Blume](https://useblume.dev). Its own docs ship in `apps
 - The API reference under `/api` renders the vendored spec in `packages/spec/`. Fix spec problems in `apps/docs/openapi-overlay.yaml`, never in the vendored file.
 - When you move a page, add a redirect in `apps/docs/blume.config.ts`.
 - The site shows no "Last updated" dates: CI builds from a shallow clone, so Blume would read the wrong dates from Git history.
+
+<!-- BEGIN:turborepo-agent-rules -->
+
+# This is NOT the Turborepo you know
+
+Turborepo configuration, task behavior, and CLI commands can vary between installed versions and may differ from your training data. Resolve the `turbo` package from this file's directory or relevant workspace; in monorepos, it may not be visible from the repository root. For example, run `node -p "require.resolve('turbo/package.json')"` from a workspace that depends on `turbo`.
+
+Read `docs/README.md` inside that installed package first, then read the relevant pages from its `docs/` directory before changing Turborepo configuration or commands. Heed deprecation notices. These bundled docs match the installed package version and are available without network access.
+
+This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": true` in the root `turbo.json` or `turbo.jsonc` to opt in; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
+<!-- END:turborepo-agent-rules -->
