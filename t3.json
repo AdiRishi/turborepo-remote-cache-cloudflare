@@ -1,0 +1,54 @@
+{
+  "$schema": "https://t3.codes/schema/t3.json",
+  "iconPath": "apps/docs/public/brand/app-icon.svg",
+  "scripts": [
+    {
+      "name": "Setup",
+      "command": "if [ -f \"$T3CODE_PROJECT_ROOT/.env.turbo.local\" ] && [ ! -e .env.turbo.local ]; then cp \"$T3CODE_PROJECT_ROOT/.env.turbo.local\" .; fi && pnpm install --frozen-lockfile",
+      "icon": "configure",
+      "runOnWorktreeCreate": true,
+      "async": false
+    },
+    {
+      "name": "Dev",
+      "command": "pnpm dev",
+      "icon": "play"
+    },
+    {
+      "name": "Docs",
+      "command": "pnpm dev --filter=@turborepo-remote-cache/docs",
+      "icon": "play",
+      "previewUrl": "http://localhost:4321/introduction"
+    },
+    {
+      "name": "Check",
+      "command": "pnpm check",
+      "icon": "lint"
+    },
+    {
+      "name": "Typecheck",
+      "command": "pnpm typecheck",
+      "icon": "test"
+    },
+    {
+      "name": "Test",
+      "command": "pnpm test",
+      "icon": "test"
+    },
+    {
+      "name": "End-to-end",
+      "command": "pnpm test:e2e",
+      "icon": "test"
+    },
+    {
+      "name": "Fix",
+      "command": "pnpm lint:fix",
+      "icon": "lint"
+    },
+    {
+      "name": "Build",
+      "command": "pnpm build",
+      "icon": "build"
+    }
+  ]
+}

@@ -1,94 +1,43 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to AI Agents when working with code in this repository.
+A self-hosted Turborepo remote cache server. It runs on Cloudflare Workers by default, builds for other platforms through Nitro, and stores artifacts through Files SDK.
 
-## Project Overview
+## Where things are
 
-An open-source Turborepo custom remote cache server built for Cloudflare Workers. Enables Turborepo remote caching using Cloudflare R2 (object storage) or KV (key-value) storage backends instead of Vercel's cache.
+- `apps/api`: the server and its tests.
+- `apps/docs`: the documentation site, built with Blume. Blume's own docs are in `apps/docs/node_modules/blume/docs`. Read them before you change the site.
+- `packages/files-sdk-kv`: a Workers KV adapter for Files SDK. Keep Turborepo and server logic out of it, so it can be published on its own.
+- `packages/spec`: the official Remote Cache OpenAPI spec and the types generated from it.
+- `.github/workflows/ci.yml`: all of CI, as one graph of jobs.
 
-## Commands
+## Check your changes
 
-```bash
-# Development
-pnpm install          # Install dependencies (requires Node >= 22, pnpm 11.6.0)
-pnpm dev              # Start development server
-pnpm build            # Build for production (outputs to dist/)
+Run every command from the repository root.
 
-# Testing
-pnpm test             # Run tests with coverage
-pnpm test:watch       # Run tests in watch mode
-pnpm vitest run tests/routes/v8/artifacts.test.ts  # Run single test file
+1. Run `pnpm check` for every change. It runs lint, typecheck, the tests, and both builds, the same steps as CI's `Verify` job. `pnpm lint:fix` fixes most lint and formatting findings.
+2. If you change anything the built Worker runs, also run `pnpm test:e2e`. That covers `apps/api/src`, `nitro.config.ts`, `vite.config.ts`, `wrangler.jsonc`, and the server's dependencies. The script builds the Worker, starts it under `wrangler dev` on port 8787, and runs the contract tests and a real `turbo` round trip against it.
+3. If you change `wrangler.jsonc` or the spec, run `pnpm codegen` and commit the generated files. CI fails when they are stale.
+4. If you change behaviour or configuration, update the matching page in `apps/docs/content/` in the same change.
 
-# Code Quality
-pnpm typecheck        # TypeScript type checking
-pnpm lint             # Oxlint + Oxfmt check
-pnpm lint:fix         # Auto-fix safe Oxlint findings
-pnpm format           # Auto-format with Oxfmt
+Test this project's behaviour, and trust Files SDK, Nitro, and the platforms to do what they document. Tests in `apps/api/tests/contract/` talk only HTTP and use random hashes, because `pnpm test:e2e` runs them against a real Worker whose store can already hold data.
 
-# Documentation
-pnpm docs:dev         # Start docs dev server
-pnpm docs:build       # Build documentation
-```
+## Decisions the code doesn't explain
 
-## Architecture
+- `.env.turbo.local` holds the credentials for this repository's own remote cache. Never read, print, or commit it. Without it, `turbo` uses only the local cache.
+- A cache hit replays a task's outputs instead of running it, so an undeclared input hides a failure. Declare every env var, file outside the package, and output that affects a task in `turbo.json`. Write `inputs` as `$TURBO_DEFAULT$` (`$TURBO_EXTENDS$` in a package) followed by `!` exclusions. Depend on `^transit`, not `transit`, because a package's own `transit` hashes all of its files and undoes the exclusions.
+- The server's variable names predate Nitro, so it reads them through `apps/api/src/utils/env.ts` instead of `runtimeConfig`.
+- `packages/spec` holds the spec unmodified, so `pnpm spec:sync` can replace it. Fix spec problems in `apps/docs/openapi-overlay.yaml`.
+- The `master` ruleset requires the checks `Verify`, `End-to-end`, and `Dependency review` by name. Renaming those jobs blocks merges until the ruleset changes too. Add new CI work as a job in `ci.yml`.
+- Type-aware Oxlint needs TypeScript 7, which rejects `baseUrl`. Use `paths` relative to the tsconfig.
+- In the docs, Blume renders the frontmatter `title` as the page's H1 and the `description` below it, so start the body with new information. Write callouts as `:::tip`, with no space after the colons. When you move a page, add a redirect in `apps/docs/blume.config.ts`.
 
-### Worker Entry Point (`src/index.ts`)
+<!-- BEGIN:turborepo-agent-rules -->
 
-Exports Cloudflare Worker with two handlers:
+# This is NOT the Turborepo you know
 
-- `fetch`: Initializes `StorageManager`, delegates to Hono router
-- `scheduled`: Cron handler running `deleteOldCache` daily at 3 AM
+Turborepo configuration, task behavior, and CLI commands can vary between installed versions and may differ from your training data. Resolve the `turbo` package from this file's directory or relevant workspace; in monorepos, it may not be visible from the repository root. For example, run `node -p "require.resolve('turbo/package.json')"` from a workspace that depends on `turbo`.
 
-### Storage Layer (`src/storage/`)
+Read `docs/README.md` inside that installed package first, then read the relevant pages from its `docs/` directory before changing Turborepo configuration or commands. Heed deprecation notices. These bundled docs match the installed package version and are available without network access.
 
-Interface-based abstraction with two backends:
-
-- `R2Storage`: Uses Cloudflare R2 bucket, metadata stored via `customMetadata`
-- `KvStorage`: Uses Cloudflare KV namespace with TTL-based expiration
-- `StorageManager`: Factory that selects backend (KV preferred when both available)
-
-### Routing (`src/routes/`)
-
-Uses Hono (`hono/tiny` for smaller bundle) with valibot validation:
-
-```
-/                     → Landing page HTML
-/ping                 → Health check
-/v8/artifacts/*       → Turborepo API (bearer auth required)
-  PUT /:artifactId    → Upload artifact
-  GET /:artifactId    → Download artifact (5 min cache)
-  HEAD /:artifactId   → Check artifact exists
-  GET /status         → Cache status
-  POST /events        → Event tracking (placeholder)
-/internal/*           → Cache management (bearer auth required)
-  POST /delete-expired-objects
-  POST /populate-random-objects
-  GET /count-objects
-```
-
-### Cron Job (`src/crons/deleteOldCache.ts`)
-
-Deletes objects older than `BUCKET_OBJECT_EXPIRATION_HOURS` (default 720h/30 days). Uses cursor-based pagination with batch size of 500 to avoid Cloudflare limits.
-
-## Testing
-
-Uses Vitest with `@cloudflare/vitest-pool-workers` for Workers simulation. The Vitest config uses the `cloudflareTest()` plugin with `wrangler.jsonc` plus Miniflare overrides for test-only bindings like `KV_STORE`.
-
-```typescript
-import { createExecutionContext } from 'cloudflare:test';
-import { env } from 'cloudflare:workers';
-import { workerHandler } from '~/index';
-import { StorageManager } from '~/storage';
-
-beforeEach(() => {
-    workerEnv = env;
-    workerEnv.STORAGE_MANAGER = new StorageManager(workerEnv);
-    ctx = createExecutionContext();
-});
-```
-
-Tests mirror source structure in `tests/` directory. Use unique IDs (`Math.random()`) for test isolation.
-
-## Documentation
-
-VitePress documentation in `docs/`. Any functional or configuration changes should include corresponding documentation updates in the same PR.
+This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": true` in the root `turbo.json` or `turbo.jsonc` to opt in; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
+<!-- END:turborepo-agent-rules -->

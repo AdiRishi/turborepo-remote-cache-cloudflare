@@ -1,0 +1,41 @@
+---
+title: Cloudflare R2
+description: Store artifacts in an R2 bucket bound to the Worker, and choose the bucket's name and location.
+---
+
+The Worker stores each artifact as one object in the bucket bound as `R2_STORE`. This is the default configuration.
+
+## Use another bucket
+
+`apps/api/wrangler.jsonc` binds a bucket named `turborepo-cache`:
+
+```jsonc apps/api/wrangler.jsonc
+{
+    "r2_buckets": [
+        {
+            "binding": "R2_STORE",
+            "bucket_name": "turborepo-cache",
+            "preview_bucket_name": "turborepo-cache-preview",
+        },
+    ],
+}
+```
+
+To use another bucket, change `bucket_name` and deploy again. If the bucket doesn't exist, `wrangler deploy` creates it. Keep the binding name `R2_STORE`, because the server looks for that name.
+
+## Choose where the bucket lives
+
+Without a location hint, R2 creates a bucket near the request that creates it. When Wrangler creates the bucket, that request comes from the machine or CI runner that runs the first deploy.
+
+To pick the location, create the bucket before the first deploy. Choose the hint closest to most of your builds, such as your CI region:
+
+```sh
+cd apps/api
+pnpm exec wrangler r2 bucket create turborepo-cache --location enam
+```
+
+Cloudflare lists the hints in [Data location](https://developers.cloudflare.com/r2/reference/data-location/#location-hints). R2 sets the location only when it creates a bucket. To move the cache, create a bucket in the new location and change `bucket_name`.
+
+## Use R2 from another platform
+
+A server outside Cloudflare reaches R2 through its S3-compatible API. [S3-compatible storage](/storage/s3#cloudflare-r2) shows the variables.

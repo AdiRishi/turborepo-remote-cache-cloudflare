@@ -1,0 +1,65 @@
+---
+title: S3-compatible storage
+description: Store artifacts in Amazon S3, in R2 over its S3 API, in MinIO, or in any other S3-compatible bucket, on every platform.
+sidebar:
+    label: S3-compatible
+---
+
+Set `S3_BUCKET` and `S3_ENDPOINT` to store artifacts in a bucket, and give the server credentials that can read, write, list, and delete objects in it. The expiry task lists and deletes objects. [Configuration](/configuration#s3-variables) describes every `S3_*` variable.
+
+## Amazon S3
+
+```sh
+S3_BUCKET=my-turborepo-cache
+S3_ENDPOINT=https://s3.us-east-1.amazonaws.com
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=<access key ID>
+S3_SECRET_ACCESS_KEY=<secret access key>
+```
+
+The credentials need `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject`, and `s3:ListBucket` on the bucket.
+
+To use an IAM role instead of keys, leave `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` unset. The server then reads the role's credentials from `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN`. It reads no AWS profiles or SSO sessions. [AWS Lambda](/deploy/aws-lambda) shows a role in use.
+
+## Cloudflare R2
+
+Create an [R2 API token](https://developers.cloudflare.com/r2/api/tokens/) with read and write access to the bucket, then set:
+
+```sh
+S3_BUCKET=turborepo-cache
+S3_ENDPOINT=https://<account ID>.r2.cloudflarestorage.com
+S3_REGION=auto
+S3_ACCESS_KEY_ID=<access key ID>
+S3_SECRET_ACCESS_KEY=<secret access key>
+```
+
+On Cloudflare Workers, bind the bucket as [`R2_STORE`](/storage/r2) instead. A binding needs no credentials.
+
+## MinIO and other self-hosted stores
+
+Most self-hosted stores have no hostname for each bucket, so turn on path-style requests:
+
+```sh
+S3_BUCKET=turborepo-cache
+S3_ENDPOINT=http://minio.internal:9000
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=<access key>
+S3_SECRET_ACCESS_KEY=<secret key>
+S3_FORCE_PATH_STYLE=true
+```
+
+If every artifact reads as missing on a new setup, check `S3_FORCE_PATH_STYLE` first.
+
+## Use S3 on Cloudflare Workers
+
+A binding wins over the `S3_*` variables, so first remove the `r2_buckets` entry from `apps/api/wrangler.jsonc`. Then add `S3_BUCKET`, `S3_ENDPOINT`, and `S3_REGION` to its `vars`, and set the keys as secrets:
+
+```sh
+cd apps/api
+pnpm exec wrangler secret put S3_ACCESS_KEY_ID
+pnpm exec wrangler secret put S3_SECRET_ACCESS_KEY
+```
+
+## Large artifacts
+
+The server holds each upload in memory and sends it to the bucket in one request. On a host with little memory, such as a Worker, a very large artifact can fail to upload. Serverless platforms also cap request sizes. [Platforms](/deploy) lists the caps.

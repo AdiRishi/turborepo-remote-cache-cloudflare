@@ -1,0 +1,65 @@
+:root {
+    --blume-background: #ffffff;
+    --blume-foreground: #0e1013;
+    --blume-muted: #f5f6f8;
+    --blume-muted-foreground: #5c6370;
+    --blume-border: #e2e5e9;
+    --blume-accent: #8f5b00;
+    --blume-accent-foreground: #ffffff;
+    --blume-action: #ffb224;
+    --blume-action-foreground: #1a1405;
+    --blume-code-background: #f7f8fa;
+    --blume-code-highlight: rgb(255 178 36 / 0.12);
+    --blume-code-highlight-border: #cc8400;
+    --blume-code-word: rgb(255 178 36 / 0.16);
+    --blume-code-word-border: rgb(204 132 0 / 0.45);
+    --blume-content-width: 44rem;
+}
+
+:root[data-theme='dark'] {
+    --blume-background: #0b0c0e;
+    --blume-foreground: #ecedef;
+    --blume-muted: #111317;
+    --blume-muted-foreground: #8c929c;
+    --blume-border: #23262c;
+    --blume-accent: #ffb224;
+    --blume-accent-foreground: #1a1405;
+    --blume-action: #ffb224;
+    --blume-action-foreground: #1a1405;
+    --blume-code-background: #0e1013;
+    --blume-code-highlight: rgb(255 178 36 / 0.09);
+    --blume-code-highlight-border: #cb8315;
+    --blume-code-word: rgb(255 178 36 / 0.12);
+    --blume-code-word-border: rgb(255 178 36 / 0.35);
+}
+
+/* Martian Mono runs wide; the semi-condensed width keeps code blocks near 80 columns. */
+code,
+pre {
+    font-stretch: 87.5%;
+}
+
+/* The header lockup is 22 px tall. Under 760 px wide, the brand shows only the mark. */
+[data-blume-header] a[aria-label] > span[aria-hidden='true'] {
+    height: 22px;
+}
+
+[data-blume-header] a[aria-label] > span[aria-hidden='true'] > svg {
+    flex-shrink: 0;
+    max-width: none;
+    height: 22px;
+}
+
+@media (max-width: 759px) {
+    [data-blume-header] a[aria-label] > span[aria-hidden='true'] {
+        width: 18px;
+        overflow: hidden;
+        justify-content: flex-start;
+    }
+}
+
+@keyframes cache-replay-blink {
+    to {
+        visibility: hidden;
+    }
+}

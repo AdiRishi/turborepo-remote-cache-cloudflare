@@ -1,0 +1,40 @@
+---
+title: Cloudflare KV
+description: Store artifacts in a Workers KV namespace, within KV's 25 MiB limit per artifact.
+---
+
+The Worker stores each artifact as one entry in the namespace bound as `KV_STORE`. The artifact is the value, and its size, upload time, and headers are the entry's metadata.
+
+## Check the limits first
+
+- An artifact can be at most 25 MiB. The server rejects a larger upload with a `400` error, so that task never reaches the remote cache.
+- KV is eventually consistent. A new artifact is readable at once in the region that wrote it, but other regions can take 60 seconds or more to see it.
+
+## Bind a namespace
+
+1. In `apps/api/wrangler.jsonc`, add a `KV_STORE` binding:
+
+    ```jsonc apps/api/wrangler.jsonc
+    {
+        "kv_namespaces": [{ "binding": "KV_STORE" }],
+    }
+    ```
+
+    With no `id`, `wrangler deploy` creates the namespace and links it to the Worker. To use a namespace you already have, add its `id`.
+
+2. Remove the `r2_buckets` entry, unless you want to keep the binding. When both are bound, the server uses KV.
+
+3. Build and deploy the Worker:
+
+    ```sh
+    pnpm build
+    pnpm run deploy
+    ```
+
+## How entries expire
+
+The server writes each entry with a TTL of `BUCKET_OBJECT_EXPIRATION_HOURS`, so KV deletes artifacts on its own. The daily expiry task also runs, and deletes any entry that has outlived that age.
+
+KV fixes the TTL when the server writes an entry. After you change `BUCKET_OBJECT_EXPIRATION_HOURS`, entries written earlier keep their old TTL.
+
+If you used KV with version 4, read [Upgrade from v4](/upgrade-from-v4#stored-artifacts) for what happens to its entries.

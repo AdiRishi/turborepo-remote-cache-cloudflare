@@ -1,0 +1,22 @@
+---
+title: Netlify
+description: Deploy the server to Netlify Functions with an S3-compatible bucket, and run the expiry task from a scheduler.
+---
+
+:::warning
+Netlify buffers at most 6 MB per request and Base64-encodes binary data inside that limit, so artifacts larger than about 4.5 MB never reach the cache.
+:::
+
+## Create the site
+
+1. Import your copy of the repository into Netlify.
+2. Leave **Base directory** empty, so Netlify installs the whole workspace from the repository root.
+3. Set **Package directory** to `apps/api`.
+4. Set the build command to `pnpm --filter @turborepo-remote-cache/api build` and the publish directory to `apps/api/dist`.
+5. Add `TURBO_TOKEN` and the [S3 variables](/storage/s3) as environment variables, then deploy.
+
+Nitro detects Netlify and builds the `netlify` preset. To make the choice explicit, set `NITRO_PRESET` to `netlify`.
+
+## The expiry task
+
+The Netlify build doesn't schedule the expiry task. Call `POST /internal/delete-expired-objects` once a day from a scheduler you already run. [Retention and expiry](/retention#run-expiry-from-a-scheduler) shows a GitHub Actions workflow that does it.

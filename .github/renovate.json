@@ -4,21 +4,31 @@
   "extends": ["config:recommended", ":semanticCommitTypeAll(chore)"],
   "dependencyDashboard": true,
   "rangeStrategy": "bump",
+  "minimumReleaseAge": "1 day",
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "dependencies (non-major)",
       "automerge": true,
-      "schedule": "* * * * 0,6"
+      "schedule": ["* * * * 0,6"]
     },
     {
       "matchDepTypes": ["engines"],
       "enabled": false
     },
     {
-      "description": "Ignored packages (synced with .ncurc.json)",
-      "matchPackageNames": ["vitest", "@vitest/ui", "@vitest/coverage-istanbul"],
-      "enabled": false
+      "groupName": "oxc",
+      "matchPackageNames": ["oxlint", "oxfmt", "oxlint-tsgolint"]
+    },
+    {
+      "groupName": "cloudflare",
+      "matchPackageNames": ["wrangler", "miniflare", "@cloudflare/**"]
+    },
+    {
+      "description": "Pre-stable betas: pin exact versions and review every update",
+      "matchPackageNames": ["nitro", "files-sdk"],
+      "rangeStrategy": "pin",
+      "automerge": false
     }
   ]
 }

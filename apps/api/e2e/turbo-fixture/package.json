@@ -1,0 +1,8 @@
+{
+  "name": "remote-cache-e2e-fixture",
+  "private": true,
+  "scripts": {
+    "build": "mkdir -p dist && date > dist/output.txt"
+  },
+  "packageManager": "npm@11.19.1"
+}

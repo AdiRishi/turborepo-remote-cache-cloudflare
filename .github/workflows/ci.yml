@@ -5,24 +5,237 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_REMOTE_CACHE_SIGNATURE_KEY: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
 
 jobs:
-  check:
-    name: Check correctness
+  verify:
+    name: Verify
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      - run: pnpm install
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test
-      - run: pnpm build
+      - name: Setup
+        uses: ./.github/actions/setup
 
-      - name: Coveralls Coverage Report
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Check generated code
+        run: pnpm codegen:check
+
+      - name: Check Worker bundle
+        working-directory: apps/api
+        run: pnpm exec wrangler deploy --dry-run
+
+      - name: Upload coverage
         uses: coverallsapp/github-action@v2
+        with:
+          files: apps/api/coverage/clover.xml packages/files-sdk-kv/coverage/clover.xml
+
+  e2e:
+    name: End-to-end
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Test end to end
+        run: pnpm test:e2e
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Review dependencies
+        uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: moderate
+
+  # Pull requests get a preview deployment; master updates the Cloudflare Pages mirror of the docs.
+  docs-cloudflare:
+    name: Docs · Cloudflare Pages
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'pull_request' && 'docs-preview' || 'docs-cloudflare' }}
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    env:
+      DOCS_CLOUDFLARE_DEPLOYMENT: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build
+        run: pnpm build --filter=@turborepo-remote-cache/docs
+
+      - name: Deploy
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
+          packageManager: pnpm
+          workingDirectory: apps/docs
+          command: pages deploy dist --project-name=cloudflare-turbo-cache-docs
+
+  docs-github-pages:
+    name: Docs · GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      - name: Build
+        run: |
+          pnpm build --filter=@turborepo-remote-cache/docs
+          touch apps/docs/dist/.nojekyll
+
+      - name: Upload
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: apps/docs/dist
+
+      - name: Deploy
+        id: deploy
+        uses: actions/deploy-pages@v5
+
+  deploy:
+    name: Deploy · Cloudflare Workers
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [verify, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build
+        run: pnpm build --filter=@turborepo-remote-cache/api
+
+      # Wrangler creates the R2 bucket named in wrangler.jsonc on the first deploy.
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v4
+        env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN || 'SECRET' }}
+        with:
+          accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
+          packageManager: pnpm
+          workingDirectory: apps/api
+          secrets: |
+            TURBO_TOKEN
+          command: deploy
+
+  release:
+    name: Release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: verify
+    runs-on: ubuntu-latest
+    concurrency:
+      group: release
+      cancel-in-progress: false
+    steps:
+      - name: Create bot token
+        id: token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.CHANGESETS_RELEASE_APP_ID }}
+          private-key: ${{ secrets.CHANGESETS_RELEASE_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          token: ${{ steps.token.outputs.token }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      # The bot id is taken from https://api.github.com/users/changesets-release-app[bot]
+      - name: Configure Git
+        run: |
+          git config --global user.name "changesets-release-app[bot]"
+          git config --global user.email "152388490+changesets-release-app[bot]@users.noreply.github.com"
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Version or tag
+        uses: changesets/action@v2
+        with:
+          github-token: ${{ steps.token.outputs.token }}
+          commit-message: 'chore(release): Release latest changesets'
+          pr-title: 'chore(release): Release latest changesets'
+          create-github-releases: true
+          publish-script: pnpm changeset git-tag
+
+  spec-drift:
+    name: Spec drift
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Refresh spec
+        run: pnpm spec:sync
+
+      - name: Compare with vendored spec
+        run: git diff --exit-code -- packages/spec

@@ -1,0 +1,56 @@
+---
+title: Upgrade from v4
+description: What an existing Cloudflare deployment must change for version 5, what breaks, and which stored artifacts keep working.
+---
+
+Version 5 rebuilds the server on [Nitro](https://nitro.build) and [Files SDK](https://files-sdk.dev). An existing Cloudflare deployment keeps its `TURBO_TOKEN`, `BUCKET_OBJECT_EXPIRATION_HOURS`, `R2_STORE`, and `KV_STORE` configuration, and its R2 artifacts stay readable.
+
+## Move your Wrangler changes
+
+The repository is now a pnpm workspace, and the server lives in `apps/api`:
+
+| Version 4                            | Version 5                                      |
+| ------------------------------------ | ---------------------------------------------- |
+| `wrangler.jsonc`                     | `apps/api/wrangler.jsonc`                      |
+| `src/`                               | `apps/api/src/`                                |
+| `triggers.crons` in `wrangler.jsonc` | `scheduledTasks` in `apps/api/nitro.config.ts` |
+
+1. Copy your changes to `wrangler.jsonc`, such as a bucket name, a KV namespace, or the retention period, into `apps/api/wrangler.jsonc`. Leave out `triggers`, because the build generates the cron trigger from `scheduledTasks`. Drop the `ENVIRONMENT` variable, which version 5 doesn't read.
+2. Build and deploy from the repository root:
+
+    ```sh
+    pnpm install
+    pnpm build
+    pnpm run deploy
+    ```
+
+If you deploy with the Deploy to Cloudflare button or Workers Builds, set the build command to `pnpm run build` and the deploy command to `pnpm run deploy`. Both run from the repository root.
+
+## Breaking changes
+
+`turbo` works with every change below. Check any script of your own that calls the server.
+
+### The API follows the Remote Cache specification
+
+- An artifact hash that isn't hexadecimal returns `400`.
+- Invalid artifact headers return `400`.
+- Errors return a JSON body of the form `{ "code": "...", "message": "..." }`.
+- `POST /v8/artifacts` answers batch queries for several hashes.
+
+### Internal endpoints
+
+- `POST /internal/delete-expired-objects` returns `{ "deleted": <count> }` instead of `{ "success": true }`. It still takes a JSON body, and `{}` still uses the configured retention period.
+- `POST /internal/populate-random-objects` and `GET /internal/count-objects` are gone. They return `404`.
+
+### No Cache API copy
+
+Version 4 kept a copy of each downloaded artifact in the Cloudflare Cache API for five minutes and sent a `Cache-Control` header with it. Version 5 reads every download from storage and sends no `Cache-Control` header.
+
+## Stored artifacts
+
+| Storage | After the upgrade                                                                                                                                                                                                              |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R2      | Version 5 serves version 4 artifacts with their signatures, so signed artifacts keep verifying.                                                                                                                                |
+| KV      | Version 5 serves version 4 entries without their signatures, because it reads metadata in a new format. Clients that verify signatures treat them as misses. The next daily expiry deletes them, because their age is unknown. |
+
+With KV and signatures on, expect each task to miss once after the upgrade, and then hit again once `turbo` uploads the new artifact.

@@ -1,6 +1,5 @@
 {
-  "name": "turborepo-remote-cache-cf",
-  "version": "4.0.0",
+  "name": "turborepo-remote-cache-cloudflare",
   "private": true,
   "description": "An implementation of the turborepo-remote-cache server custom made for Cloudflare Workers",
   "keywords": [
@@ -27,49 +26,34 @@
   },
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "cf-typegen": "wrangler types",
-    "deploy": "wrangler deploy",
-    "dev": "vite",
-    "docs:build": "vitepress build docs",
-    "docs:dev": "vitepress dev docs",
-    "docs:preview": "vitepress preview docs",
+    "build": "dotenv -e .env.turbo.local -- turbo run build",
+    "check": "dotenv -e .env.turbo.local -- turbo run lint typecheck test build",
+    "codegen": "pnpm --recursive run codegen",
+    "codegen:check": "pnpm --recursive run codegen:check",
+    "deploy": "pnpm --filter @turborepo-remote-cache/api run deploy",
+    "dev": "dotenv -e .env.turbo.local -- turbo run dev",
+    "docs:preview": "pnpm --filter @turborepo-remote-cache/docs run preview",
     "format": "oxfmt .",
-    "format:check": "oxfmt --check .",
-    "lint": "oxlint --quiet && oxfmt --check .",
-    "lint:fix": "oxlint --fix",
-    "preview": "vite preview",
-    "test": "vitest run --coverage",
-    "test:ui": "vitest --coverage --ui",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@hono/valibot-validator": "^0.6.1",
-    "hono": "^4.12.25",
-    "valibot": "^1.4.1"
+    "lint": "oxlint && oxfmt --check .",
+    "lint:fix": "oxlint --fix && oxfmt .",
+    "preview": "pnpm --filter @turborepo-remote-cache/api run preview",
+    "spec:sync": "pnpm --filter @turborepo-remote-cache/spec run sync",
+    "start": "pnpm --filter @turborepo-remote-cache/api run start",
+    "test": "dotenv -e .env.turbo.local -- turbo run test",
+    "test:e2e": "dotenv -e .env.turbo.local -- turbo run test:e2e",
+    "typecheck": "dotenv -e .env.turbo.local -- turbo run typecheck"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.7.0",
-    "@changesets/cli": "^2.31.0",
-    "@cloudflare/vite-plugin": "^1.40.2",
-    "@cloudflare/vitest-pool-workers": "^0.16.15",
-    "@vitest/coverage-istanbul": "^4.1.8",
-    "@vitest/ui": "^4.1.8",
-    "miniflare": "^4.20260611.0",
-    "oxfmt": "^0.54.0",
-    "oxlint": "^1.69.0",
-    "oxlint-tsgolint": "^0.23.0",
-    "rollup-plugin-visualizer": "^7.0.1",
-    "typescript": "^6.0.3",
-    "vite": "^8.0.16",
-    "vitepress": "2.0.0-alpha.16",
-    "vitest": "^4.1.8",
-    "wrangler": "^4.100.0"
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
+    "dotenv-cli": "^11.0.0",
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "oxlint-tsgolint": "^7.0.2004",
+    "turbo": "^2.11.9"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
-  "packageManager": "pnpm@11.6.0",
-  "readme": "README.md"
+  "packageManager": "pnpm@12.14.0"
 }

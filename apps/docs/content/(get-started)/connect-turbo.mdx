@@ -1,0 +1,192 @@
+---
+title: Connect turbo
+description: Give every machine and CI job the server's URL, token, and team, sign artifacts, and confirm that hits come from the remote cache.
+---
+
+## What turbo needs
+
+`turbo` uses the remote cache only when it has all three of these values:
+
+| Value      | Environment variable | `turbo.json` key       | Notes                                                                                                                        |
+| ---------- | -------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Server URL | `TURBO_API`          | `remoteCache.apiUrl`   | The deployment's origin, such as `https://cache.example.com`. Leave off the trailing slash, or every request misses the API. |
+| Token      | `TURBO_TOKEN`        | None                   | The server's `TURBO_TOKEN`. Keep it out of `turbo.json`.                                                                     |
+| Team       | `TURBO_TEAM`         | `remoteCache.teamSlug` | Any name. Machines that share artifacts must use the same team.                                                              |
+
+`turbo` also accepts a team ID in `TURBO_TEAMID` or `remoteCache.teamId`. It sends the ID only when it starts with `team_`.
+
+## Choose where to set them
+
+For most repositories, commit the URL and team in `turbo.json`, and give each machine the token through an environment variable or `turbo login`.
+
+`turbo` reads its configuration from these sources. An earlier source wins over a later one:
+
+1. Command-line flags
+2. `TURBO_*` environment variables
+3. `.turbo/config.json` in the repository
+4. Your user configuration, which `turbo login` writes
+5. `turbo.json`
+
+### turbo.json
+
+Commit the values that aren't secret, so every clone uses the same server and team:
+
+```json turbo.json
+{
+    "$schema": "https://turborepo.dev/schema.json",
+    "remoteCache": {
+        "apiUrl": "https://cache.example.com",
+        "teamSlug": "my-team"
+    }
+}
+```
+
+Each machine then needs only `TURBO_TOKEN`.
+
+### turbo login --manual
+
+`turbo login --manual` asks for each value and checks the token against the server:
+
+1. At **Remote Cache URL**, enter the server's URL.
+2. At **How do you want to specify your team?**, choose **slug** and enter the team name. Choose **id** only for a name that starts with `team_`.
+3. At **Enter token**, paste the token.
+
+`turbo` saves the token in your user configuration and writes `remoteCache.apiUrl` and the team to the root `turbo.json`. Commit that change, and the rest of your team only has to log in.
+
+### Environment variables
+
+Set all three values in the environment that runs `turbo`. This suits CI and one-off runs:
+
+```sh
+export TURBO_API=https://cache.example.com
+export TURBO_TOKEN=<your token>
+export TURBO_TEAM=my-team
+turbo run build
+```
+
+### .turbo/config.json
+
+To keep the values in one checkout without changing `turbo.json`, write them to `.turbo/config.json` at the repository root:
+
+```json .turbo/config.json
+{
+    "apiUrl": "https://cache.example.com",
+    "teamSlug": "my-team",
+    "token": "<your token>"
+}
+```
+
+The file holds the token, so keep `.turbo` in your `.gitignore`.
+
+## Set up CI
+
+Store the token as a secret in your CI provider, and pass all three values to every step that runs `turbo`.
+
+<Tabs>
+<Tab title="GitHub Actions">
+
+Add a `TURBO_TOKEN` secret and `TURBO_API` and `TURBO_TEAM` variables under **Settings** > **Secrets and variables** > **Actions**:
+
+```yaml .github/workflows/ci.yml
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        env:
+            TURBO_API: ${{ vars.TURBO_API }}
+            TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+            TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+        steps:
+            - uses: actions/checkout@v7
+            # Install Node.js and your dependencies here.
+            - run: pnpm turbo run build
+```
+
+</Tab>
+<Tab title="GitLab CI">
+
+Add `TURBO_API`, `TURBO_TEAM`, and a masked `TURBO_TOKEN` under **Settings** > **CI/CD** > **Variables**. GitLab passes project variables to every job, so the job only has to run `turbo`:
+
+```yaml .gitlab-ci.yml
+build:
+    image: node:24
+    script:
+        - corepack enable
+        - pnpm install --frozen-lockfile
+        - pnpm turbo run build
+```
+
+</Tab>
+<Tab title="Other CI">
+
+Export the variables before the step that runs `turbo`, and read the token from the provider's secret store:
+
+```sh
+export TURBO_API=https://cache.example.com
+export TURBO_TEAM=my-team
+export TURBO_TOKEN="$CACHE_TOKEN_SECRET"
+turbo run build
+```
+
+</Tab>
+</Tabs>
+
+## Sign artifacts
+
+With signatures on, `turbo` signs every artifact it uploads with an HMAC-SHA256 key, and it rejects any download whose signature doesn't verify. The server stores the signature and returns it unchanged. `turbo` treats a rejected artifact as a miss.
+
+1. Turn on signatures in `turbo.json`:
+
+    ```json turbo.json
+    {
+        "remoteCache": {
+            "signature": true
+        }
+    }
+    ```
+
+2. Set the same key on every machine and CI job. Use a key of at least 32 bytes:
+
+    ```sh
+    export TURBO_REMOTE_CACHE_SIGNATURE_KEY=$(openssl rand -hex 32)
+    ```
+
+    In CI, store the key as a secret beside `TURBO_TOKEN`. `turbo` accepts shorter keys today. Its [`longerSignatureKey`](https://turborepo.dev/docs/reference/configuration#longersignaturekey) future flag rejects them.
+
+A machine with a different key misses on every signed artifact and runs the task again. A machine with no key can't sign, so it uploads nothing.
+
+## Check that hits come from the server
+
+Run a task, then run it again with only the remote cache:
+
+```sh
+turbo run build
+turbo run build --cache=remote:r --summarize
+```
+
+`--cache=remote:r` reads from the remote cache and writes nothing, so every hit in the second run came from the server. Look for these lines:
+
+```text
+   • Remote caching enabled
+
+build: cache hit, replaying logs edf677b2880f0799
+
+  Tasks:    1 successful, 1 total
+ Cached:    1 cached, 1 total
+   Time:    19ms >>> FULL TURBO
+```
+
+`--summarize` writes a JSON summary to `.turbo/runs/`. Each task's `cache` field shows where its artifact came from:
+
+```json
+{ "local": false, "remote": true, "status": "HIT", "source": "REMOTE", "timeSaved": 118 }
+```
+
+When `turbo` can't use the remote cache, it prints the reason in place of **Remote caching enabled**:
+
+| Message                                                                          | Cause                                               |
+| -------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `Remote caching disabled (TURBO_TOKEN set without TURBO_TEAM)`                   | No team is set.                                     |
+| `Remote caching unavailable (Authentication failed ...)`                         | The token doesn't match the server's `TURBO_TOKEN`. |
+| `Remote caching unavailable (Could not connect to "https://cache.example.com/")` | The URL is wrong or ends in a slash.                |
+
+The run still succeeds with the local cache. Only the remote reads and writes stop.

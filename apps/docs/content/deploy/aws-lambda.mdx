@@ -1,0 +1,34 @@
+---
+title: AWS Lambda
+description: Build the server as an AWS Lambda handler with Amazon S3 storage, use the function's role for credentials, and schedule the expiry task.
+---
+
+:::warning
+Lambda caps a synchronous request or response at 6 MB, so larger artifacts never reach the cache.
+:::
+
+## Build the handler
+
+```sh
+NITRO_PRESET=aws_lambda pnpm build
+```
+
+1. Package the contents of `apps/api/.output/server` as the function code.
+2. Choose a Node.js runtime, and set the handler to `index.handler`.
+3. Give the function an HTTPS endpoint that `turbo` can reach, such as a Lambda function URL or an API Gateway HTTP API.
+
+## Configure storage
+
+Set these variables on the function:
+
+```sh
+TURBO_TOKEN=<your token>
+S3_BUCKET=my-turborepo-cache
+S3_ENDPOINT=https://s3.us-east-1.amazonaws.com
+```
+
+Leave the `S3_*` keys and `S3_REGION` unset to use the function's execution role. Lambda puts the role's credentials in `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN`, and its region in `AWS_REGION`, and the server reads all four. The role needs `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject`, and `s3:ListBucket` on the bucket.
+
+## The expiry task
+
+The Lambda build doesn't schedule the expiry task. Call `POST /internal/delete-expired-objects` once a day from any scheduler that can send an HTTPS request with a header, such as a CI cron job. [Retention and expiry](/retention#run-expiry-from-a-scheduler) shows the request.

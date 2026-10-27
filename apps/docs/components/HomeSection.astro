@@ -1,0 +1,59 @@
+---
+// On wide screens, the section's h2 sits in a left column beside the rest of its MDX children.
+---
+
+<section class="home-section">
+  <slot />
+</section>
+
+<style>
+  .home-section {
+    max-width: 72rem;
+    margin: 6rem auto 0;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--blume-border);
+  }
+
+  .home-section > :global(h2) {
+    margin-top: 0;
+    font-size: 1.75rem;
+    letter-spacing: -0.04em;
+  }
+
+  .home-section > :global(ul) {
+    display: grid;
+    gap: 1.5rem 2.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .home-section > :global(ul > li) {
+    margin: 0;
+    padding: 0;
+  }
+
+  .home-section > :global(ul > li > strong) {
+    display: block;
+  }
+
+  @media (min-width: 40rem) {
+    .home-section > :global(ul) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .home-section > :global(h2) {
+      float: left;
+      width: 16rem;
+    }
+
+    .home-section > :global(:not(h2)) {
+      margin-left: 20rem;
+    }
+
+    .home-section > :global(:first-child + *) {
+      margin-top: 0;
+    }
+  }
+</style>

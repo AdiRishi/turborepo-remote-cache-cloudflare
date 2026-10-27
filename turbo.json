@@ -1,28 +1,44 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "extends": ["//"],
-  "pipeline": {
+  "$schema": "./node_modules/turbo/schema.json",
+  "agentGuidance": true,
+  "cacheMaxAge": "7d",
+  "globalDependencies": [".nvmrc", "tsconfig.base.json"],
+  "remoteCache": {
+    "apiUrl": "https://turbo-cache.adishwar-rishi.com",
+    "teamId": "team_turborepo-remote-cache-cloudflare",
+    "signature": true
+  },
+  "tasks": {
+    "transit": {
+      "description": "Has no script. Hashes each workspace dependency's files into the tasks that depend on ^transit.",
+      "dependsOn": ["^transit"],
+      "inputs": ["$TURBO_DEFAULT$", "!README.md", "!CHANGELOG.md", "!tests/**"]
+    },
     "build": {
+      "description": "Builds the server and the documentation site.",
+      "dependsOn": ["^transit"],
+      "inputs": ["$TURBO_DEFAULT$", "!README.md", "!CHANGELOG.md"],
       "outputs": ["dist/**"]
     },
     "typecheck": {
-      "outputs": []
-    },
-    "lint": {
-      "dependsOn": ["typecheck"],
-      "outputs": []
-    },
-    "dev": {
-      "cache": false
-    },
-    "dev:scheduled": {
-      "cache": false
+      "description": "Type-checks each package with tsc.",
+      "dependsOn": ["^transit"],
+      "inputs": ["$TURBO_DEFAULT$", "!README.md", "!CHANGELOG.md"]
     },
     "test": {
-      "dependsOn": ["build"]
+      "description": "Runs the Vitest suites with coverage and validates the documentation site.",
+      "dependsOn": ["^transit"],
+      "inputs": ["$TURBO_DEFAULT$", "!README.md", "!CHANGELOG.md"],
+      "outputs": ["coverage/**"],
+      "passThroughEnv": ["CI"]
     },
-    "test:watch": {
-      "dependsOn": ["build"]
+    "dev": {
+      "description": "Starts the server and the documentation site in development mode.",
+      "cache": false,
+      "persistent": true
+    },
+    "//#lint": {
+      "description": "Runs oxlint and the oxfmt check across the whole repository."
     }
   }
 }

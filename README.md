@@ -1,10 +1,12 @@
 <div align="center">
 
-# Turborepo Remote Cache (For Cloudflare Workers!)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="apps/docs/public/brand/lockup-on-dark.svg">
+  <img src="apps/docs/public/brand/lockup-on-light.svg" alt="Turborepo Remote Cache" width="360">
+</picture>
 
-</div>
-
-<div align="center">
+<br>
+<br>
 
 [![CI](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/actions/workflows/ci.yml/badge.svg)](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/github/AdiRishi/turborepo-remote-cache-cloudflare/badge.svg)](https://coveralls.io/github/AdiRishi/turborepo-remote-cache-cloudflare) ![GitHub License](https://img.shields.io/github/license/AdiRishi/turborepo-remote-cache-cloudflare) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](.github/CONTRIBUTING.md)
 
@@ -16,146 +18,77 @@
 
 ## 🚀 Introduction
 
-This project offers an open source implementation of the [Turborepo custom remote cache server](https://turbo.build/repo/docs/core-concepts/remote-caching) **purpose-built from the ground up for [Cloudflare Workers](https://developers.cloudflare.com/workers/)**
+An open-source [Turborepo remote cache](https://turborepo.dev/docs/core-concepts/remote-caching) server that you host yourself, **built first for [Cloudflare Workers](https://developers.cloudflare.com/workers/)**. Deploy it in one click, and every laptop and CI runner on your team shares build outputs through storage you own.
 
-📚 For detailed documentation, please refer to our [official website](https://adirishi.github.io/turborepo-remote-cache-cloudflare)
-
-> [!IMPORTANT]
-> You can now store your build artifacts in either Cloudflare 🪣 R2 or 🔑 KV storage. Find out how in our [official documentation](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/kv-storage)
+📚 The [documentation](https://adirishi.github.io/turborepo-remote-cache-cloudflare) covers every storage option, platform, and setting.
 
 ## 🤔 Why should I use this?
 
-If you're a Turborepo user, this project offers compelling advantages:
-
-- 💿 **Storage Options**: Choose between 🪣 [R2](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/r2-storage) or 🔑 [KV](https://adirishi.github.io/turborepo-remote-cache-cloudflare/configuration/kv-storage) storage for your build artifacts. This gives you the flexibility to choose the storage option that best fits your needs.
-- 🚀 **Faster Builds**: Harness the power of remote caching to significantly speed up your builds
-- 🌐 **Independence from Vercel**: Use Turborepo without tying your project to Vercel. This gives you flexibility in hosting decisions.
-- 🌍 **Global Deployment**: Code deploys instantly across the globe in over 300 countries, ensuring unmatched performance and reliability.
-- 💰 **Affordable Start**: With Cloudflare Workers' [generous free tier](https://developers.cloudflare.com/workers/platform/pricing), you can make up to 100,000 requests every day at no cost. Even better Cloudflare has [zero egress fees](https://www.cloudflare.com/en-au/learning/cloud/what-are-data-egress-fees/) on it's platform, meaning you only pay for what you use.
+- ⚡ **Faster builds.** A task that ran on any machine, with the same inputs, replays from the cache instead of running again.
+- 🌐 **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never leave your storage.
+- 💰 **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges [nothing for egress](https://www.cloudflare.com/learning/cloud/what-are-data-egress-fees/), so the bandwidth of every cache download is free.
+- 🌍 **Close to your builds.** The Worker runs in Cloudflare data centers around the world.
+- 💿 **Your choice of storage.** 🪣 [R2](https://adirishi.github.io/turborepo-remote-cache-cloudflare/storage/r2), 🔑 [KV](https://adirishi.github.io/turborepo-remote-cache-cloudflare/storage/kv), any [S3-compatible bucket](https://adirishi.github.io/turborepo-remote-cache-cloudflare/storage/s3), or anything with a [Files SDK](https://files-sdk.dev) adapter.
+- 🧳 **Not only Cloudflare.** The same server builds for [Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda](https://adirishi.github.io/turborepo-remote-cache-cloudflare/deploy).
 
 ## ⚡️ Quick start
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
 
-### Deploy Using the CLI
+The button copies this repository to your GitHub or GitLab account and deploys it as a Worker with an R2 bucket. When it finishes, add a secret named `TURBO_TOKEN` to the Worker, with a long random value such as the output of `openssl rand -hex 32`.
 
-This project already comes with [wrangler](https://developers.cloudflare.com/workers/wrangler/) (cloudflare's CLI tool for managing works) installed and configured, so all you need to do is clone this repository and run `pnpm run deploy`.
+### Deploy with the CLI
+
+You need Node.js 24 or later and pnpm. [Wrangler](https://developers.cloudflare.com/workers/wrangler/) comes with the repository and creates the R2 bucket on the first deploy.
 
 ```sh
 # 1. Clone the repository
 git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
+cd turborepo-remote-cache-cloudflare
 
 # 2. Install packages
 pnpm install
 
-# 3. Create the R2 bucket for storage
-pnpm wrangler r2 bucket create turborepo-cache
-
-# 4. Publish the project
+# 3. Build and deploy the Worker
+pnpm build
 pnpm run deploy
 
-# 5. Set a Bearer auth token
-echo "SECRET" | pnpm wrangler secret put TURBO_TOKEN
+# 4. Set the bearer token
+cd apps/api && pnpm exec wrangler secret put TURBO_TOKEN
 ```
 
-## ⚙️ Configuration
+## ▲ Point turbo at your cache
 
-### Github actions requirements
-
-In order to successfully run the [deploy](.github/workflows//deploy.yml) Github action you will need the following secrets
-
-- `CLOUDFLARE_API_TOKEN`
-- `CLOUDFLARE_ACCOUNT_ID`
-- `TURBO_TOKEN`
-
-For those who have forked this repository, feel free to delete the [release.yml](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/release.yml) workflow file. This is only used to automatically publish new releases of this repository to GitHub releases.
-
-### Automatic deletion of old cache files
-
-This project sets up a [cron trigger](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for Cloudflare workers, which automatically deletes old cache files within the bound R2 bucket. This behavior can be customized:
-
-- To disable the automatic deletion, remove the [triggers] configuration in [wrangler.jsonc](./wrangler.jsonc)
-- To change the retention period for objects, adjust the `BUCKET_OBJECT_EXPIRATION_HOURS` option in [wrangler.jsonc](./wrangler.jsonc) or set it via [workers environment variables](https://developers.cloudflare.com/workers/platform/environment-variables/)
-
-## ▲ Setting up remote caching in your Turborepo project
-
-Here's my recommended approach for setting up remote caching in your Turborepo project. You can read more about this topic in the [official Turborepo documentation](https://turbo.build/repo/docs/core-concepts/remote-caching).
-
-### Step 1: Update `turbo.json`
-
-Modify the `turbo.json` file at your project root to include [signature validation](https://turbo.build/repo/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification)
-
-```json
-{
-    "remoteCache": { "signature": true }
-}
-```
-
-### Step 2: Install `dotenv-cli`
-
-Install the `dotenv-cli` npm package:
+Set these variables wherever `turbo` runs, with your Worker's URL and no trailing slash:
 
 ```sh
-# You may have to add -W if you are installing this on your workspace root
-pnpm add -D dotenv-cli
+export TURBO_API=https://turborepo-remote-cache.<your-subdomain>.workers.dev
+export TURBO_TOKEN=<your token>
+export TURBO_TEAM=my-team
 ```
 
-### Step 3: Create a `.env` File
+Then run a build, and run it again with only the remote cache. The second run replays everything from your Worker:
 
-Create a `.env` file at your project root with the following content:
-
-```dotenv
-TURBO_API=YOUR_API_URL # Remember to remove the trailing slash
-TURBO_TEAM=team_my_team_name
-TURBO_TOKEN=SECRET # The turbo token must be a valid Bearer auth token
-TURBO_REMOTE_CACHE_SIGNATURE_KEY=SECRET
 ```
+$ turbo run build
+$ turbo run build --cache=remote:r
 
-Keep the following in mind
+• Remote caching enabled
 
-- Replace `SECRET` and `YOUR_API_URL` with your chosen values.
-- Turborepo requires that the `TURBO_API` value must not end with a trailing slash
-- The `TURBO_TEAM` value must begin with `team_`
-- Remember to add the `.env` file to `.gitignore`
-- If you are building your project in some remote CI tool (like Github Actions) you need to make these environment variables available to your build script
+build: cache hit, replaying logs edf677b2880f0799
 
-### Step 4: Modify Turbo Commands
-
-Load the `.env` file prior to execution. Instead of running a command like `turbo run build` directly, use `dotenv -- turbo run build`. This loads everything in our `.env` file into the process's environment variables.
-
-Here's how to modify your scripts in `package.json` to use dotenv-cli:
-
-```json
-{
-    "scripts": {
-        "build": "dotenv -- turbo run build",
-        "dev": "dotenv -- turbo run dev",
-        "lint": "dotenv -- turbo run lint",
-        "test": "dotenv -- turbo run test"
-    }
-}
+ Tasks:    1 successful, 1 total
+Cached:    1 cached, 1 total
+  Time:    19ms >>> FULL TURBO
 ```
 
 And that's it 🎉🎉
 
-Whenever you run a turbo command you will see `Remote cache enabled` in it's log output
+[Connect turbo](https://adirishi.github.io/turborepo-remote-cache-cloudflare/connect-turbo) covers CI, signed artifacts, and keeping the URL and team in `turbo.json`.
 
-```
-pnpm lint
+## 🤝 Contributing
 
-$ dotenv -- turbo run lint
-• Packages in scope: turborepo-project, webapp, docs
-• Running lint in 3 packages
-• Remote caching enabled
-
-...output
-
- Tasks:    3 successful, 3 total
-Cached:    3 cached, 3 total
-  Time:    1.174s >>> FULL TURBO
-
-✨  Done in 3.54s.
-```
+Read [CONTRIBUTING.md](.github/CONTRIBUTING.md) to get started. Turborepo Remote Cache is an independent, MIT-licensed project, not affiliated with Vercel or Cloudflare.
 
 ---
 

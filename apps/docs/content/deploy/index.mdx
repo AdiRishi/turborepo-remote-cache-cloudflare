@@ -1,0 +1,28 @@
+---
+title: Choose a platform
+description: Build the server for Node.js, Bun, Deno, Vercel, Netlify, or AWS Lambda, and compare how each platform handles expiry and artifact size.
+---
+
+The server is a [Nitro](https://nitro.build) app. It builds for Cloudflare Workers by default, and `NITRO_PRESET` selects another target:
+
+```sh
+NITRO_PRESET=node_server pnpm build
+```
+
+Every build serves the same API. The platforms differ in storage, in how they run the daily expiry task, and in the largest artifact they can carry:
+
+| Platform                               | `NITRO_PRESET`                      | Expiry task           | Largest artifact                                             |
+| -------------------------------------- | ----------------------------------- | --------------------- | ------------------------------------------------------------ |
+| [Cloudflare Workers](/get-started)     | `cloudflare_module`, the default    | Cron trigger          | 100 MB upload on the Free and Pro plans, 200 MB on Business. |
+| [Node.js, Bun, and Deno](/deploy/node) | `node_server`, `bun`, `deno_server` | In the server process | No limit, unless a proxy in front of the server sets one.    |
+| [Vercel](/deploy/vercel)               | `vercel`, detected on Vercel        | Vercel Cron Jobs      | 4.5 MB.                                                      |
+| [Netlify](/deploy/netlify)             | `netlify`, detected on Netlify      | None                  | About 4.5 MB.                                                |
+| [AWS Lambda](/deploy/aws-lambda)       | `aws_lambda`                        | None                  | 6 MB.                                                        |
+
+An artifact over the limit can't be uploaded, so its task never hits the remote cache. Build outputs often exceed 4.5 MB. For a repository with large outputs, choose Cloudflare Workers or a long-running server.
+
+Where the table says **None**, call `POST /internal/delete-expired-objects` from a scheduler once a day. [Retention and expiry](/retention#run-expiry-from-a-scheduler) shows how.
+
+The `R2_STORE` and `KV_STORE` bindings exist only on Cloudflare Workers. Everywhere else, use an [S3-compatible bucket](/storage/s3) or a [custom adapter](/storage/custom-adapter).
+
+Nitro has presets for more platforms. CI runs only the Cloudflare build end to end.

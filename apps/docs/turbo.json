@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/turbo/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["DOCS_CLOUDFLARE_DEPLOYMENT"],
+      "inputs": ["$TURBO_EXTENDS$", "$TURBO_ROOT$/apps/api/package.json"]
+    },
+    "test": {
+      "outputs": []
+    }
+  }
+}
