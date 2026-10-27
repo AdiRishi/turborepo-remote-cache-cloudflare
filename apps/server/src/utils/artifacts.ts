@@ -1,9 +1,8 @@
+import type { operations } from '@turborepo-remote-cache/spec';
 import type { FileInfo } from 'files-sdk';
 import type { H3Event } from 'nitro';
 
 import * as v from 'valibot';
-
-import type { operations } from '../../openapi/turborepo';
 
 import { parseInput } from './http';
 

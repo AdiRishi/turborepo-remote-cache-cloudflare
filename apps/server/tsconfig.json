@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["./worker-configuration.d.ts", "node"]
   },
-  "include": ["src", "tests", "openapi", "nitro.config.ts", "vite.config.ts"]
+  "include": ["src", "tests", "nitro.config.ts", "vite.config.ts"]
 }

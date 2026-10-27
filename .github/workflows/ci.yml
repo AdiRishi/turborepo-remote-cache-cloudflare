@@ -243,4 +243,4 @@ jobs:
         run: pnpm spec:sync
 
       - name: Compare with vendored spec
-        run: git diff --exit-code -- apps/server/openapi
+        run: git diff --exit-code -- packages/spec

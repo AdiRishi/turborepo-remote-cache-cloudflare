@@ -1,7 +1,7 @@
+import type { components } from '@turborepo-remote-cache/spec';
+
 import { defineErrorHandler } from 'nitro';
 import { isEvent } from 'nitro/h3';
-
-import type { components } from '../openapi/turborepo';
 
 const ERROR_CODES: Record<number, string> = {
   400: 'bad_request',

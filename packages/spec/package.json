@@ -1,0 +1,17 @@
+{
+  "name": "@turborepo-remote-cache/spec",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The official Turborepo Remote Cache OpenAPI spec and its generated types",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./turborepo.ts",
+    "./openapi.json": "./turborepo.openapi.json"
+  },
+  "scripts": {
+    "codegen": "pnpm --package=openapi-typescript@7.13.0 --package=typescript@5.9.3 dlx openapi-typescript turborepo.openapi.json --output turborepo.ts",
+    "codegen:check": "pnpm codegen && git diff --exit-code -- turborepo.ts",
+    "sync": "curl --fail --silent --show-error --location https://turborepo.com/api/remote-cache-spec --output turborepo.openapi.json && pnpm codegen"
+  }
+}

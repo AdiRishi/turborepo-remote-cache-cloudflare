@@ -1,6 +1,6 @@
-import { defineHandler } from 'nitro';
+import type { components } from '@turborepo-remote-cache/spec';
 
-import type { components } from '../../../../openapi/turborepo';
+import { defineHandler } from 'nitro';
 
 import { readArtifact, toStoredMetadata, UploadHeaders } from '../../../utils/artifacts';
 import { parseInput, toHttpError } from '../../../utils/http';

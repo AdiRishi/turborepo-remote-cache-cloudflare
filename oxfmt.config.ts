@@ -20,7 +20,7 @@ export default defineConfig({
     'pnpm-lock.yaml',
     '**/CHANGELOG.md',
     '**/worker-configuration.d.ts',
-    'apps/server/openapi/turborepo.*',
+    'packages/spec/turborepo.*',
   ],
   overrides: [
     {

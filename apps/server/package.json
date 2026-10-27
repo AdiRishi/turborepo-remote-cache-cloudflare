@@ -7,14 +7,11 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "codegen": "pnpm codegen:spec && pnpm codegen:worker",
-    "codegen:check": "pnpm codegen:spec && git diff --exit-code -- openapi && wrangler types --check",
-    "codegen:spec": "pnpm --package=openapi-typescript@7.13.0 --package=typescript@5.9.3 dlx openapi-typescript openapi/turborepo.openapi.json --output openapi/turborepo.ts",
-    "codegen:worker": "wrangler types",
+    "codegen": "wrangler types",
+    "codegen:check": "wrangler types --check",
     "deploy": "wrangler deploy",
     "dev": "vite dev",
     "preview": "wrangler dev --port 8787 --var TURBO_TOKEN:test-token",
-    "spec:sync": "curl --fail --silent --show-error --location https://turborepo.com/api/remote-cache-spec --output openapi/turborepo.openapi.json && pnpm codegen:spec",
     "start": "node .output/server/index.mjs",
     "test": "vitest run --coverage",
     "test:e2e": "sh e2e/run.sh",
@@ -28,6 +25,7 @@
     "valibot": "^1.5.0"
   },
   "devDependencies": {
+    "@turborepo-remote-cache/spec": "workspace:*",
     "@types/node": "^24.19.2",
     "@vitest/coverage-istanbul": "^5.0.5",
     "miniflare": "5.20261012.1-beta",

@@ -51,7 +51,7 @@ export default defineConfig({
   },
   reference: [
     openapi({
-      spec: './apps/server/openapi/turborepo.openapi.json',
+      spec: './packages/spec/turborepo.openapi.json',
       overlays: ['./docs/openapi-overlay.yaml'],
       route: '/api',
     }),

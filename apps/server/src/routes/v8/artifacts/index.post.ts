@@ -1,7 +1,7 @@
+import type { components } from '@turborepo-remote-cache/spec';
+
 import { defineHandler } from 'nitro';
 import * as v from 'valibot';
-
-import type { components } from '../../../../openapi/turborepo';
 
 import { artifactKey, fromStoredMetadata, HEX_HASH, readTeam } from '../../../utils/artifacts';
 import { readJsonBody } from '../../../utils/http';
