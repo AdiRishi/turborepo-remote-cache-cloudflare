@@ -1,5 +1,60 @@
 # turborepo-remote-cache-cf
 
+## 5.0.0
+
+**Turborepo Remote Cache 5.0 is no longer Cloudflare-only.** We rebuilt the server on [Nitro](https://nitro.build) and [Files SDK](https://files-sdk.dev). It still deploys to Cloudflare Workers in one click, and the same code now builds for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda, with artifacts in R2, KV, any S3-compatible bucket, or anything Files SDK can talk to.
+
+Already running on Cloudflare? Your `TURBO_TOKEN`, retention period, and R2 or KV binding carry over, and your R2 artifacts stay readable. Read the [upgrade guide](https://adirishi.github.io/turborepo-remote-cache-cloudflare/upgrade-from-v4) before you deploy, because the repository layout changed.
+
+### 🌍 Deploy it wherever your builds run
+
+Pick a target with `NITRO_PRESET` and build:
+
+```sh
+NITRO_PRESET=node_server pnpm build
+```
+
+Cloudflare Workers stays the default. `node_server`, `bun`, `deno_server`, `vercel`, `netlify`, and `aws_lambda` each have a [deployment guide](https://adirishi.github.io/turborepo-remote-cache-cloudflare/deploy), with the expiry schedule and the largest artifact each platform can carry.
+
+### 💿 Keep artifacts in storage you already have
+
+- 🪣 **R2 and 🔑 KV** on Workers, through bindings, as before.
+- **Any S3-compatible bucket**, such as Amazon S3, R2 over its S3 API, or MinIO, through the new `S3_*` variables. On AWS Lambda, the function's IAM role supplies the credentials.
+- **Anything else Files SDK supports**, such as Google Cloud Storage or a local disk. Return the adapter from `apps/api/src/custom-adapter.ts`, and the server uses it ahead of everything else.
+
+[Choose storage](https://adirishi.github.io/turborepo-remote-cache-cloudflare/storage) compares the options and recommends one for each platform.
+
+### ✅ The whole Remote Cache spec
+
+The server now implements the [official Remote Cache API](https://turborepo.dev/docs/core-concepts/remote-caching#remote-cache-api), and its types are generated from the spec that Vercel publishes. `POST /v8/artifacts` answers batch queries for many hashes in one request, every error has the spec's `{ code, message }` shape, and the server validates hashes and artifact headers before it touches storage.
+
+On every change, CI runs the contract tests against the built Worker, then a real `turbo` build with signed artifacts that must restore from the remote cache.
+
+### 🧹 Expiry on every platform
+
+The daily cleanup is now a Nitro scheduled task, `cache:delete-expired`. It runs as a Cron Trigger on Workers, inside the process on Node.js, Bun, and Deno, and as a Vercel Cron Job on Vercel. On platforms without a scheduler, `POST /internal/delete-expired-objects` runs the same deletion and returns how many artifacts it removed. See [Retention and expiry](https://adirishi.github.io/turborepo-remote-cache-cloudflare/retention).
+
+### 🩺 Configuration errors that say what's wrong
+
+The server checks its configuration on every request. A missing token, a malformed retention period, or no storage at all fails with a `500` and a log line that names the problem, such as `Invalid server configuration: no artifact storage`.
+
+### 📚 New documentation
+
+The [documentation site](https://adirishi.github.io/turborepo-remote-cache-cloudflare) is rewritten from scratch, with guides for every platform and storage backend, CI setup for GitHub Actions and GitLab, artifact signing, and an [API reference](https://adirishi.github.io/turborepo-remote-cache-cloudflare/api) rendered from the spec.
+
+### ⚠️ Breaking changes
+
+- **The repository is a pnpm workspace.** The server, its `wrangler.jsonc`, and its source moved to `apps/api`. Build and deploy from the root with `pnpm build` and `pnpm run deploy`. The cron trigger now comes from `scheduledTasks` in `apps/api/nitro.config.ts`, and the `ENVIRONMENT` variable is gone.
+- **The API follows the spec strictly.** A hash that isn't hexadecimal, or an invalid artifact header, returns `400`. Errors return `{ code, message }`. `turbo` handles all of this, but check any script of your own that calls the server.
+- **Downloads skip the Cloudflare Cache API.** Version 4 kept a five-minute copy of each downloaded artifact and sent a `Cache-Control` header. Version 5 reads every download from storage and sends no `Cache-Control` header.
+- **`POST /internal/delete-expired-objects` returns `{ deleted }`** instead of `{ success: true }`.
+- **`POST /internal/populate-random-objects` and `GET /internal/count-objects` are removed.** They return `404`.
+- **KV entries from version 4 lose their signatures.** Version 5 serves them without one, so clients that verify signatures treat them as misses, and the next daily expiry deletes them. Expect one miss per task after the upgrade. R2 artifacts keep their signatures.
+
+The [upgrade guide](https://adirishi.github.io/turborepo-remote-cache-cloudflare/upgrade-from-v4) walks through each step.
+
+Shipped in [#1067](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/1067) by [@AdiRishi](https://github.com/AdiRishi).
+
 ## 4.0.0
 
 ### Major Changes
