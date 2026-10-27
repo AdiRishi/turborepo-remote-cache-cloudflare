@@ -1,6 +1,6 @@
 {
   "name": "@turborepo-remote-cache/files-sdk-kv",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Cloudflare Workers KV adapter for Files SDK",
   "license": "MIT",
