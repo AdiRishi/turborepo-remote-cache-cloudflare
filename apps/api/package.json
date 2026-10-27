@@ -14,7 +14,7 @@
     "preview": "wrangler dev --port 8787 --var TURBO_TOKEN:test-token",
     "start": "node .output/server/index.mjs",
     "test": "vitest run --coverage",
-    "test:e2e": "sh e2e/run.sh",
+    "test:e2e": "bash e2e/run.sh",
     "test:watch": "vitest",
     "typecheck": "tsc"
   },

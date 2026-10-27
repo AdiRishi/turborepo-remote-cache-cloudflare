@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # Starts the built Worker under `wrangler dev`, runs the contract tests and a real `turbo` round trip
 # against it, and stops it again. Run it through `pnpm test:e2e` at the root, which builds first.
 set -eu
@@ -14,7 +14,8 @@ fi
 
 log="$(mktemp)"
 
-# Job control gives the Worker its own process group, so stopping it also stops workerd.
+# Job control gives the Worker its own process group, so stopping it also stops workerd. The script runs
+# under bash because dash turns job control off without a terminal and cannot signal a process group.
 set -m
 pnpm preview > "$log" 2>&1 &
 worker=$!
