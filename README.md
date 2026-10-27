@@ -67,9 +67,10 @@ export TURBO_TOKEN=<your token>
 export TURBO_TEAM=my-team
 ```
 
-Then run a build twice. The second run replays everything from the remote cache:
+Then run a build, and run it again with only the remote cache. The second run replays everything from your Worker:
 
 ```
+$ turbo run build
 $ turbo run build --cache=remote:r
 
 • Remote caching enabled
