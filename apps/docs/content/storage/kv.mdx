@@ -1,22 +1,18 @@
 ---
 title: Cloudflare KV
-description: Store artifacts in a Workers KV namespace, with a TTL from BUCKET_OBJECT_EXPIRATION_HOURS and a 25 MiB limit per artifact.
-sidebar:
-    label: Cloudflare KV
+description: Store artifacts in a Workers KV namespace, within KV's 25 MiB limit per artifact.
 ---
 
-Each artifact is one KV entry. The artifact is the value, and its size, upload time, and headers are the entry's metadata.
+The Worker stores each artifact as one entry in the namespace bound as `KV_STORE`. The artifact is the value, and its size, upload time, and headers are the entry's metadata.
 
-## Limits
+## Check the limits first
 
-Check these limits before you choose KV:
-
-- An artifact can be at most 25 MiB. The server rejects a larger upload with a `400` error, so that task's outputs never reach the remote cache.
-- KV is eventually consistent. An artifact is readable at once where it was written, but other locations can take 60 seconds or more to see it.
+- An artifact can be at most 25 MiB. The server rejects a larger upload with a `400` error, so that task never reaches the remote cache.
+- KV is eventually consistent. A new artifact is readable at once in the region that wrote it, but other regions can take 60 seconds or more to see it.
 
 ## Bind a namespace
 
-1. Add a `KV_STORE` binding to `apps/api/wrangler.jsonc`, and remove the `r2_buckets` entry unless you still want the bucket:
+1. In `apps/api/wrangler.jsonc`, add a `KV_STORE` binding:
 
     ```jsonc apps/api/wrangler.jsonc
     {
@@ -24,23 +20,21 @@ Check these limits before you choose KV:
     }
     ```
 
-    With no `id`, `wrangler deploy` creates the namespace and links it to the Worker. To use a namespace you already have, add its `id`. `wrangler kv namespace create <name>` creates one and prints the `id`.
+    With no `id`, `wrangler deploy` creates the namespace and links it to the Worker. To use a namespace you already have, add its `id`.
 
-2. Build and deploy the Worker:
+2. Remove the `r2_buckets` entry, unless you want to keep the binding. When both are bound, the server uses KV.
+
+3. Build and deploy the Worker:
 
     ```sh
     pnpm build
     pnpm run deploy
     ```
 
-When both `KV_STORE` and `R2_STORE` are bound, the server uses KV.
+## How entries expire
 
-## Expiry
+The server writes each entry with a TTL of `BUCKET_OBJECT_EXPIRATION_HOURS`, so KV deletes artifacts on its own. The daily expiry task also runs, and deletes any entry that has outlived that age.
 
-The server writes each artifact with a KV TTL of `BUCKET_OBJECT_EXPIRATION_HOURS`, converted to seconds. KV deletes the entry when the TTL ends, so artifacts expire without the daily task. The daily task also runs and deletes any entry older than that age.
+KV fixes the TTL when the server writes an entry. After you change `BUCKET_OBJECT_EXPIRATION_HOURS`, entries written earlier keep their old TTL.
 
-The TTL is fixed when the server writes an entry. After you change `BUCKET_OBJECT_EXPIRATION_HOURS`, entries written earlier keep their old TTL.
-
-## Entries from earlier versions
-
-Version 4 of the server stored KV entries without the metadata that version 5 reads. Version 5 still serves them, but without their signature, so clients that verify signatures treat them as misses. The next daily expiry deletes them, because their age is unknown.
+If you used KV with version 4, read [Upgrade from v4](/upgrade-from-v4#stored-artifacts) for what happens to its entries.

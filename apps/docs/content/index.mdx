@@ -8,18 +8,28 @@ sidebar:
 
 # A Turborepo remote cache you host yourself
 
-An open-source server for the Turborepo Remote Cache API. Deploy it to Cloudflare Workers and R2 with one button, or build it for Node.js, Vercel, AWS Lambda, and other platforms with storage you already run.
+Every laptop and CI runner on your team shares build outputs through storage you own. Deploy the server to Cloudflare Workers with one button, or build it for Node.js, Vercel, AWS Lambda, and other platforms.
 
-[Get started](/get-started) or [deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare). Then point turbo at it with `turbo login --manual`.
+[Get started](/get-started) or [deploy to Cloudflare now](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare).
 
-## Where it runs
+## Why host your own cache
 
-Every platform serves the same cache API. Cloudflare Workers is the default build, and the only one with built-in R2 and KV storage.
+- **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never leave your storage.
+- **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges nothing for egress, so the bandwidth of every cache download is free.
+- **Your choice of storage.** Keep artifacts in R2, Workers KV, any S3-compatible bucket, or anything with a [Files SDK](https://files-sdk.dev) adapter.
+- **Signed artifacts.** The server stores each artifact's signature and returns it unchanged, so `turbo` can reject anything it didn't sign.
 
-| Platform                                         | Storage                           | Daily expiry          |
-| ------------------------------------------------ | --------------------------------- | --------------------- |
-| [Cloudflare Workers](/get-started) (recommended) | R2, KV, or S3-compatible          | Cron trigger          |
-| [Node.js, Bun, and Deno](/deploy/node)           | S3-compatible or a custom adapter | In the server process |
-| [Vercel](/deploy/vercel)                         | S3-compatible                     | Vercel Cron Jobs      |
-| [Netlify](/deploy/netlify)                       | S3-compatible                     | External scheduler    |
-| [AWS Lambda](/deploy/aws-lambda)                 | Amazon S3 or S3-compatible        | External scheduler    |
+<CardGroup cols={2}>
+    <Card title="Deploy to Cloudflare" href="/get-started" icon="rocket">
+        Deploy the Worker with an R2 bucket and set its token.
+    </Card>
+    <Card title="Connect turbo" href="/connect-turbo" icon="plug">
+        Point every machine and CI job at the cache.
+    </Card>
+    <Card title="Choose storage" href="/storage" icon="database">
+        R2, KV, an S3-compatible bucket, or a custom adapter.
+    </Card>
+    <Card title="Deploy elsewhere" href="/deploy" icon="server">
+        Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
+    </Card>
+</CardGroup>

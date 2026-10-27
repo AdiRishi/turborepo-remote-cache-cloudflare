@@ -1,6 +1,6 @@
 ---
 title: Node.js, Bun, and Deno
-description: Run the server as a long-running Node.js, Bun, or Deno process with an S3-compatible bucket, and keep the daily expiry task in the process.
+description: Run the server as a long-running Node.js, Bun, or Deno process with an S3-compatible bucket.
 ---
 
 The server runs as one process and stores artifacts in an [S3-compatible bucket](/storage/s3) or through a [custom adapter](/storage/custom-adapter).
@@ -15,8 +15,6 @@ NITRO_PRESET=node_server pnpm build
 cd apps/api
 pnpm start
 ```
-
-`pnpm start` runs `node .output/server/index.mjs`.
 
 </Tab>
 <Tab title="Bun">
@@ -39,7 +37,7 @@ deno run --allow-net --allow-read --allow-env .output/server/index.mjs
 </Tab>
 </Tabs>
 
-The build is self-contained. To deploy it, copy `apps/api/.output` to the machine or image that runs it.
+The build in `apps/api/.output` is self-contained. To deploy it, copy that directory to the machine or image that runs it.
 
 ## Configure the server
 
@@ -47,7 +45,6 @@ Set the variables in the process environment:
 
 ```sh
 TURBO_TOKEN=<your token>
-PORT=3000
 S3_BUCKET=turborepo-cache
 S3_ENDPOINT=https://s3.us-east-1.amazonaws.com
 S3_REGION=us-east-1
@@ -55,14 +52,14 @@ S3_ACCESS_KEY_ID=<access key ID>
 S3_SECRET_ACCESS_KEY=<secret access key>
 ```
 
-The server listens on `PORT`, or on `3000` when it's unset. `HOST` sets the address it binds to. [Configuration](/configuration) lists every variable.
+The server listens on `PORT`, or on `3000` when `PORT` is unset. `HOST` sets the address it binds to. [Configuration](/configuration) lists every variable.
 
 Check it with `curl http://localhost:3000/ping`, which answers `pong`.
 
+## Serve it over HTTPS
+
+`turbo` sends the token with every request. Run the server behind a reverse proxy or load balancer that terminates TLS, and set `TURBO_API` to the HTTPS address.
+
 ## The expiry task
 
-The server schedules `cache:delete-expired` inside its own process, daily at 03:00 UTC. It runs only while the process is up, so a server that is stopped at that time skips that day's run. If you run several copies behind a load balancer, each copy runs the task, and the later runs find nothing to delete.
-
-## Put it behind HTTPS
-
-`turbo` sends the token in every request, so serve the cache over HTTPS. Run the server behind a reverse proxy or load balancer that terminates TLS, and set `TURBO_API` to the HTTPS address.
+The server runs `cache:delete-expired` inside its own process, daily at 03:00 UTC. A server that is down at that time skips that day's run. When several copies run behind a load balancer, each one runs the task, and the later runs find nothing to delete.

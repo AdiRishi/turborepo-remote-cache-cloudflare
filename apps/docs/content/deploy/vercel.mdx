@@ -1,18 +1,18 @@
 ---
 title: Vercel
-description: Deploy the server to Vercel Functions with an S3-compatible bucket, and let Vercel Cron Jobs run the daily expiry task.
+description: Deploy the server to Vercel Functions with an S3-compatible bucket, and let Vercel Cron Jobs run the expiry task.
 ---
 
-Vercel limits a request or response body to 4.5 MB, so artifacts larger than that never reach the cache. Check your build outputs before you choose Vercel. [Request size limits](/deploy#request-size-limits) compares the platforms.
+:::warning
+Vercel limits a request or response body to 4.5 MB, so larger artifacts never reach the cache. Check the size of your build outputs before you choose Vercel.
+:::
 
 ## Create the project
 
 1. Import your copy of the repository into Vercel.
-2. Set **Root Directory** to `apps/api`. Keep **Include source files outside of the Root Directory in the Build Step** on, because the server uses a package from `packages/`.
-3. Keep the default build command, which runs the server's `build` script. Nitro detects the Vercel build environment and builds the `vercel` preset. To make the choice explicit, set the `NITRO_PRESET` environment variable to `vercel`.
+2. Set **Root Directory** to `apps/api`. Keep **Include source files outside of the Root Directory in the Build Step** on, because the server uses packages from `packages/`.
+3. Keep the default build command. Nitro detects Vercel and builds the `vercel` preset. To make the choice explicit, set the `NITRO_PRESET` environment variable to `vercel`.
 4. Add the environment variables below, then deploy.
-
-## Environment variables
 
 | Variable                                              | Value                                                                                                     |
 | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
@@ -20,7 +20,9 @@ Vercel limits a request or response body to 4.5 MB, so artifacts larger than tha
 | `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, and the keys | Your bucket. See [S3-compatible storage](/storage/s3).                                                    |
 | `CRON_SECRET`                                         | A random string. Vercel sends it with each cron request, and the server rejects cron requests without it. |
 
-Set `TURBO_API` on your clients to the project's production URL, such as `https://<project>.vercel.app`. Vercel's default Deployment Protection puts preview URLs behind a Vercel login, which `turbo` can't pass.
+## Point turbo at the production URL
+
+Set `TURBO_API` to the project's production URL, such as `https://<project>.vercel.app`. Vercel's default Deployment Protection puts preview URLs behind a Vercel login, which `turbo` can't pass.
 
 ## The expiry task
 

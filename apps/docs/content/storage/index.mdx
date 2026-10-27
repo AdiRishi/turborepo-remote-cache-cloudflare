@@ -1,8 +1,6 @@
 ---
-title: Storage
-description: The storage backends the server supports, the order in which it picks one, and what happens when none is configured.
-sidebar:
-    label: Choose storage
+title: Choose storage
+description: The storage backends the server supports, which one to pick, and the order in which the server picks one.
 ---
 
 The server stores artifacts through [Files SDK](https://files-sdk.dev). It has three built-in backends and a hook for any other Files SDK adapter.
@@ -14,20 +12,24 @@ The server stores artifacts through [Files SDK](https://files-sdk.dev). It has t
 | [S3-compatible bucket](/storage/s3)       | `S3_BUCKET`, `S3_ENDPOINT`, and credentials | Every platform         |
 | [Custom adapter](/storage/custom-adapter) | Code in `apps/api/src/custom-adapter.ts`    | Depends on the adapter |
 
+## Which one to pick
+
+On Cloudflare Workers, use R2. It is the default, it needs no credentials, and it stores any artifact the Worker accepts. Choose KV only if every artifact is under 25 MiB and you can accept that a new artifact can take a minute or more to reach other regions.
+
+On any other platform, use an S3-compatible bucket. Write a custom adapter only for storage that has no S3 API, such as Google Cloud Storage or a local disk.
+
 ## How the server picks a backend
 
-For every request, the server takes the first backend in this list that is configured:
+For every request, the server uses the first backend in this list that is configured:
 
 1. The adapter that `src/custom-adapter.ts` returns, when it returns one.
 2. The `KV_STORE` binding.
 3. The `R2_STORE` binding.
 4. The `S3_*` variables, when `S3_BUCKET` is set.
 
-When both `KV_STORE` and `R2_STORE` are bound, artifacts go to KV. A binding also wins over the `S3_*` variables, so remove the `r2_buckets` entry from `wrangler.jsonc` to use S3 on Cloudflare Workers.
+A binding wins over the `S3_*` variables. To use S3 on Cloudflare Workers, remove the `r2_buckets` entry from `apps/api/wrangler.jsonc`.
 
-## When nothing is configured
-
-With no backend, or with an invalid configuration, every cache request fails with a `500` error, and the server logs the reason:
+With no backend, every cache request fails with a `500` error, and the server logs the reason:
 
 ```text
 Invalid server configuration: no artifact storage. Bind KV_STORE or R2_STORE on Cloudflare, set S3_BUCKET and S3_ENDPOINT, or return an adapter from src/custom-adapter.ts.
@@ -35,6 +37,6 @@ Invalid server configuration: no artifact storage. Bind KV_STORE or R2_STORE on 
 
 The response body doesn't include the reason, so check the platform's logs.
 
-## Moving to another backend
+## Switch to another backend
 
-The server reads artifacts only from the backend it picks. When you switch, the new backend starts empty, and the first run on each machine misses the remote cache. Artifacts in the old backend stay where they are until you delete them.
+The server reads artifacts only from the backend it picks, so a new backend starts empty. Each task misses once and uploads a fresh artifact. The old backend keeps its artifacts until you delete them.

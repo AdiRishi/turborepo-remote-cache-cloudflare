@@ -1,61 +1,62 @@
 ---
 title: Configuration
-description: Every environment variable, binding, and endpoint of the server, with its type, default, and the platforms it applies to.
+description: Every environment variable, binding, and endpoint of the server, with its default and the platforms it applies to.
 sidebar:
     label: Configuration reference
 ---
 
-The server reads its configuration from the Worker's environment on Cloudflare and from `process.env` on every other platform. It checks the values on each request. An invalid value makes the request fail with a `500` error, and the server logs `Invalid server configuration:` followed by the reason.
+The server reads its configuration from the Worker's environment on Cloudflare and from `process.env` on every other platform. It checks the values on each request. An invalid value fails the request with a `500` error, and the server logs `Invalid server configuration:` followed by the reason.
 
 ## Server variables
 
 | Variable                         | Required | Default | Description                                                                                                          |
 | -------------------------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
-| `TURBO_TOKEN`                    | Yes      | None    | The bearer token every client sends. Can't be empty.                                                                 |
+| `TURBO_TOKEN`                    | Yes      | None    | The bearer token that every client sends. Can't be empty.                                                            |
 | `BUCKET_OBJECT_EXPIRATION_HOURS` | No       | `720`   | How long to keep an artifact, in whole hours. At least `1`. Also the KV TTL. See [Retention and expiry](/retention). |
 
 ## Cloudflare bindings
+
+Bindings exist only on Cloudflare Workers.
 
 | Binding    | Type         | Description                                                          |
 | ---------- | ------------ | -------------------------------------------------------------------- |
 | `KV_STORE` | KV namespace | Stores artifacts in [Workers KV](/storage/kv). Wins over `R2_STORE`. |
 | `R2_STORE` | R2 bucket    | Stores artifacts in [R2](/storage/r2).                               |
 
-Bindings exist only on Cloudflare Workers.
-
 ## S3 variables
 
 Setting `S3_BUCKET` turns on [S3-compatible storage](/storage/s3). The server uses it only when no custom adapter and no binding is configured.
 
-| Variable               | Required    | Default                                                   | Description                                                 |
-| ---------------------- | ----------- | --------------------------------------------------------- | ----------------------------------------------------------- |
-| `S3_BUCKET`            | Yes, for S3 | None                                                      | The bucket name.                                            |
-| `S3_ENDPOINT`          | Yes, for S3 | None                                                      | The S3 API URL. Only its origin is used.                    |
-| `S3_REGION`            | No          | `AWS_REGION`, then `AWS_DEFAULT_REGION`, then `us-east-1` | The signing region. Use `auto` for R2.                      |
-| `S3_ACCESS_KEY_ID`     | No          | `AWS_ACCESS_KEY_ID`                                       | The access key ID.                                          |
-| `S3_SECRET_ACCESS_KEY` | No          | `AWS_SECRET_ACCESS_KEY`                                   | The secret access key.                                      |
-| `S3_SESSION_TOKEN`     | No          | `AWS_SESSION_TOKEN`, when both keys come from `AWS_*`     | A session token for temporary credentials.                  |
-| `S3_FORCE_PATH_STYLE`  | No          | `false`                                                   | `true` puts the bucket in the path instead of the hostname. |
+| Variable               | Required    | Default                                                   | Description                                                                                    |
+| ---------------------- | ----------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `S3_BUCKET`            | Yes, for S3 | None                                                      | The bucket name. Can't be empty.                                                               |
+| `S3_ENDPOINT`          | Yes, for S3 | None                                                      | The S3 API URL, such as `https://s3.us-east-1.amazonaws.com`. The server uses only its origin. |
+| `S3_REGION`            | No          | `AWS_REGION`, then `AWS_DEFAULT_REGION`, then `us-east-1` | The signing region. Use `auto` for R2.                                                         |
+| `S3_ACCESS_KEY_ID`     | No          | `AWS_ACCESS_KEY_ID`                                       | The access key ID.                                                                             |
+| `S3_SECRET_ACCESS_KEY` | No          | `AWS_SECRET_ACCESS_KEY`                                   | The secret access key.                                                                         |
+| `S3_SESSION_TOKEN`     | No          | `AWS_SESSION_TOKEN`, when both keys come from `AWS_*`     | A session token for temporary credentials.                                                     |
+| `S3_FORCE_PATH_STYLE`  | No          | `false`                                                   | `true` sends requests to `<endpoint>/<bucket>` instead of `<bucket>.<endpoint>`.               |
 
-The `AWS_*` fallbacks come from the process environment.
+The `AWS_*` fallbacks come from the process environment. The server reads no AWS profiles or SSO sessions.
 
 ## Build and platform variables
 
-| Variable       | Applies to             | Description                                                                                                         |
-| -------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `NITRO_PRESET` | Build                  | The build target, such as `node_server` or `aws_lambda`. Defaults to `cloudflare_module`. See [Platforms](/deploy). |
-| `PORT`         | Node.js, Bun, and Deno | The port to listen on. Defaults to `3000`.                                                                          |
-| `HOST`         | Node.js, Bun, and Deno | The address to bind to.                                                                                             |
-| `CRON_SECRET`  | Vercel                 | The secret Vercel sends with cron requests. See [Vercel](/deploy/vercel).                                           |
+| Variable       | Applies to             | Description                                                                                                                 |
+| -------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `NITRO_PRESET` | Build                  | The build target, such as `node_server` or `aws_lambda`. Defaults to `cloudflare_module`. See [Choose a platform](/deploy). |
+| `PORT`         | Node.js, Bun, and Deno | The port to listen on. Defaults to `3000`.                                                                                  |
+| `HOST`         | Node.js, Bun, and Deno | The address to bind to.                                                                                                     |
+| `CRON_SECRET`  | Vercel                 | The secret that Vercel sends with cron requests. See [Vercel](/deploy/vercel).                                              |
 
 A [custom adapter](/storage/custom-adapter) can read any other variable you define.
 
 ## Endpoints
 
-| Endpoint                                | Auth         | Description                                                                          |
-| --------------------------------------- | ------------ | ------------------------------------------------------------------------------------ |
-| `GET /ping`                             | None         | Answers `pong`. Use it as a health check.                                            |
-| `/v8/artifacts/...`                     | Bearer token | The Remote Cache API. The [API reference](/api) documents every operation.           |
-| `POST /internal/delete-expired-objects` | Bearer token | Runs the expiry task. See [Retention and expiry](/retention#run-the-task-on-demand). |
+| Endpoint                                | Auth         | Description                                                                        |
+| --------------------------------------- | ------------ | ---------------------------------------------------------------------------------- |
+| `GET /`                                 | None         | Redirects to this documentation.                                                   |
+| `GET /ping`                             | None         | Answers `pong`. Use it as a health check.                                          |
+| `/v8/artifacts/...`                     | Bearer token | The Remote Cache API. The [API reference](/api) documents every operation.         |
+| `POST /internal/delete-expired-objects` | Bearer token | Runs the expiry task. See [Retention and expiry](/retention#run-expiry-on-demand). |
 
 Responses under `/v8` allow requests from any origin, so a browser can call the API. Errors return a JSON body with a `code` and a `message`, such as `{"code":"unauthorized","message":"Missing or invalid bearer token"}`.

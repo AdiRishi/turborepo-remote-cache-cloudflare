@@ -1,59 +1,28 @@
 ---
-title: Deploy to other platforms
-description: Build the server for Node.js, Bun, Deno, Vercel, Netlify, or AWS Lambda with a Nitro preset, and see how each platform runs the expiry task.
-sidebar:
-    label: Platforms
+title: Choose a platform
+description: Build the server for Node.js, Bun, Deno, Vercel, Netlify, or AWS Lambda, and compare how each platform handles expiry and artifact size.
 ---
 
-The server is a [Nitro](https://nitro.build) app. It builds for Cloudflare Workers by default, and the `NITRO_PRESET` variable selects another target. Every target serves the same API. Storage and the daily expiry task differ by platform.
-
-## Build for a platform
-
-From the repository root, set `NITRO_PRESET` and build the server:
+The server is a [Nitro](https://nitro.build) app. It builds for Cloudflare Workers by default, and `NITRO_PRESET` selects another target:
 
 ```sh
 NITRO_PRESET=node_server pnpm build
 ```
 
-| Platform           | `NITRO_PRESET`                    | Build output in `apps/api` | Guide                                     |
-| ------------------ | --------------------------------- | -------------------------- | ----------------------------------------- |
-| Cloudflare Workers | `cloudflare_module` (the default) | `.output`                  | [Get started on Cloudflare](/get-started) |
-| Node.js            | `node_server`                     | `.output`                  | [Node.js, Bun, and Deno](/deploy/node)    |
-| Bun                | `bun`                             | `.output`                  | [Node.js, Bun, and Deno](/deploy/node)    |
-| Deno               | `deno_server`                     | `.output`                  | [Node.js, Bun, and Deno](/deploy/node)    |
-| Vercel             | `vercel`, detected on Vercel      | `.vercel/output`           | [Vercel](/deploy/vercel)                  |
-| Netlify            | `netlify`, detected on Netlify    | `.netlify` and `dist`      | [Netlify](/deploy/netlify)                |
-| AWS Lambda         | `aws_lambda`                      | `.output`                  | [AWS Lambda](/deploy/aws-lambda)          |
+Every build serves the same API. The platforms differ in storage, in how they run the daily expiry task, and in the largest artifact they can carry:
 
-Nitro has presets for more platforms. This project tests the Cloudflare and Node.js builds end to end in CI.
+| Platform                               | `NITRO_PRESET`                      | Expiry task           | Largest artifact                                             |
+| -------------------------------------- | ----------------------------------- | --------------------- | ------------------------------------------------------------ |
+| [Cloudflare Workers](/get-started)     | `cloudflare_module`, the default    | Cron trigger          | 100 MB upload on the Free and Pro plans, 200 MB on Business. |
+| [Node.js, Bun, and Deno](/deploy/node) | `node_server`, `bun`, `deno_server` | In the server process | No limit, unless a proxy in front of the server sets one.    |
+| [Vercel](/deploy/vercel)               | `vercel`, detected on Vercel        | Vercel Cron Jobs      | 4.5 MB.                                                      |
+| [Netlify](/deploy/netlify)             | `netlify`, detected on Netlify      | None                  | About 4.5 MB.                                                |
+| [AWS Lambda](/deploy/aws-lambda)       | `aws_lambda`                        | None                  | 6 MB.                                                        |
 
-## Storage on each platform
+An artifact over the limit can't be uploaded, so its task never hits the remote cache. Build outputs often exceed 4.5 MB. For a repository with large outputs, choose Cloudflare Workers or a long-running server.
+
+Where the table says **None**, call `POST /internal/delete-expired-objects` from a scheduler once a day. [Retention and expiry](/retention#run-expiry-from-a-scheduler) shows how.
 
 The `R2_STORE` and `KV_STORE` bindings exist only on Cloudflare Workers. Everywhere else, use an [S3-compatible bucket](/storage/s3) or a [custom adapter](/storage/custom-adapter).
 
-## The expiry task on each platform
-
-The `cache:delete-expired` task runs daily at 03:00 UTC. Each platform runs it differently:
-
-| Platform                               | How the task runs                                                                 |
-| -------------------------------------- | --------------------------------------------------------------------------------- |
-| Cloudflare Workers                     | A cron trigger in the Worker's generated Wrangler configuration.                  |
-| Node.js, Bun, and Deno                 | A scheduler inside the server process, so it runs while the server is up.         |
-| Vercel                                 | A Vercel Cron Job.                                                                |
-| Netlify, AWS Lambda, and other presets | Nothing. Call `POST /internal/delete-expired-objects` from an external scheduler. |
-
-[Retention and expiry](/retention) shows how to call the endpoint.
-
-## Request size limits
-
-Platforms cap the size of a request, and serverless platforms also cap the response. An artifact larger than the cap can't be uploaded or downloaded, so its task never hits the remote cache:
-
-| Platform               | Largest artifact                                                                           |
-| ---------------------- | ------------------------------------------------------------------------------------------ |
-| Cloudflare Workers     | 100 MB uploads on the Free and Pro plans, 200 MB on Business. Downloads have no limit.     |
-| Node.js, Bun, and Deno | No platform limit. A proxy in front of the server can set one.                             |
-| Vercel                 | 4.5 MB, the limit for a request or response body.                                          |
-| Netlify                | About 4.5 MB. Netlify buffers up to 6 MB and Base64-encodes binary data inside that limit. |
-| AWS Lambda             | 6 MB for a synchronous request or response.                                                |
-
-Build outputs often exceed 4.5 MB. For a repository with large outputs, choose Cloudflare Workers or a long-running server.
+Nitro has presets for more platforms. CI runs only the Cloudflare build end to end.

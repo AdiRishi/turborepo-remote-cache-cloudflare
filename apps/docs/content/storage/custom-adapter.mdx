@@ -1,6 +1,6 @@
 ---
 title: Custom storage adapter
-description: Store artifacts anywhere Files SDK has an adapter by returning it from src/custom-adapter.ts, with a worked example on a Node.js server.
+description: Store artifacts anywhere Files SDK has an adapter, by returning it from apps/api/src/custom-adapter.ts.
 sidebar:
     label: Custom adapter
 ---
@@ -17,19 +17,21 @@ import type { CustomAdapter } from './utils/storage';
 export const customAdapter: CustomAdapter = () => undefined;
 ```
 
-`env` holds the Worker's variables, secrets, and bindings on Cloudflare, and `process.env` on other platforms. The server calls the function for every request, so read configuration from `env` there rather than at import time.
+`env` holds the Worker's variables, secrets, and bindings on Cloudflare, and `process.env` on other platforms. The server calls the function on every request, so read configuration from `env` inside it, not at import time.
 
-## What an adapter must support
+The server bundles everything that `custom-adapter.ts` imports. Import only the adapter you use.
 
-The server relies on three things that not every adapter provides:
+## Check what the adapter supports
 
-- **User metadata.** The server stores the task duration and the signature as metadata on each artifact. An adapter that rejects metadata fails every upload. The Vercel Blob adapter is one of these.
-- **`lastModified` in `list()`.** The expiry task deletes every artifact whose age the store doesn't report. If `list()` returns no `lastModified`, every expiry run deletes all artifacts. The Netlify Blobs adapter is one of these.
+Not every Files SDK adapter can store artifacts. The server needs three things from it:
+
+- **User metadata.** The server stores the task's duration and the artifact's signature as metadata. An adapter that rejects metadata, such as Vercel Blob, fails every upload.
+- **`lastModified` in `list()`.** The expiry task deletes every artifact whose age it can't read. With an adapter that returns no `lastModified`, such as Netlify Blobs, every expiry run deletes the whole cache.
 - **Your platform's runtime.** Many adapters use Node.js SDKs that don't run in Workers. Check the adapter's page before you deploy it to Cloudflare.
 
-## Worked example: local disk on a Node.js server
+## Store artifacts on a local disk
 
-This example stores artifacts on the disk of one Node.js server with the Files SDK `fs` adapter. It suits a single long-running machine with a persistent disk. Files SDK describes `fs` as a development adapter, because it has no replication.
+This example uses the Files SDK `fs` adapter on one Node.js server with a persistent disk. Files SDK describes `fs` as a development adapter, because nothing replicates the files.
 
 1. Return the adapter when `CACHE_DIR` is set:
 
@@ -57,17 +59,19 @@ This example stores artifacts on the disk of one Node.js server with the Files S
     CACHE_DIR=/var/lib/turborepo-cache TURBO_TOKEN=<your token> PORT=3000 pnpm start
     ```
 
-4. Run a build twice with `TURBO_API=http://<server>:3000`, as in [Connect turbo](/connect-turbo). The second run reports `cache hit, replaying logs`.
+4. Set `TURBO_API=http://<server>:3000` and run a build twice, as in [Connect turbo](/connect-turbo#check-that-hits-come-from-the-server). The second run prints `cache hit, replaying logs`.
 
-The server writes each artifact to `<CACHE_DIR>/<team>/<hash>`, with a `<hash>.meta.json` file beside it that holds its metadata. The daily expiry task runs in the server process, as on any [Node.js server](/deploy/node).
+The server writes each artifact to `<CACHE_DIR>/<team>/<hash>`, with its metadata in a `<hash>.meta.json` file beside it.
 
-## Another example: Google Cloud Storage
+## Store artifacts in Google Cloud Storage
 
-The GCS adapter needs its SDK. Add it to the server, then return the adapter:
+The GCS adapter needs Google's SDK. Add it to the server:
 
 ```sh
 pnpm --filter @turborepo-remote-cache/api add @google-cloud/storage
 ```
+
+Then return the adapter:
 
 ```ts apps/api/src/custom-adapter.ts
 import { gcs } from 'files-sdk/gcs';
@@ -79,5 +83,3 @@ export const customAdapter: CustomAdapter = (env) =>
 ```
 
 The SDK finds credentials through Google's Application Default Credentials.
-
-Import only the adapter you use. The server bundles everything that `custom-adapter.ts` imports.
