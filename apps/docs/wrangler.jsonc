@@ -10,5 +10,6 @@
   },
   "routes": [{ "pattern": "turborepo-remote-cache.dev", "custom_domain": true }],
   "workers_dev": false,
+  "preview_urls": true,
   "previews": {}
 }
