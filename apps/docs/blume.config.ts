@@ -10,7 +10,7 @@ const changelogUrl = `${repositoryUrl}/blob/master/apps/api/CHANGELOG.md`;
 
 const deployment =
   process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true'
-    ? { site: 'https://cloudflare.turborepo-remote-cache.dev' }
+    ? { site: 'https://turborepo-remote-cache.dev' }
     : { site: 'https://adirishi.github.io', base: '/turborepo-remote-cache-cloudflare' };
 
 // Pages that moved. The VitePress site also served every page at `<route>.html`.

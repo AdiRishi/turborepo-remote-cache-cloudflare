@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "env": ["DOCS_CLOUDFLARE_DEPLOYMENT"],
-      "inputs": ["$TURBO_EXTENDS$", "$TURBO_ROOT$/apps/api/package.json"]
+      "inputs": ["$TURBO_EXTENDS$", "!wrangler.jsonc", "$TURBO_ROOT$/apps/api/package.json"]
     },
     "test": {
       "outputs": []

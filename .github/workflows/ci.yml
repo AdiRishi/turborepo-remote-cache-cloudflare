@@ -83,9 +83,9 @@ jobs:
         with:
           fail-on-severity: moderate
 
-  # Pull requests get a preview deployment; master updates the Cloudflare Pages mirror of the docs.
+  # Pull requests get a Worker Preview; master deploys https://turborepo-remote-cache.dev.
   docs-cloudflare:
-    name: Docs · Cloudflare Pages
+    name: Docs · Cloudflare Workers
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
     needs: verify
     runs-on: ubuntu-latest
@@ -112,7 +112,7 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: apps/docs
-          command: pages deploy dist --project-name=cloudflare-turbo-cache-docs
+          command: ${{ github.event_name == 'pull_request' && format('preview --name pr-{0}', github.event.pull_request.number) || 'deploy' }}
 
   docs-github-pages:
     name: Docs · GitHub Pages
