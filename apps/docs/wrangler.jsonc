@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "turborepo-remote-cache-docs",
+  "compatibility_date": "2026-06-15",
+  "assets": {
+    "directory": "./dist",
+    // Blume writes each page as `<route>/index.html` and links to it without a trailing slash.
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [{ "pattern": "turborepo-remote-cache.dev", "custom_domain": true }],
+  "workers_dev": false,
+  "previews": {}
+}

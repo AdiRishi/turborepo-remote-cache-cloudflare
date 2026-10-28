@@ -8,7 +8,7 @@ A self-hosted Turborepo remote cache server. It runs on Cloudflare Workers by de
 - `apps/docs`: the documentation site, built with Blume. Blume's own docs are in `apps/docs/node_modules/blume/docs`. Read them before you change the site.
 - `packages/files-sdk-kv`: a Workers KV adapter for Files SDK. Keep Turborepo and server logic out of it, so it can be published on its own.
 - `packages/spec`: the official Remote Cache OpenAPI spec and the types generated from it.
-- `.github/workflows/ci.yml`: all of CI, as one graph of jobs.
+- `.github/workflows/ci.yml`: all of CI, as one graph of jobs. It deploys the docs to the Worker in `apps/docs/wrangler.jsonc`, which serves `turborepo-remote-cache.dev`, and to GitHub Pages. A redirect rule in the Cloudflare zone sends `www.` and `cloudflare.` to the apex.
 
 ## Check your changes
 
