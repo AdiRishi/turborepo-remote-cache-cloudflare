@@ -5,6 +5,8 @@ import { useDatabase } from 'nitro/database';
 
 import type { Inventory } from './inventory';
 
+import { migrate } from './migrate';
+
 export type Database = ReturnType<typeof useDatabase>;
 
 const HOUR = 3_600_000;
@@ -16,60 +18,9 @@ const TURBO_USER_AGENT = /^turbo (?<version>\S+) \S+ (?<os>\S+) (?<arch>\S+)/u;
 type CacheEvent = Omit<components['schemas']['CacheEvent'], 'sessionId'> &
   Partial<Pick<components['schemas']['CacheEvent'], 'sessionId'>>;
 
-let tablesCreated = false;
+let migrated: Promise<void> | undefined;
 
-// The SQL runs on SQLite (D1, node:sqlite, libSQL) and PostgreSQL.
-const createTables = async (db: Database) => {
-  await db.sql`CREATE TABLE IF NOT EXISTS cache_events (
-    hour BIGINT NOT NULL,
-    team TEXT NOT NULL,
-    source TEXT NOT NULL,
-    outcome TEXT NOT NULL,
-    lookups BIGINT NOT NULL,
-    time_saved_ms BIGINT NOT NULL,
-    PRIMARY KEY (hour, team, source, outcome)
-  )`;
-  await db.sql`CREATE TABLE IF NOT EXISTS runs (
-    session_id TEXT PRIMARY KEY,
-    team TEXT NOT NULL,
-    started_at BIGINT NOT NULL,
-    ci TEXT NOT NULL,
-    agent TEXT NOT NULL
-  )`;
-  await db.sql`CREATE INDEX IF NOT EXISTS runs_started_at ON runs (started_at)`;
-  await db.sql`CREATE TABLE IF NOT EXISTS transfers (
-    hour BIGINT NOT NULL,
-    team TEXT NOT NULL,
-    direction TEXT NOT NULL,
-    turbo_version TEXT NOT NULL,
-    platform TEXT NOT NULL,
-    requests BIGINT NOT NULL,
-    bytes BIGINT NOT NULL,
-    PRIMARY KEY (hour, team, direction, turbo_version, platform)
-  )`;
-  await db.sql`CREATE TABLE IF NOT EXISTS storage_snapshots (
-    taken_at BIGINT PRIMARY KEY,
-    artifacts BIGINT NOT NULL,
-    bytes BIGINT NOT NULL
-  )`;
-  await db.sql`CREATE TABLE IF NOT EXISTS storage_teams (
-    taken_at BIGINT NOT NULL,
-    team TEXT NOT NULL,
-    artifacts BIGINT NOT NULL,
-    bytes BIGINT NOT NULL,
-    PRIMARY KEY (taken_at, team)
-  )`;
-  await db.sql`CREATE TABLE IF NOT EXISTS storage_bins (
-    taken_at BIGINT NOT NULL,
-    histogram TEXT NOT NULL,
-    bin INTEGER NOT NULL,
-    artifacts BIGINT NOT NULL,
-    bytes BIGINT NOT NULL,
-    PRIMARY KEY (taken_at, histogram, bin)
-  )`;
-};
-
-/** Returns the stats database with its tables created, or `undefined` when none is configured. */
+/** Returns the migrated stats database, or `undefined` when none is configured. */
 export const useStatsDatabase = async () => {
   let db: Database;
   try {
@@ -79,10 +30,13 @@ export const useStatsDatabase = async () => {
   } catch {
     return undefined;
   }
-  if (!tablesCreated) {
-    await createTables(db);
-    tablesCreated = true;
-  }
+  // Migrate once per isolate. Requests that arrive meanwhile wait for the same run, and a failed run is
+  // retried by the next request.
+  migrated ??= migrate(db).catch((error: unknown) => {
+    migrated = undefined;
+    throw error;
+  });
+  await migrated;
   return db;
 };
 

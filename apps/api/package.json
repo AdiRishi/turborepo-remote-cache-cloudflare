@@ -29,6 +29,7 @@
     "@turborepo-remote-cache/spec": "workspace:*",
     "@types/node": "^24.19.2",
     "@vitest/coverage-istanbul": "^5.0.5",
+    "db0": "^0.4.1",
     "miniflare": "5.20261012.1-beta",
     "srvx": "^1.0.6",
     "typescript": "^7.0.2",

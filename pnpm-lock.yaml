@@ -215,6 +215,9 @@ importers:
       '@vitest/coverage-istanbul':
         specifier: ^5.0.5
         version: 5.0.5(vitest@5.0.5)
+      db0:
+        specifier: ^0.4.1
+        version: 0.4.1
       miniflare:
         specifier: 5.20261012.1-beta
         version: 5.20261012.1-beta(@types/node@24.19.2)

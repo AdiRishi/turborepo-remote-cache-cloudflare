@@ -25,6 +25,7 @@ Test this project's behaviour, and trust Files SDK, Nitro, and the platforms to 
 
 - `.env.turbo.local` holds the credentials for this repository's own remote cache. Never read, print, or commit it. Without it, `turbo` uses only the local cache.
 - A cache hit replays a task's outputs instead of running it, so an undeclared input hides a failure. Declare every env var, file outside the package, and output that affects a task in `turbo.json`. Write `inputs` as `$TURBO_DEFAULT$` (`$TURBO_EXTENDS$` in a package) followed by `!` exclusions. Depend on `^transit`, not `transit`, because a package's own `transit` hashes all of its files and undoes the exclusions.
+- To change the stats database's tables or data, append a migration to `apps/api/src/migrations/index.ts` and follow the rules written there.
 - The server's variable names predate Nitro, so it reads them through `apps/api/src/utils/env.ts` instead of `runtimeConfig`.
 - `packages/spec` holds the spec unmodified, so `pnpm spec:sync` can replace it. Fix spec problems in `apps/docs/openapi-overlay.yaml`.
 - The `master` ruleset requires the checks `Verify`, `End-to-end`, and `Dependency review` by name. Renaming those jobs blocks merges until the ruleset changes too. Add new CI work as a job in `ci.yml`.
