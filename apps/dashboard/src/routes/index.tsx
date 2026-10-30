@@ -1,8 +1,9 @@
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import * as v from 'valibot';
 
 import { Dashboard } from '@/components/dashboard';
@@ -14,7 +15,7 @@ import { statsQuery } from '@/lib/stats';
 import { STATS_RANGES } from '../../contract';
 
 const SearchParams = v.object({
-  range: v.fallback(v.optional(v.picklist(STATS_RANGES), '30d'), '30d'),
+  range: v.optional(v.fallback(v.picklist(STATS_RANGES), '30d'), '30d'),
 });
 
 export const Route = createFileRoute('/')({
@@ -76,6 +77,11 @@ function PendingPage() {
 
 function ErrorPage({ error }: ErrorComponentProps) {
   const router = useRouter();
+  const queryErrorResetBoundary = useQueryErrorResetBoundary();
+  // A retry re-runs the loader, whose query must not replay the cached error.
+  useEffect(() => {
+    queryErrorResetBoundary.reset();
+  }, [queryErrorResetBoundary]);
   return (
     <PageFrame>
       <LoadError
