@@ -90,10 +90,18 @@ export const recordCacheEvents = (
   });
 };
 
-/** Adds an artifact upload or download to the hourly totals, with the `turbo` client that made it. */
+/**
+ * Adds an artifact upload or download to the hourly totals, with the `turbo` client that made it. An
+ * upload carries the run time of the task that produced it, which is what that cache miss cost.
+ */
 export const recordTransfer = (
   event: H3Event,
-  { team, direction, bytes }: { team: string; direction: 'upload' | 'download'; bytes: number },
+  {
+    team,
+    direction,
+    bytes,
+    taskDurationMs = 0,
+  }: { team: string; direction: 'upload' | 'download'; bytes: number; taskDurationMs?: number },
 ) => {
   const now = Date.now();
   const hour = now - (now % HOUR);
@@ -102,11 +110,13 @@ export const recordTransfer = (
   const platform = client ? `${client.os} ${client.arch}` : '';
 
   writeAfterResponse(event, async (db) => {
-    await db.sql`INSERT INTO transfers (hour, team, direction, turbo_version, platform, requests, bytes)
-      VALUES (${hour}, ${team}, ${direction}, ${version}, ${platform}, 1, ${bytes})
+    await db.sql`INSERT INTO transfers
+        (hour, team, direction, turbo_version, platform, requests, bytes, task_duration_ms)
+      VALUES (${hour}, ${team}, ${direction}, ${version}, ${platform}, 1, ${bytes}, ${taskDurationMs})
       ON CONFLICT (hour, team, direction, turbo_version, platform) DO UPDATE SET
         requests = transfers.requests + excluded.requests,
-        bytes = transfers.bytes + excluded.bytes`;
+        bytes = transfers.bytes + excluded.bytes,
+        task_duration_ms = transfers.task_duration_ms + excluded.task_duration_ms`;
   });
 };
 

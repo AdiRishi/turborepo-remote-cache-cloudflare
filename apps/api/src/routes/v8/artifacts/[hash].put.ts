@@ -14,7 +14,12 @@ export default defineHandler(async (event) => {
   await useStorage(event)
     .upload(key, event.req.body ?? new Uint8Array(), { metadata: toStoredMetadata(headers) })
     .catch(toHttpError);
-  recordTransfer(event, { team, direction: 'upload', bytes: Number(headers['content-length']) });
+  recordTransfer(event, {
+    team,
+    direction: 'upload',
+    bytes: Number(headers['content-length']),
+    taskDurationMs: Number(headers['x-artifact-duration'] ?? 0),
+  });
 
   const url = new URL(event.url);
   url.search = new URLSearchParams({ teamId: team }).toString();

@@ -46,7 +46,8 @@ const OUTCOMES = [
     name: 'Ran',
     color: 'var(--miss)',
     count: (activity: Activity) => activity.remoteMisses,
-    detail: (activity: Activity) => `${formatBytes(activity.uploadedBytes)} uploaded`,
+    detail: (activity: Activity) =>
+      `${formatDuration(activity.runTimeMs)} spent, ${formatBytes(activity.uploadedBytes)} uploaded`,
     better: 'down',
   },
 ] as const;
@@ -64,7 +65,7 @@ function OutcomeRow({
   const shown = useTweened(count);
   const total = tasks(current);
   return (
-    <li className="grid grid-cols-[1fr_auto_3.5rem_4.5rem] items-center gap-x-4 py-2.5 sm:grid-cols-[1fr_9rem_auto_3.5rem_4.5rem]">
+    <li className="grid grid-cols-[1fr_4.5rem_3.5rem_4.5rem] items-center gap-x-4 py-2.5 sm:grid-cols-[1fr_17rem_4.5rem_3.5rem_4.5rem]">
       <span className="flex items-center gap-2.5">
         <span
           className="size-2.5 rounded-[3px]"

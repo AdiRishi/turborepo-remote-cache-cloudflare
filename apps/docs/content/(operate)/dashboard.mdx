@@ -10,7 +10,7 @@ Open the server's URL in a browser, such as `https://turborepo-remote-cache.<you
 The page opens with time saved on each day of the last year. The range control under it picks the last 24 hours, 7 days, 30 days, or 90 days, and a bracket marks that range on the year. Everything below covers the chosen range, and each figure shows its change from the range of the same length just before it.
 
 - **Time saved.** After every run, `turbo` reports each cache lookup, and a hit carries the duration of the task it replayed. The dashboard adds those durations up, for this server and for the local cache on each machine.
-- **Tasks.** Every task checks the cache on its own machine first, and asks the server only when that misses. A task that misses both runs. The dashboard splits tasks into those three outcomes and shows the share that came from a cache.
+- **Tasks.** Every task checks the cache on its own machine first, and asks the server only when that misses. A task that misses both runs. The dashboard splits tasks into those three outcomes and shows the share that came from a cache. For tasks that ran, it adds up the run time that `turbo` reports with each upload, which is what those misses cost.
 - **Server hit rate.** The share of lookups that reached this server and found the artifact. It shows how well the server serves the tasks that need it.
 - **Saved per run, runs, and data sent.** Time saved divided by runs, the number of `turbo` runs, and the bytes the server sent in artifact downloads.
 - **Teams.** Runs, hit rate, time saved with its trend, storage, and downloads for each team, which is the `teamId` or `slug` that `turbo` sends. The table appears when more than one team uses the server.

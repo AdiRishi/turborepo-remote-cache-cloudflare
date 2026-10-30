@@ -18,6 +18,7 @@ const Activity = v.object({
   agentRuns: count,
   uploads: count,
   uploadedBytes: count,
+  runTimeMs: count,
   downloads: count,
   downloadedBytes: count,
 });

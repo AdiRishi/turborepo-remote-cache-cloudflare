@@ -20,6 +20,8 @@ export interface Activity {
   agentRuns: number;
   uploads: number;
   uploadedBytes: number;
+  /** Run time of the tasks that missed and uploaded their artifacts, as `turbo` reports with each upload. */
+  runTimeMs: number;
   downloads: number;
   downloadedBytes: number;
 }

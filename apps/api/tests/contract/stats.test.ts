@@ -110,7 +110,7 @@ describe('artifact transfers', () => {
       hash,
       body: new Uint8Array(40),
       search: `?teamId=${team}`,
-      headers: { 'user-agent': TURBO_USER_AGENT },
+      headers: { 'user-agent': TURBO_USER_AGENT, 'x-artifact-duration': '850' },
     });
     const download = await authorized(`/v8/artifacts/${hash}?teamId=${team}`, {
       headers: { 'user-agent': TURBO_USER_AGENT },
@@ -123,6 +123,7 @@ describe('artifact transfers', () => {
       .toMatchObject({
         uploads: 1,
         uploadedBytes: 40,
+        runTimeMs: 850,
         downloads: 1,
         downloadedBytes: 40,
       });

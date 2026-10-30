@@ -27,6 +27,7 @@ const migration: Migration = async (db) => {
     platform TEXT NOT NULL,
     requests BIGINT NOT NULL,
     bytes BIGINT NOT NULL,
+    task_duration_ms BIGINT NOT NULL,
     PRIMARY KEY (hour, team, direction, turbo_version, platform)
   )`;
   await db.sql`CREATE TABLE IF NOT EXISTS storage_snapshots (

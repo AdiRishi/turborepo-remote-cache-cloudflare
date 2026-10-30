@@ -18,6 +18,7 @@ const emptyActivity = (): Activity => ({
   agentRuns: 0,
   uploads: 0,
   uploadedBytes: 0,
+  runTimeMs: 0,
   downloads: 0,
   downloadedBytes: 0,
 });
@@ -36,6 +37,7 @@ const sumActivity = (activities: readonly Activity[]) =>
       agentRuns: total.agentRuns + a.agentRuns,
       uploads: total.uploads + a.uploads,
       uploadedBytes: total.uploadedBytes + a.uploadedBytes,
+      runTimeMs: total.runTimeMs + a.runTimeMs,
       downloads: total.downloads + a.downloads,
       downloadedBytes: total.downloadedBytes + a.downloadedBytes,
     }),
@@ -71,6 +73,7 @@ interface TransferRow {
   direction: string;
   requests: Int;
   bytes: Int;
+  duration: Int;
 }
 
 /** Merges rows from the three tables into one activity per time bucket and team. */
@@ -105,6 +108,7 @@ const toCells = (events: EventRow[], runs: RunRow[], transfers: TransferRow[]) =
     if (row.direction === 'upload') {
       activity.uploads += Number(row.requests);
       activity.uploadedBytes += Number(row.bytes);
+      activity.runTimeMs += Number(row.duration);
     } else {
       activity.downloads += Number(row.requests);
       activity.downloadedBytes += Number(row.bytes);
@@ -128,7 +132,7 @@ export const readActivity = async (db: Database, from: number, to: number, bucke
       GROUP BY bucket, team`,
     db.sql<{ rows: TransferRow[] }>`
       SELECT hour - hour % ${bucketMs} AS bucket, team, direction,
-        SUM(requests) AS requests, SUM(bytes) AS bytes
+        SUM(requests) AS requests, SUM(bytes) AS bytes, SUM(task_duration_ms) AS duration
       FROM transfers WHERE hour >= ${from} AND hour < ${to}
       GROUP BY bucket, team, direction`,
   ]);
