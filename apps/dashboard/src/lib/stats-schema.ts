@@ -42,7 +42,6 @@ export const StatsResponseSchema = v.variant('enabled', [
     totals: v.object({ current: Activity, previous: Activity }),
     series: v.array(v.object({ ...Activity.entries, start: count })),
     allTime: v.object({ timeSavedMs: count, since: v.nullable(count) }),
-    calendar: v.array(v.object({ day: count, runs: count, timeSavedMs: count })),
     storage: v.object({
       expirationHours: count,
       latest: v.nullable(Snapshot),

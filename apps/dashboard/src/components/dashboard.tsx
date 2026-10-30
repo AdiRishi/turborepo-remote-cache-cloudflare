@@ -3,12 +3,11 @@ import { RANGE_LABELS, tasks } from '@/lib/stats';
 import type { Stats, StatsRange } from '../../contract';
 
 import { Clients } from './clients';
+import { Hero, Timeline } from './hero';
 import { RangeControl } from './range-control';
 import { Storage } from './storage';
 import { TaskBreakdown } from './task-breakdown';
 import { TeamsTable } from './teams-table';
-import { Headline, Timeline } from './time-saved';
-import { YearStrip } from './year-strip';
 
 export function Dashboard({
   stats,
@@ -19,15 +18,15 @@ export function Dashboard({
 }) {
   const { current } = stats.totals;
   return (
-    <div className="pt-6 pb-24">
-      <YearStrip
+    <div className="pt-8 pb-24">
+      <Hero
         stats={stats}
         control={<RangeControl range={stats.range.name} onChange={onRangeChange} />}
       />
-      <div className="mt-16 sm:mt-20">
-        <Headline stats={stats} />
+      <div className="mt-16">
+        <Timeline stats={stats} />
       </div>
-      <div className="mt-12">
+      <div className="mt-20">
         {tasks(current) === 0 ? (
           <p className="text-muted-foreground">
             No tasks used the cache in the {RANGE_LABELS[stats.range.name].toLowerCase()}.
@@ -35,9 +34,6 @@ export function Dashboard({
         ) : (
           <TaskBreakdown current={current} previous={stats.totals.previous} />
         )}
-      </div>
-      <div className="mt-20">
-        <Timeline stats={stats} />
       </div>
       {stats.teams.length > 1 ? (
         <div className="mt-20">

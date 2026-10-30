@@ -7,12 +7,13 @@ Open the server's URL in a browser, such as `https://turborepo-remote-cache.<you
 
 ## What it shows
 
-The page opens with time saved on each day of the last year. The range control under it picks the last 24 hours, 7 days, 30 days, or 90 days, and a bracket marks that range on the year. Everything below covers the chosen range, and each figure shows its change from the range of the same length just before it.
+The range control at the top picks the last 24 hours, 7 days, 30 days, or 90 days. Every figure covers that range and shows its change from the range of the same length just before it. The line beside the control shows the time saved since the server recorded its first run.
 
 - **Time saved.** After every run, `turbo` reports each cache lookup, and a hit carries the duration of the task it replayed. The dashboard adds those durations up, for this server and for the local cache on each machine.
-- **Tasks.** Every task checks the cache on its own machine first, and asks the server only when that misses. A task that misses both runs. The dashboard splits tasks into those three outcomes and shows the share that came from a cache. For tasks that ran, it adds up the run time that `turbo` reports with each upload, which is what those misses cost.
+- **Share of task time from a cache.** Time saved, divided by time saved plus the run time of the tasks that ran. `turbo` reports that run time with each upload, so tasks that ran without uploading aren't counted.
+- **Tasks.** Every task checks the cache on its own machine first, and asks the server only when that misses. A task that misses both runs. The dashboard splits tasks into those three outcomes and shows the share that came from a cache.
 - **Server hit rate.** The share of lookups that reached this server and found the artifact. It shows how well the server serves the tasks that need it.
-- **Saved per run, runs, and data sent.** Time saved divided by runs, the number of `turbo` runs, and the bytes the server sent in artifact downloads.
+- **Saved per run and runs.** Time saved divided by runs, and the number of `turbo` runs.
 - **Teams.** Runs, hit rate, time saved with its trend, storage, and downloads for each team, which is the `teamId` or `slug` that `turbo` sends. The table appears when more than one team uses the server.
 - **Storage.** What the server stores, and how the total changed over the range.
 - **Clients.** The CI providers that ran `turbo`, the AI coding agents that started runs, and the `turbo` versions and platforms that moved artifacts.

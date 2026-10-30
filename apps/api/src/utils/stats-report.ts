@@ -8,7 +8,6 @@ import { readActivity, sumCells } from './stats-activity';
 
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
-const CALENDAR_DAYS = 53 * 7;
 
 const RANGES = {
   '24h': { buckets: 24, bucketMs: HOUR },
@@ -16,22 +15,6 @@ const RANGES = {
   '30d': { buckets: 30, bucketMs: DAY },
   '90d': { buckets: 90, bucketMs: DAY },
 } as const satisfies Record<StatsRange, { buckets: number; bucketMs: number }>;
-
-/** Runs and time saved per UTC day from `from` onwards, keyed by the day's start. */
-const readCalendar = async (db: Database, from: number) => {
-  const [saved, runs] = await Promise.all([
-    db.sql<{ rows: { day: Int; saved: Int }[] }>`
-      SELECT hour - hour % ${DAY} AS day, SUM(time_saved_ms) AS saved
-      FROM cache_events WHERE hour >= ${from} GROUP BY day`,
-    db.sql<{ rows: { day: Int; runs: Int }[] }>`
-      SELECT started_at - started_at % ${DAY} AS day, COUNT(*) AS runs
-      FROM runs WHERE started_at >= ${from} GROUP BY day`,
-  ]);
-  return {
-    saved: new Map(saved.rows.map((row) => [Number(row.day), Number(row.saved)])),
-    runs: new Map(runs.rows.map((row) => [Number(row.day), Number(row.runs)])),
-  };
-};
 
 const readAllTime = async (db: Database) => {
   const { rows } = await db.sql<{ rows: { saved: Int | null; since: Int | null }[] }>`
@@ -138,12 +121,10 @@ export const buildStats = async (
   const { buckets, bucketMs } = RANGES[range];
   const from = now - (now % bucketMs) - (buckets - 1) * bucketMs;
   const to = from + buckets * bucketMs;
-  const calendarFrom = now - (now % DAY) - (CALENDAR_DAYS - 1) * DAY;
 
   // One read covers this range and the equally long range before it, for the comparison.
-  const [cells, calendar, allTime, clients, storage] = await Promise.all([
+  const [cells, allTime, clients, storage] = await Promise.all([
     readActivity(db, from - (to - from), to, bucketMs),
-    readCalendar(db, calendarFrom),
     readAllTime(db),
     readClients(db, from, to),
     readStorage(db, from, to),
@@ -161,11 +142,6 @@ export const buildStats = async (
     totals: { current: sumCells(current), previous: sumCells(previous) },
     series: starts.map((start) => Object.assign({ start }, sumCells(byBucket.get(start)))),
     allTime,
-    calendar: timeline(calendarFrom, CALENDAR_DAYS, DAY).map((day) => ({
-      day,
-      runs: calendar.runs.get(day) ?? 0,
-      timeSavedMs: calendar.saved.get(day) ?? 0,
-    })),
     storage: { expirationHours, latest: storage.latest, history: storage.history },
     teams: teamActivity(byTeam, storage.teams, starts),
     clients,

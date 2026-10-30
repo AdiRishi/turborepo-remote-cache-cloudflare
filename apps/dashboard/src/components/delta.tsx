@@ -1,7 +1,17 @@
 import { cn } from 'cn';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
+import { relativeChange } from '@/lib/format';
+
 export type Change = { ratio: number } | { points: number };
+
+export const countChange = (current: number, previous: number): Change | null => {
+  const ratio = relativeChange(current, previous);
+  return ratio === null ? null : { ratio };
+};
+
+export const rateChange = (current: number | null, previous: number | null): Change | null =>
+  current === null || previous === null ? null : { points: current - previous };
 
 const TONES = {
   good: 'bg-positive/12 text-positive',

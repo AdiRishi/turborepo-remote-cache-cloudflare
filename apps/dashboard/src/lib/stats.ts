@@ -46,3 +46,18 @@ export const serverHitRate = (activity: Activity) => {
   const lookups = activity.remoteHits + activity.remoteMisses;
   return lookups === 0 ? null : activity.remoteHits / lookups;
 };
+
+export const savedPerRun = (activity: Activity) =>
+  activity.runs === 0 ? null : timeSaved(activity) / activity.runs;
+
+/**
+ * The share of all task time that caches replayed instead of running. Run time arrives with uploads, so
+ * a range with misses but no reported run time has no share.
+ */
+export const cachedShare = (activity: Activity) => {
+  const saved = timeSaved(activity);
+  if (activity.runTimeMs === 0 && activity.remoteMisses > 0) {
+    return null;
+  }
+  return saved + activity.runTimeMs === 0 ? null : saved / (saved + activity.runTimeMs);
+};
