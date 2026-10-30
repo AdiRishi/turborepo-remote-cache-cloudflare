@@ -122,7 +122,8 @@ export const recordTransfer = (
 
 /**
  * Stores the inventory that expiry took of the artifacts it kept. Two expiry runs in the same
- * millisecond describe the same store, so the second snapshot is dropped.
+ * millisecond describe the same store, so the second snapshot is dropped. The snapshot row goes in
+ * last, because readers take the latest one and expect all of its team rows to exist.
  */
 export const recordStorageSnapshot = async ({ takenAt, total, teams }: Inventory) => {
   try {
@@ -130,14 +131,14 @@ export const recordStorageSnapshot = async ({ takenAt, total, teams }: Inventory
     if (!db) {
       return;
     }
-    await db.sql`INSERT INTO storage_snapshots (taken_at, artifacts, bytes)
-      VALUES (${takenAt}, ${total.artifacts}, ${total.bytes})
-      ON CONFLICT (taken_at) DO NOTHING`;
     for (const [team, { artifacts, bytes }] of teams) {
       await db.sql`INSERT INTO storage_teams (taken_at, team, artifacts, bytes)
         VALUES (${takenAt}, ${team}, ${artifacts}, ${bytes})
         ON CONFLICT (taken_at, team) DO NOTHING`;
     }
+    await db.sql`INSERT INTO storage_snapshots (taken_at, artifacts, bytes)
+      VALUES (${takenAt}, ${total.artifacts}, ${total.bytes})
+      ON CONFLICT (taken_at) DO NOTHING`;
   } catch (error) {
     console.error('[stats]', error);
   }
