@@ -29,6 +29,7 @@ An open-source [Turborepo remote cache](https://turborepo.dev/docs/core-concepts
 - 💰 **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges [nothing for egress](https://www.cloudflare.com/learning/cloud/what-are-data-egress-fees/), so the bandwidth of every cache download is free.
 - 🌍 **Close to your builds.** The Worker runs in Cloudflare data centers around the world.
 - 💿 **Your choice of storage.** 🪣 [R2](https://adirishi.github.io/turborepo-remote-cache-cloudflare/storage/r2), 🔑 [KV](https://adirishi.github.io/turborepo-remote-cache-cloudflare/storage/kv), any [S3-compatible bucket](https://adirishi.github.io/turborepo-remote-cache-cloudflare/storage/s3), or anything with a [Files SDK](https://files-sdk.dev) adapter.
+- 📊 **A dashboard at the root.** See how much time the cache saves, its hit rate, what it stores, and which teams, CI providers, and coding agents use it.
 - 🧳 **Not only Cloudflare.** The same server builds for [Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda](https://adirishi.github.io/turborepo-remote-cache-cloudflare/deploy).
 
 ## ⚡️ Quick start

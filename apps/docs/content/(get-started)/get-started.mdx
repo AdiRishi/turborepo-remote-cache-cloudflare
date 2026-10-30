@@ -28,7 +28,7 @@ Then deploy with the button or with Wrangler.
 1. Select **Deploy to Cloudflare** and sign in to Cloudflare.
 2. Connect your GitHub or GitLab account. Cloudflare copies the repository into it and creates a Worker that builds from the copy.
 3. Keep the build command, `pnpm run build`, and the deploy command, `pnpm run deploy`. Both run from the repository root, because the server depends on other packages in the workspace.
-4. Wait for the first deploy to finish. Wrangler creates the `turborepo-cache` R2 bucket during that deploy.
+4. Wait for the first deploy to finish. Wrangler creates the `turborepo-cache` R2 bucket and the `turborepo-cache-stats` D1 database during that deploy.
 5. In the dashboard, go to **Workers & Pages**, select the `turborepo-remote-cache` Worker, and open **Settings** > **Variables and Secrets**. Add a secret named `TURBO_TOKEN` with your token as its value.
 
 Until `TURBO_TOKEN` is set, the server answers every cache request with a `500` error.
@@ -52,7 +52,7 @@ You need [Node.js](https://nodejs.org) 24 or later and [pnpm](https://pnpm.io). 
     pnpm run deploy
     ```
 
-    Wrangler opens a browser to sign you in to Cloudflare if you aren't signed in yet. On the first deploy, it creates the `turborepo-cache` R2 bucket. When it finishes, it prints the Worker's URL, such as `https://turborepo-remote-cache.<your-subdomain>.workers.dev`.
+    Wrangler opens a browser to sign you in to Cloudflare if you aren't signed in yet. On the first deploy, it creates the `turborepo-cache` R2 bucket and the `turborepo-cache-stats` D1 database for the [dashboard](/dashboard). When it finishes, it prints the Worker's URL, such as `https://turborepo-remote-cache.<your-subdomain>.workers.dev`.
 
 3. Set the token:
 
@@ -101,7 +101,7 @@ turbo run build
 turbo run build --cache=remote:r
 ```
 
-The second run prints `cache hit, replaying logs` for each task and ends with `FULL TURBO`. Every one of those hits came from your Worker.
+The second run prints `cache hit, replaying logs` for each task and ends with `FULL TURBO`. Every one of those hits came from your Worker. Open the Worker's URL in a browser to see them on the [dashboard](/dashboard).
 
 [Connect turbo](/connect-turbo) shows how to keep the URL and team in `turbo.json`, set up CI, and sign artifacts.
 
@@ -111,7 +111,7 @@ The repository's [CI workflow](https://github.com/AdiRishi/turborepo-remote-cach
 
 1. Delete the `release`, `docs-cloudflare`, and `docs-github-pages` jobs. They publish this project's releases and documentation.
 2. Add these repository secrets:
-    - `CLOUDFLARE_API_TOKEN`: a Cloudflare API token that can edit Workers and R2.
+    - `CLOUDFLARE_API_TOKEN`: a Cloudflare API token that can edit Workers, R2, and D1.
     - `CLOUDFLARE_ACCOUNT_ID`: your Cloudflare account ID.
     - `TURBO_TOKEN`: the Worker's token. The workflow sets it as the Worker's secret on every deploy.
 

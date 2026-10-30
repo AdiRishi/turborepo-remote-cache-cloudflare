@@ -39,6 +39,8 @@ deno run --allow-net --allow-read --allow-env .output/server/index.mjs
 
 The build in `apps/api/.output` is self-contained. To deploy it, copy that directory to the machine or image that runs it.
 
+The server keeps the [dashboard](/dashboard)'s stats in a SQLite file at `.data/db.sqlite`, relative to the directory it starts in. In a container, mount a volume there so the stats survive a restart.
+
 ## Configure the server
 
 Set the variables in the process environment:

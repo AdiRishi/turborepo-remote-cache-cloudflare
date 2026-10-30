@@ -1,0 +1,78 @@
+---
+title: Dashboard
+description: See how much time the cache saves, how often tasks hit it, what it stores, and who uses it, on a page the server serves at its root.
+---
+
+Open the server's URL in a browser, such as `https://turborepo-remote-cache.<your-subdomain>.workers.dev`. The page needs no token and refreshes every minute.
+
+## What it shows
+
+- **Time saved.** After every run, `turbo` reports each cache lookup, and a hit carries the duration of the task it replayed. The dashboard adds those durations up, for this server and for the local cache on each machine.
+- **Hit rate and where tasks came from.** Every task checks the cache on its own machine first, and asks the server only when that misses. A task that misses both runs.
+- **A year of saved time.** Time saved per day over the last twelve months, in UTC days.
+- **Storage.** The artifacts each team stores, by age and by size, and how the total has changed.
+- **Clients.** The CI providers that ran `turbo`, the AI coding agents that started runs, and the `turbo` versions and platforms that moved artifacts.
+- **Teams.** Runs, hit rate, time saved, storage, and downloads for each team, which is the `teamId` or `slug` that `turbo` sends.
+
+The range control at the top switches between the last 24 hours, 7 days, 30 days, and 90 days.
+
+:::warning
+The dashboard is public. Anyone with the server's URL can see your team names and usage. To restrict it, put `/` and `/stats` behind your own access control, such as [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/), and leave `/v8` open to `turbo`.
+:::
+
+## Where stats are stored
+
+The server records stats in a database through [Nitro's database layer](https://nitro.build/docs/database). It writes after each response, so stats never slow the cache down. Without a database, the cache works the same and the dashboard explains that stats are off.
+
+| Platform                                                                               | Database                                                                                                                                                              |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Cloudflare Workers](/get-started)                                                     | A D1 database bound as `STATS_DB`. Wrangler creates it, named `turborepo-cache-stats`, on the first deploy.                                                           |
+| [Node.js and Deno](/deploy/node)                                                       | Nitro's default SQLite database, a file at `.data/db.sqlite` in the working directory. Keep it on a persistent volume. For Bun, configure the `bun-sqlite` connector. |
+| [Vercel](/deploy/vercel), [Netlify](/deploy/netlify), [AWS Lambda](/deploy/aws-lambda) | None that works. Their file systems are read-only, so the SQLite default can't open its file and stats stay off. Configure a hosted database.                         |
+
+D1's free plan allows 100,000 rows written a day. The server writes about four rows per `turbo` run and one per artifact upload or download.
+
+### Configure a database
+
+Set the `default` connection in `apps/api/nitro.config.ts`. Use a hosted database on serverless platforms, whose file systems don't keep files between requests. For example, with [Turso](https://turso.tech):
+
+```ts title="apps/api/nitro.config.ts"
+export default defineConfig({
+    // ...
+    database: {
+        default: {
+            connector: 'libsql',
+            options: { url: process.env.TURSO_URL, authToken: process.env.TURSO_AUTH_TOKEN },
+        },
+    },
+});
+```
+
+The server creates its tables on first use. Its queries run on SQLite and PostgreSQL, so choose a SQLite, libSQL, PostgreSQL, Neon, or PGlite [connector](https://nitro.build/docs/database#connectors). MySQL isn't supported.
+
+:::tip
+Nitro writes the connector options into the build output. A value read from `process.env` here is read when you build, not when the server starts.
+:::
+
+### Turn stats off
+
+On Cloudflare, remove the `d1_databases` entry from `apps/api/wrangler.jsonc`. Elsewhere, set `database: {}` in `apps/api/nitro.config.ts`.
+
+## When storage numbers update
+
+The [expiry task](/retention) measures storage while it deletes expired artifacts, daily at 03:00 UTC. A new server shows no storage numbers until that first run. To measure now, run expiry on demand:
+
+```sh
+curl -X POST -H "Authorization: Bearer <your token>" \
+  https://<your server>/internal/delete-expired-objects
+```
+
+## Read the stats as JSON
+
+`GET /stats` returns everything the dashboard shows. It needs no token. The optional `range` query parameter is `24h`, `7d`, `30d`, or `90d`, and defaults to `30d`:
+
+```sh
+curl "https://<your server>/stats?range=7d"
+```
+
+The response has `"enabled": false` when the server has no stats database. Day buckets are UTC days, and every duration is in milliseconds.
