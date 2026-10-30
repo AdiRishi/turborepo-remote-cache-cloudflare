@@ -31,7 +31,7 @@ bun run ./.output/server/index.mjs
 ```sh
 NITRO_PRESET=deno_server pnpm build
 cd apps/api
-deno run --allow-net --allow-read --allow-env .output/server/index.mjs
+deno run --allow-net --allow-read --allow-env --allow-write=.data .output/server/index.mjs
 ```
 
 </Tab>
