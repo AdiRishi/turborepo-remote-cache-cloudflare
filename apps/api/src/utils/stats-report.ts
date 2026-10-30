@@ -122,13 +122,12 @@ export const buildStats = async (
   const from = now - (now % bucketMs) - (buckets - 1) * bucketMs;
   const to = from + buckets * bucketMs;
   const period = to - from;
-  const elapsedEnd = now - (now % HOUR) + HOUR;
 
-  // The last bucket is still in progress, so the previous range ends one period before the end of
-  // the current hour, not at `from`.
+  // The last bucket is still in progress, so the previous range ends one period before now, not at
+  // `from`. Hourly totals can't be split, so it includes the whole hour that contains its end.
   const [current, previous, allTime, clients, storage] = await Promise.all([
     readActivity(db, from, to, bucketMs),
-    readActivity(db, from - period, elapsedEnd - period, bucketMs),
+    readActivity(db, from - period, now - period, bucketMs),
     readAllTime(db),
     readClients(db, from, to),
     readStorage(db, from, to),
