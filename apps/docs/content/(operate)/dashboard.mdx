@@ -7,7 +7,7 @@ Open the server's URL in a browser, such as `https://turborepo-remote-cache.<you
 
 ## What it shows
 
-The range control at the top picks the last 24 hours, 7 days, 30 days, or 90 days. Every figure covers that range and shows its change from the range of the same length just before it. The line beside the control shows the time saved since the server recorded its first run.
+The range control at the top picks the last 24 hours, 7 days, 30 days, or 90 days. Every figure covers that range and shows its change from the same stretch of time one range earlier. The line beside the control shows the time saved since the server recorded its first run.
 
 - **Time saved.** After every run, `turbo` reports each cache lookup, and a hit carries the duration of the task it replayed. The dashboard adds those durations up, for this server and for the local cache on each machine.
 - **Share of task time from a cache.** Time saved, divided by time saved plus the run time of the tasks that ran. `turbo` reports that run time with each upload, so tasks that ran without uploading aren't counted.

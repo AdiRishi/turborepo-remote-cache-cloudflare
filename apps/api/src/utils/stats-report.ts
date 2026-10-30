@@ -121,16 +121,18 @@ export const buildStats = async (
   const { buckets, bucketMs } = RANGES[range];
   const from = now - (now % bucketMs) - (buckets - 1) * bucketMs;
   const to = from + buckets * bucketMs;
+  const period = to - from;
+  const elapsedEnd = now - (now % HOUR) + HOUR;
 
-  // One read covers this range and the equally long range before it, for the comparison.
-  const [cells, allTime, clients, storage] = await Promise.all([
-    readActivity(db, from - (to - from), to, bucketMs),
+  // The last bucket is still in progress, so the previous range ends one period before the end of
+  // the current hour, not at `from`.
+  const [current, previous, allTime, clients, storage] = await Promise.all([
+    readActivity(db, from, to, bucketMs),
+    readActivity(db, from - period, elapsedEnd - period, bucketMs),
     readAllTime(db),
     readClients(db, from, to),
     readStorage(db, from, to),
   ]);
-  const current = cells.filter((cell) => cell.bucket >= from);
-  const previous = cells.filter((cell) => cell.bucket < from);
   const byBucket = Map.groupBy(current, (cell) => cell.bucket);
   const byTeam = Map.groupBy(current, (cell) => cell.team);
   const starts = timeline(from, buckets, bucketMs);
