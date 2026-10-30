@@ -75,8 +75,8 @@ export interface Stats {
     /** When the first cache event was recorded, or `null` before there is one. */
     since: number | null;
   };
-  /** Runs per UTC day over the last 53 weeks, oldest first. */
-  calendar: { day: number; runs: number }[];
+  /** Runs and time saved per UTC day over the last 53 weeks, oldest first. */
+  calendar: { day: number; runs: number; timeSavedMs: number }[];
   storage: {
     expirationHours: number;
     latest: StorageSnapshot | null;

@@ -185,20 +185,6 @@ export const allTimeSaved = async (database: Database) => {
   return { timeSavedMs: row?.saved ?? 0, since: row?.since ?? null };
 };
 
-/** Runs per UTC day from `from` onwards, keyed by the day's start. */
-export const runsPerDay = async (database: Database, from: number) =>
-  new Map(
-    (
-      await query(
-        database,
-        v.object({ key: Key, runs: Numeric }),
-        `SELECT started_at - started_at % ${DAY} AS key, COUNT(*) AS runs
-        FROM runs WHERE started_at >= ? GROUP BY key`,
-        from,
-      )
-    ).map(({ key, runs: count }) => [key, count]),
-  );
-
 const ShareRow = v.object({ name: v.string(), count: Numeric });
 
 const shares = async (

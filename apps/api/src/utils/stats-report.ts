@@ -11,7 +11,6 @@ import {
   clientShares,
   DAY,
   emptyActivity,
-  runsPerDay,
   sumActivity,
 } from './stats-queries';
 import { latestSnapshot, storageHistory } from './storage-snapshots';
@@ -56,7 +55,7 @@ export const buildStats = async (
       activityBy(database, { from: from - (to - from), to: from, group: byBucket(bucketMs) }),
       activityBy(database, { from, to, group: byTeam }),
       allTimeSaved(database),
-      runsPerDay(database, calendarFrom),
+      activityBy(database, { from: calendarFrom, to, group: byBucket(DAY) }),
       latestSnapshot(database),
       storageHistory(database, { from, to }),
       clientShares(database, { from, to }),
@@ -72,10 +71,14 @@ export const buildStats = async (
       Object.assign({ start }, series.get(String(start)) ?? emptyActivity()),
     ),
     allTime,
-    calendar: timeline(calendarFrom, CALENDAR_DAYS, DAY).map((day) => ({
-      day,
-      runs: calendar.get(String(day)) ?? 0,
-    })),
+    calendar: timeline(calendarFrom, CALENDAR_DAYS, DAY).map((day) => {
+      const activity = calendar.get(String(day));
+      return {
+        day,
+        runs: activity?.runs ?? 0,
+        timeSavedMs: (activity?.localTimeSavedMs ?? 0) + (activity?.remoteTimeSavedMs ?? 0),
+      };
+    }),
     storage: { expirationHours, latest: storage.snapshot, history },
     teams: teamRows(teams, storage.teams),
     clients,

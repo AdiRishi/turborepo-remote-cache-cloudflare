@@ -137,38 +137,52 @@ const TURBO_USER_AGENT = /^turbo (?<version>\S+) \S+ (?<os>\S+) (?<arch>\S+)/u;
 type CacheEvent = Omit<components['schemas']['CacheEvent'], 'sessionId'> &
   Partial<Pick<components['schemas']['CacheEvent'], 'sessionId'>>;
 
+interface OutcomeRow {
+  hour: number;
+  team: string;
+  source: string;
+  outcome: string;
+  lookups: number;
+  time_saved_ms: number;
+}
+
+/** Sums a batch per source and outcome. Only hits save time: their duration is the task they replayed. */
+const outcomeRows = (
+  events: readonly CacheEvent[],
+  { hour, team }: Pick<OutcomeRow, 'hour' | 'team'>,
+) => {
+  const rows = new Map<string, OutcomeRow>();
+  for (const { source, event: outcome, duration = 0 } of events) {
+    const key = `${source}:${outcome}`;
+    const row = rows.get(key) ?? { hour, team, source, outcome, lookups: 0, time_saved_ms: 0 };
+    rows.set(key, row);
+    row.lookups += 1;
+    row.time_saved_ms += outcome === 'HIT' ? duration : 0;
+  }
+  return [...rows.values()];
+};
+
 /** Adds a batch from `POST /v8/artifacts/events` to the hourly totals, and records each new run. */
 export const recordCacheEvents = (
   event: H3Event,
   { team, ci, events }: { team: string; ci: string | undefined; events: readonly CacheEvent[] },
 ) => {
   const now = Date.now();
-  const outcomes = new Map<
-    string,
-    { source: string; outcome: string; lookups: number; timeSavedMs: number }
-  >();
-  for (const { source, event: outcome, duration = 0 } of events) {
-    const key = `${source}:${outcome}`;
-    const total = outcomes.get(key) ?? { source, outcome, lookups: 0, timeSavedMs: 0 };
-    outcomes.set(key, total);
-    total.lookups += 1;
-    total.timeSavedMs += outcome === 'HIT' ? duration : 0;
-  }
+  const outcomes = outcomeRows(events, { hour: hourOf(now), team });
   const sessions = new Set(events.flatMap(({ sessionId }) => (sessionId ? [sessionId] : [])));
-  const agent = agentName(event.req.headers.get('x-ai-agent'));
+  const run = {
+    team,
+    started_at: now,
+    // `turbo` names CI providers like `GITHUB_ACTIONS`; other clients may send `github-actions`.
+    ci: ci?.toUpperCase().replaceAll('-', '_') ?? '',
+    agent: agentName(event.req.headers.get('x-ai-agent')),
+  };
 
   inBackground(event, async (database) => {
     await insertRows(database, {
       table: 'cache_events',
       columns: ['hour', 'team', 'source', 'outcome', 'lookups', 'time_saved_ms'],
-      rows: [...outcomes.values()].map(({ source, outcome, lookups, timeSavedMs }) => ({
-        hour: hourOf(now),
-        team,
-        source,
-        outcome,
-        lookups,
-        time_saved_ms: timeSavedMs,
-      })),
+      rows: outcomes,
       onConflict: `ON CONFLICT (hour, team, source, outcome) DO UPDATE SET
         lookups = cache_events.lookups + excluded.lookups,
         time_saved_ms = cache_events.time_saved_ms + excluded.time_saved_ms`,
@@ -176,13 +190,7 @@ export const recordCacheEvents = (
     await insertRows(database, {
       table: 'runs',
       columns: ['session_id', 'team', 'started_at', 'ci', 'agent'],
-      rows: [...sessions].map((sessionId) => ({
-        session_id: sessionId,
-        team,
-        started_at: now,
-        ci: ci ?? '',
-        agent,
-      })),
+      rows: [...sessions].map((sessionId) => Object.assign({ session_id: sessionId }, run)),
       onConflict: 'ON CONFLICT (session_id) DO NOTHING',
     });
   });
@@ -216,7 +224,10 @@ export const recordTransfer = (
   });
 };
 
-/** Stores the inventory that expiry took of the artifacts it kept. */
+/**
+ * Stores the inventory that expiry took of the artifacts it kept. Two expiry runs in the same millisecond
+ * describe the same store, so the second snapshot is dropped.
+ */
 export const recordStorageSnapshot = (inventory: Inventory) =>
   withStatsDatabase(async (database) => {
     await insertRows(database, {
@@ -231,6 +242,7 @@ export const recordStorageSnapshot = (inventory: Inventory) =>
           sizes: JSON.stringify(inventory.sizes),
         },
       ],
+      onConflict: 'ON CONFLICT (taken_at) DO NOTHING',
     });
     await insertRows(database, {
       table: 'storage_teams',
@@ -241,5 +253,6 @@ export const recordStorageSnapshot = (inventory: Inventory) =>
         artifacts,
         bytes,
       })),
+      onConflict: 'ON CONFLICT (taken_at, team) DO NOTHING',
     });
   });

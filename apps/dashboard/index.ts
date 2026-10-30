@@ -1,4 +1,4 @@
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 
 /** The built dashboard: an `index.html` shell and its hashed assets. */
-export const clientDir = fileURLToPath(new URL('dist/client', import.meta.url));
+export const clientDir = join(import.meta.dirname, 'dist/client');

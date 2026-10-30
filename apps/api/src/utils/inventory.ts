@@ -6,7 +6,7 @@ const MILLISECONDS_PER_HOUR = 3_600_000;
 export const AGE_BOUNDS = [24, 72, 168, 336, 720, 1440, 2160] as const;
 
 /** Upper bounds of the size bins, in bytes. A last bin holds everything larger. */
-export const SIZE_BOUNDS = [10_240, 102_400, 1_048_576, 10_485_760, 104_857_600] as const;
+export const SIZE_BOUNDS = [10_000, 100_000, 1_000_000, 10_000_000, 100_000_000] as const;
 
 export interface Tally {
   artifacts: number;
