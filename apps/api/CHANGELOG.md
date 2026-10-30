@@ -1,5 +1,15 @@
 # turborepo-remote-cache-cf
 
+## 5.1.0
+
+### Minor Changes
+
+- [#1070](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/1070) [`25714a2`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/25714a263bfbe4e41159dcf09ae1c545b13d994e) Thanks [@AdiRishi](https://github.com/AdiRishi)! - Serve a usage dashboard at the server's root, in place of the redirect to the documentation. It shows the time the caches saved, hit rates, where tasks came from, storage, clients, and teams, over a range from the last 24 hours to the last 90 days, and compares each figure with the period before. `GET /stats` returns the same numbers as JSON. Both are public.
+  
+  The server records stats in a database through Nitro's database layer, after each response. Cloudflare builds bind a D1 database as `STATS_DB`, which Wrangler creates on the next deploy. Node.js and Deno builds use a SQLite file in `.data/`. Without a database, the cache works as before and the dashboard reports that stats are off.
+  
+  If you deploy from CI, give the Cloudflare API token permission to edit D1. Vercel and Netlify builds now run `turbo run build`, so the dashboard builds before the server.
+
 ## 5.0.0
 
 **Turborepo Remote Cache 5.0 is no longer Cloudflare-only.** We rebuilt the server on [Nitro](https://nitro.build) and [Files SDK](https://files-sdk.dev). It still deploys to Cloudflare Workers in one click, and the same code now builds for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda, with artifacts in R2, KV, any S3-compatible bucket, or anything Files SDK can talk to.
