@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Starts the built Worker under `wrangler dev`, runs the contract tests, checks that it serves the
-# dashboard, runs a real `turbo` round trip against it, and stops it again. Run it through
+# dashboard, runs the real `turbo` CLI against it, and stops it again. Run it through
 # `pnpm test:e2e` at the root, which builds first.
 set -eu
 
@@ -45,4 +45,4 @@ done
 CONTRACT_BASE_URL="$base_url" pnpm exec vitest run tests/contract
 curl --silent --fail "$base_url/" | grep --quiet '<title>Turborepo Remote Cache</title>'
 echo 'the Worker serves the dashboard at the root'
-sh e2e/turbo-roundtrip.sh "$base_url"
+E2E_BASE_URL="$base_url" pnpm exec vitest run --config e2e/vitest.config.ts

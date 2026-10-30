@@ -41,7 +41,7 @@ export default defineConfig({
       },
     },
     {
-      files: ['**/tests/**/*.ts'],
+      files: ['**/tests/**/*.ts', 'apps/api/e2e/**/*.ts'],
       rules: {
         'eslint/max-lines': 'off',
         'eslint/max-lines-per-function': 'off',

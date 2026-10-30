@@ -8,15 +8,12 @@
       "inputs": ["$TURBO_EXTENDS$", "!tests/**", "!e2e/**"],
       "outputs": [".output/**", ".wrangler/deploy/config.json"]
     },
-    "typecheck": {
-      "inputs": ["$TURBO_EXTENDS$", "!e2e/**"]
-    },
     "test": {
       "env": ["CONTRACT_BASE_URL"],
       "inputs": ["$TURBO_EXTENDS$", "!e2e/**"]
     },
     "test:e2e": {
-      "description": "Runs the contract tests and a real turbo round trip against the built Worker under wrangler dev.",
+      "description": "Runs the contract tests and real turbo builds against the built Worker under wrangler dev.",
       "dependsOn": ["build"],
       "cache": false
     }
