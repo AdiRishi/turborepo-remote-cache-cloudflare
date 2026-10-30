@@ -27,6 +27,11 @@ const AGENT_NAMES: Record<string, string> = {
   'claude-code': 'Claude Code',
   codex: 'Codex',
   cursor: 'Cursor',
+  claude: 'Claude Code',
+  'augment-cli': 'Augment',
+  'cursor-cli': 'Cursor CLI',
+  devin: 'Devin',
+  replit: 'Replit',
   'github-copilot': 'GitHub Copilot',
   copilot: 'GitHub Copilot',
   gemini: 'Gemini CLI',
@@ -87,7 +92,7 @@ function ShareBar({
                 style={{ background: shade(rank) }}
                 aria-hidden
               />
-              <span className={cn(mono && !GROUPS.has(name) && 'font-mono text-[13px]')}>
+              <span className={cn(mono && !GROUPS.has(name) && 'font-mono')}>
                 {GROUPS.get(name) ?? label(name)}
               </span>
               <span className="text-muted-foreground tabular-nums">
