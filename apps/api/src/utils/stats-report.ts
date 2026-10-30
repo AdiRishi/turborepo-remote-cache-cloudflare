@@ -1,15 +1,9 @@
-import type {
-  HistogramBin,
-  Share,
-  Stats,
-  StatsRange,
-} from '@turborepo-remote-cache/dashboard/contract';
+import type { Share, Stats, StatsRange } from '@turborepo-remote-cache/dashboard/contract';
 
 import type { Tally } from './inventory';
 import type { Database } from './stats';
-import type { Int } from './stats-activity';
+import type { Cell, Int } from './stats-activity';
 
-import { AGE_BOUNDS, SIZE_BOUNDS } from './inventory';
 import { readActivity, sumCells } from './stats-activity';
 
 const HOUR = 3_600_000;
@@ -95,27 +89,10 @@ const readStorage = async (db: Database, from: number, to: number) => {
   if (!snapshot) {
     return { latest: null, teams: new Map<string, Tally>(), history: [] };
   }
-  const [teams, bins] = await Promise.all([
-    db.sql<{ rows: { team: string; artifacts: Int; bytes: Int }[] }>`
-      SELECT team, artifacts, bytes FROM storage_teams WHERE taken_at = ${snapshot.taken_at}`,
-    db.sql<{ rows: { histogram: string; artifacts: Int; bytes: Int }[] }>`
-      SELECT histogram, artifacts, bytes FROM storage_bins
-      WHERE taken_at = ${snapshot.taken_at} ORDER BY histogram, bin`,
-  ]);
-  const histogram = (name: string, bounds: readonly number[]): HistogramBin[] =>
-    bins.rows
-      .filter((row) => row.histogram === name)
-      .map((row, index) => ({
-        below: bounds[index] ?? null,
-        artifacts: Number(row.artifacts),
-        bytes: Number(row.bytes),
-      }));
+  const teams = await db.sql<{ rows: { team: string; artifacts: Int; bytes: Int }[] }>`
+    SELECT team, artifacts, bytes FROM storage_teams WHERE taken_at = ${snapshot.taken_at}`;
   return {
-    latest: {
-      ...toSnapshot(snapshot),
-      ages: histogram('age', AGE_BOUNDS),
-      sizes: histogram('size', SIZE_BOUNDS),
-    },
+    latest: toSnapshot(snapshot),
     teams: new Map(
       teams.rows.map((row): [string, Tally] => [
         row.team,
@@ -128,6 +105,27 @@ const readStorage = async (db: Database, from: number, to: number) => {
 
 const timeline = (from: number, count: number, step: number) =>
   Array.from({ length: count }, (_, index) => from + index * step);
+
+/** Each team's activity in the range, what it had stored, and its time saved per bucket. */
+const teamActivity = (
+  byTeam: Map<string, Cell[]>,
+  stored: Map<string, Tally>,
+  starts: readonly number[],
+) =>
+  [...new Set([...byTeam.keys(), ...stored.keys()])].map((team) => {
+    const cells = byTeam.get(team) ?? [];
+    const saved = new Map(
+      cells.map(({ bucket, activity }) => [
+        bucket,
+        activity.localTimeSavedMs + activity.remoteTimeSavedMs,
+      ]),
+    );
+    return Object.assign({ team }, sumCells(cells), {
+      storedArtifacts: stored.get(team)?.artifacts ?? 0,
+      storedBytes: stored.get(team)?.bytes ?? 0,
+      timeSavedSeries: starts.map((start) => saved.get(start) ?? 0),
+    });
+  });
 
 export const buildStats = async (
   db: Database,
@@ -154,15 +152,14 @@ export const buildStats = async (
   const previous = cells.filter((cell) => cell.bucket < from);
   const byBucket = Map.groupBy(current, (cell) => cell.bucket);
   const byTeam = Map.groupBy(current, (cell) => cell.team);
+  const starts = timeline(from, buckets, bucketMs);
 
   return {
     enabled: true,
     generatedAt: now,
     range: { name: range, from, to, bucketMs },
     totals: { current: sumCells(current), previous: sumCells(previous) },
-    series: timeline(from, buckets, bucketMs).map((start) =>
-      Object.assign({ start }, sumCells(byBucket.get(start))),
-    ),
+    series: starts.map((start) => Object.assign({ start }, sumCells(byBucket.get(start)))),
     allTime,
     calendar: timeline(calendarFrom, CALENDAR_DAYS, DAY).map((day) => ({
       day,
@@ -170,12 +167,7 @@ export const buildStats = async (
       timeSavedMs: calendar.saved.get(day) ?? 0,
     })),
     storage: { expirationHours, latest: storage.latest, history: storage.history },
-    teams: [...new Set([...byTeam.keys(), ...storage.teams.keys()])].map((team) =>
-      Object.assign({ team }, sumCells(byTeam.get(team)), {
-        storedArtifacts: storage.teams.get(team)?.artifacts ?? 0,
-        storedBytes: storage.teams.get(team)?.bytes ?? 0,
-      }),
-    ),
+    teams: teamActivity(byTeam, storage.teams, starts),
     clients,
   };
 };

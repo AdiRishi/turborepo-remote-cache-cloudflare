@@ -34,6 +34,8 @@ export interface TeamActivity extends Activity {
   /** Artifacts the team had stored at the latest storage snapshot. */
   storedArtifacts: number;
   storedBytes: number;
+  /** Time saved in each bucket of the range, aligned with `Stats.series`. */
+  timeSavedSeries: number[];
 }
 
 export interface Share {
@@ -41,21 +43,10 @@ export interface Share {
   count: number;
 }
 
-export interface HistogramBin {
-  /** The exclusive upper bound of the bin, or `null` for the last, unbounded bin. */
-  below: number | null;
-  artifacts: number;
-  bytes: number;
-}
-
 export interface StorageSnapshot {
   takenAt: number;
   artifacts: number;
   bytes: number;
-  /** Artifacts by age, with bounds in hours. */
-  ages: HistogramBin[];
-  /** Artifacts by size, with bounds in bytes. */
-  sizes: HistogramBin[];
 }
 
 export interface Stats {
@@ -80,7 +71,7 @@ export interface Stats {
   storage: {
     expirationHours: number;
     latest: StorageSnapshot | null;
-    history: Pick<StorageSnapshot, 'takenAt' | 'artifacts' | 'bytes'>[];
+    history: StorageSnapshot[];
   };
   teams: TeamActivity[];
   clients: {

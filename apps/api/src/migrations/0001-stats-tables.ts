@@ -41,14 +41,6 @@ const migration: Migration = async (db) => {
     bytes BIGINT NOT NULL,
     PRIMARY KEY (taken_at, team)
   )`;
-  await db.sql`CREATE TABLE IF NOT EXISTS storage_bins (
-    taken_at BIGINT NOT NULL,
-    histogram TEXT NOT NULL,
-    bin INTEGER NOT NULL,
-    artifacts BIGINT NOT NULL,
-    bytes BIGINT NOT NULL,
-    PRIMARY KEY (taken_at, histogram, bin)
-  )`;
 };
 
 export default migration;

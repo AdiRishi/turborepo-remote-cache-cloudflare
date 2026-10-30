@@ -79,6 +79,10 @@ describe('cache events', () => {
         runs: 1,
         ciRuns: 0,
       });
+    const { series, teams } = await readStats();
+    const saved = teams.find((row) => row.team === team)?.timeSavedSeries;
+    expect(saved).toHaveLength(series.length);
+    expect(saved?.reduce((sum, ms) => sum + ms, 0)).toBe(2000);
   });
 
   test('splits runs by CI provider and AI coding agent', async () => {
@@ -153,7 +157,7 @@ describe('storage snapshots', () => {
       storedArtifacts: 2,
       storedBytes: 12,
     });
-    expect(stats.storage.latest?.ages[0]?.artifacts).toBeGreaterThanOrEqual(2);
+    expect(stats.storage.latest?.artifacts).toBeGreaterThanOrEqual(2);
     expect(stats.storage.history.at(-1)?.takenAt).toBe(stats.storage.latest?.takenAt);
   });
 });

@@ -114,7 +114,7 @@ export const recordTransfer = (
  * Stores the inventory that expiry took of the artifacts it kept. Two expiry runs in the same
  * millisecond describe the same store, so the second snapshot is dropped.
  */
-export const recordStorageSnapshot = async ({ takenAt, total, teams, ages, sizes }: Inventory) => {
+export const recordStorageSnapshot = async ({ takenAt, total, teams }: Inventory) => {
   try {
     const db = await useStatsDatabase();
     if (!db) {
@@ -127,16 +127,6 @@ export const recordStorageSnapshot = async ({ takenAt, total, teams, ages, sizes
       await db.sql`INSERT INTO storage_teams (taken_at, team, artifacts, bytes)
         VALUES (${takenAt}, ${team}, ${artifacts}, ${bytes})
         ON CONFLICT (taken_at, team) DO NOTHING`;
-    }
-    for (const [histogram, bins] of [
-      ['age', ages],
-      ['size', sizes],
-    ] as const) {
-      for (const [bin, { artifacts, bytes }] of bins.entries()) {
-        await db.sql`INSERT INTO storage_bins (taken_at, histogram, bin, artifacts, bytes)
-          VALUES (${takenAt}, ${histogram}, ${bin}, ${artifacts}, ${bytes})
-          ON CONFLICT (taken_at, histogram, bin) DO NOTHING`;
-      }
     }
   } catch (error) {
     console.error('[stats]', error);

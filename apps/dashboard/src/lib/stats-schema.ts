@@ -24,8 +24,6 @@ const Activity = v.object({
 
 const Share = v.object({ name: v.string(), count });
 
-const HistogramBin = v.object({ below: v.nullable(count), artifacts: count, bytes: count });
-
 const Snapshot = v.object({ takenAt: count, artifacts: count, bytes: count });
 
 /** Parses the body of `GET /stats`, which crosses the network into the page. */
@@ -46,13 +44,7 @@ export const StatsResponseSchema = v.variant('enabled', [
     calendar: v.array(v.object({ day: count, runs: count, timeSavedMs: count })),
     storage: v.object({
       expirationHours: count,
-      latest: v.nullable(
-        v.object({
-          ...Snapshot.entries,
-          ages: v.array(HistogramBin),
-          sizes: v.array(HistogramBin),
-        }),
-      ),
+      latest: v.nullable(Snapshot),
       history: v.array(Snapshot),
     }),
     teams: v.array(
@@ -61,6 +53,7 @@ export const StatsResponseSchema = v.variant('enabled', [
         team: v.string(),
         storedArtifacts: count,
         storedBytes: count,
+        timeSavedSeries: v.array(count),
       }),
     ),
     clients: v.object({

@@ -42,7 +42,7 @@ const sumActivity = (activities: readonly Activity[]) =>
     emptyActivity(),
   );
 
-interface Cell {
+export interface Cell {
   bucket: number;
   team: string;
   activity: Activity;
