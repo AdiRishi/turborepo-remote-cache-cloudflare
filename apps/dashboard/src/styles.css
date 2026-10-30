@@ -34,6 +34,10 @@
     --color-local: var(--local);
     --color-miss: var(--miss);
     --color-grid: var(--grid);
+    --color-positive: var(--positive);
+    --color-negative: var(--negative);
+
+    --animate-ping-once: ping-once 1.4s cubic-bezier(0, 0, 0.2, 1);
 
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
@@ -63,16 +67,14 @@
     --ring: #cc8400;
     --radius: 0.5rem;
 
-    /* Amber always means "replayed by this server". The pair passes CVD separation and 3:1 contrast. */
+    /* Amber is reserved for this server. Everything else is ink, so the server's share stands alone. */
     --remote: #c27c00;
-    --local: #3b6fd8;
-    --miss: #ccd1d8;
+    --local: #6b7280;
+    --miss: #c9ced6;
     --grid: #eceef1;
     --mark: #f2a30f;
-    --neutral: color-mix(in oklab, var(--foreground) 62%, var(--background));
-
-    --ts-chart-1: var(--remote);
-    --ts-chart-2: var(--local);
+    --positive: #15803d;
+    --negative: #c4321f;
 }
 
 .dark {
@@ -93,13 +95,13 @@
     --input: #23262c;
     --ring: #ffb224;
 
-    /* The brand amber sits above the categorical lightness band; it is kept for identity, and it still
-     clears CVD separation (ΔE 30) and contrast against this surface. */
     --remote: #ffb224;
-    --local: #5a8dee;
-    --miss: #30343b;
+    --local: #9aa0aa;
+    --miss: #3a3e46;
     --grid: #1a1d22;
     --mark: #ffb224;
+    --positive: #4ade80;
+    --negative: #ff6b57;
 }
 
 @layer base {
@@ -121,4 +123,21 @@
     ::selection {
         background: rgb(255 178 36 / 0.3);
     }
+}
+
+@keyframes ping-once {
+    to {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+/* Only named elements, such as team rows, animate between ranges; the rest of the page stays live. */
+:root {
+    view-transition-name: none;
+}
+
+::view-transition-group(*) {
+    animation-duration: 450ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
 }

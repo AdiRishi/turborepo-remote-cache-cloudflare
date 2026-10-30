@@ -22,7 +22,7 @@ import { hitRate, tasks, timeSaved } from '@/lib/stats';
 
 import type { TeamActivity } from '../../contract';
 
-import { Section } from './chart-parts';
+import { Sparkline } from './charts/sparkline';
 
 const features = tableFeatures({
   rowSortingFeature,
@@ -31,6 +31,8 @@ const features = tableFeatures({
 });
 
 const column = createColumnHelper<typeof features, TeamActivity>();
+
+const ARIA_SORT = { asc: 'ascending', desc: 'descending' } as const;
 
 const numeric = { sortFn: 'basic', sortDescFirst: true } as const;
 
@@ -54,20 +56,19 @@ const columns = column.columns([
       return rate === null ? (
         <span className="text-muted-foreground">–</span>
       ) : (
-        <span
-          className="inline-flex items-center gap-2.5"
-          title={`${formatCount(tasks(info.row.original))} tasks`}
-        >
-          <span className="h-1 w-14 rounded-full bg-grid max-sm:hidden">
-            <span
-              className="block h-full rounded-full bg-remote"
-              style={{ width: `${rate * 100}%` }}
-            />
-          </span>
-          {formatPercent(rate)}
-        </span>
+        <span title={`${formatCount(tasks(info.row.original))} tasks`}>{formatPercent(rate)}</span>
       );
     },
+  }),
+  column.display({
+    id: 'trend',
+    header: () => <span className="sr-only">Time saved over the range</span>,
+    cell: (info) => (
+      <Sparkline
+        values={info.row.original.timeSavedSeries}
+        className="ml-auto h-5 w-24 text-muted-foreground"
+      />
+    ),
   }),
   column.accessor((team) => timeSaved(team), {
     id: 'timeSaved',
@@ -96,11 +97,9 @@ export function TeamsTable({ teams }: { teams: readonly TeamActivity[] }) {
   });
 
   return (
-    <Section
-      title="Teams"
-      description="Each team's activity in this period. A team is the teamId or slug that turbo sends."
-    >
-      <Table className="min-w-[620px] tabular-nums">
+    <section>
+      <h2 className="mb-2 text-sm font-medium">Teams</h2>
+      <Table className="min-w-[720px] tabular-nums">
         <TableHeader>
           {table.getHeaderGroups().map((group) => (
             <TableRow key={group.id} className="hover:bg-transparent">
@@ -111,18 +110,22 @@ export function TeamsTable({ teams }: { teams: readonly TeamActivity[] }) {
                     key={header.id}
                     className="px-0 first:pl-0 [&:not(:first-child)]:text-right"
                     aria-sort={
-                      sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : 'none'
+                      header.column.getCanSort() ? (sorted ? ARIA_SORT[sorted] : 'none') : undefined
                     }
                   >
-                    <button
-                      type="button"
-                      onClick={header.column.getToggleSortingHandler()}
-                      className="inline-flex items-center gap-1 rounded-sm font-normal text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:outline-none"
-                    >
+                    {header.column.getCanSort() ? (
+                      <button
+                        type="button"
+                        onClick={header.column.getToggleSortingHandler()}
+                        className="inline-flex items-center gap-1 rounded-sm font-normal text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:outline-none"
+                      >
+                        <table.FlexRender header={header} />
+                        {sorted === 'asc' ? <ArrowUp className="size-3.5" /> : null}
+                        {sorted === 'desc' ? <ArrowDown className="size-3.5" /> : null}
+                      </button>
+                    ) : (
                       <table.FlexRender header={header} />
-                      {sorted === 'asc' ? <ArrowUp className="size-3.5" /> : null}
-                      {sorted === 'desc' ? <ArrowDown className="size-3.5" /> : null}
-                    </button>
+                    )}
                   </TableHead>
                 );
               })}
@@ -131,7 +134,11 @@ export function TeamsTable({ teams }: { teams: readonly TeamActivity[] }) {
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
+            <TableRow
+              key={row.id}
+              // Rows glide to their new order when the range changes.
+              style={{ viewTransitionName: CSS.escape(`team-${row.original.team}`) }}
+            >
               {row.getAllCells().map((cell) => (
                 <TableCell
                   key={cell.id}
@@ -144,6 +151,6 @@ export function TeamsTable({ teams }: { teams: readonly TeamActivity[] }) {
           ))}
         </TableBody>
       </Table>
-    </Section>
+    </section>
   );
 }

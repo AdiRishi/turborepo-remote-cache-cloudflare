@@ -85,11 +85,12 @@ export function LoadError({ error, onRetry }: { error: unknown; onRetry: () => v
 
 export function Loading() {
   return (
-    <div className="pt-16 pb-14" aria-busy="true" aria-label="Loading stats">
-      <Skeleton className="h-4 w-48" />
-      <Skeleton className="mt-5 h-28 w-[min(32rem,80%)]" />
-      <Skeleton className="mt-9 h-5 w-[min(40rem,90%)]" />
-      <Skeleton className="mt-10 h-44 w-full" />
+    <div className="pt-6 pb-14" aria-busy="true" aria-label="Loading stats">
+      <Skeleton className="h-14 w-full" />
+      <Skeleton className="mt-4 h-4 w-56" />
+      <Skeleton className="mt-20 h-32 w-[min(30rem,80%)]" />
+      <Skeleton className="mt-16 h-2 w-full" />
+      <Skeleton className="mt-6 h-24 w-full" />
     </div>
   );
 }

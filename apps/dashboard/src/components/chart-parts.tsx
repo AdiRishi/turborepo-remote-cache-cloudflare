@@ -62,31 +62,3 @@ export function TooltipCard({ title, rows }: { title: string; rows: readonly Too
     </div>
   );
 }
-
-/** A section of the page: a plain heading, an optional one-line description, and its content. */
-export function Section({
-  title,
-  description,
-  aside,
-  children,
-  className,
-}: {
-  title: string;
-  description?: ReactNode;
-  aside?: ReactNode;
-  children?: ReactNode;
-  className?: string;
-}) {
-  return (
-    <section className={cn('border-t pt-8 pb-14', className)}>
-      <div className="mb-7 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
-        <div className="max-w-[62ch]">
-          <h2 className="text-xl font-semibold tracking-[-0.02em]">{title}</h2>
-          {description ? <p className="mt-1.5 text-muted-foreground">{description}</p> : null}
-        </div>
-        {aside}
-      </div>
-      {children}
-    </section>
-  );
-}

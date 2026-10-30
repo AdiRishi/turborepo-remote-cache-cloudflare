@@ -40,3 +40,9 @@ export const hitRate = (activity: Activity) => {
   const total = tasks(activity);
   return total === 0 ? null : cacheHits(activity) / total;
 };
+
+/** The share of lookups that reached this server and found the artifact. */
+export const serverHitRate = (activity: Activity) => {
+  const lookups = activity.remoteHits + activity.remoteMisses;
+  return lookups === 0 ? null : activity.remoteHits / lookups;
+};

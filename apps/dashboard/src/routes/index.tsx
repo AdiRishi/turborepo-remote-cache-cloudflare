@@ -9,7 +9,6 @@ import * as v from 'valibot';
 import { Dashboard } from '@/components/dashboard';
 import { SiteHeader } from '@/components/site-header';
 import { LoadError, Loading, NoActivity, StatsDisabled } from '@/components/states';
-import { formatAge } from '@/lib/format';
 import { statsQuery } from '@/lib/stats';
 
 import { STATS_RANGES } from '../../contract';
@@ -29,29 +28,18 @@ export const Route = createFileRoute('/')({
   errorComponent: ErrorPage,
 });
 
-function PageFrame({ footer, children }: { footer?: ReactNode; children: ReactNode }) {
-  const { range } = Route.useSearch();
-  const navigate = Route.useNavigate();
+function PageFrame({ updatedAt, children }: { updatedAt?: number; children: ReactNode }) {
   return (
     <div className="min-h-dvh">
-      <SiteHeader
-        range={range}
-        onRangeChange={(next) => {
-          void navigate({ search: { range: next } });
-        }}
-      />
+      <SiteHeader updatedAt={updatedAt} />
       <main className="mx-auto max-w-6xl px-5 sm:px-8">{children}</main>
-      {footer ? (
-        <footer className="mx-auto max-w-6xl px-5 sm:px-8">
-          <p className="border-t py-8 text-sm text-muted-foreground">{footer}</p>
-        </footer>
-      ) : null}
     </div>
   );
 }
 
 function DashboardPage() {
   const { range } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const { data } = useSuspenseQuery(statsQuery(range));
   if (!data.enabled) {
     return (
@@ -61,8 +49,17 @@ function DashboardPage() {
     );
   }
   return (
-    <PageFrame footer={`Updated ${formatAge(data.generatedAt)}. The page refreshes every minute.`}>
-      {data.allTime.since === null ? <NoActivity /> : <Dashboard stats={data} />}
+    <PageFrame updatedAt={data.generatedAt}>
+      {data.allTime.since === null ? (
+        <NoActivity />
+      ) : (
+        <Dashboard
+          stats={data}
+          onRangeChange={(next) => {
+            void navigate({ search: { range: next }, viewTransition: true });
+          }}
+        />
+      )}
     </PageFrame>
   );
 }

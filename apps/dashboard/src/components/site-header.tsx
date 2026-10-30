@@ -1,60 +1,45 @@
 import { BookOpen, Moon, Sun } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { RANGE_LABELS } from '@/lib/stats';
+import { formatAge } from '@/lib/format';
 import { useTheme } from '@/lib/theme';
 
-import type { StatsRange } from '../../contract';
-
-import { STATS_RANGES } from '../../contract';
 import { BrandMark, Lockup } from './brand';
 
 const DOCS_URL = 'https://turborepo-remote-cache.dev';
 
-const isRange = (value: string): value is StatsRange =>
-  STATS_RANGES.some((range) => range === value);
+/** A dot that pings once each time fresh stats arrive. */
+function LiveDot({ updatedAt }: { updatedAt: number }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="relative flex size-7 items-center justify-center" tabIndex={0}>
+          <span
+            key={updatedAt}
+            className="absolute size-2 rounded-full bg-remote motion-safe:animate-ping-once"
+            aria-hidden
+          />
+          <span className="size-2 rounded-full bg-remote" aria-hidden />
+          <span className="sr-only">Updated {formatAge(updatedAt)}</span>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>Updated {formatAge(updatedAt)}</TooltipContent>
+    </Tooltip>
+  );
+}
 
-export function SiteHeader({
-  range,
-  onRangeChange,
-}: {
-  range: StatsRange;
-  onRangeChange: (range: StatsRange) => void;
-}) {
+export function SiteHeader({ updatedAt }: { updatedAt?: number }) {
   const { theme, toggle } = useTheme();
   return (
-    <header className="sticky top-0 z-20 border-b bg-background/85 backdrop-blur-md">
+    <header className="sticky top-0 z-20 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-5 sm:px-8">
         <a href="/" className="flex items-center gap-3 text-foreground">
           <Lockup className="hidden h-[18px] w-auto sm:block" />
           <BrandMark className="size-5 sm:hidden" />
         </a>
-        <ToggleGroup
-          type="single"
-          size="sm"
-          value={range}
-          onValueChange={(value) => {
-            if (isRange(value)) {
-              onRangeChange(value);
-            }
-          }}
-          aria-label="Time range"
-          className="ml-auto"
-        >
-          {STATS_RANGES.map((option) => (
-            <ToggleGroupItem
-              key={option}
-              value={option}
-              aria-label={RANGE_LABELS[option]}
-              className="px-2.5 text-muted-foreground data-[state=on]:text-foreground"
-            >
-              {option}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-        <div className="flex items-center gap-1">
+        <div className="ml-auto flex items-center gap-1">
+          {updatedAt === undefined ? null : <LiveDot updatedAt={updatedAt} />}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon-sm" onClick={toggle}>

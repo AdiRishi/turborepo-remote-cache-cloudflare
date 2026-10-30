@@ -1,29 +1,53 @@
-import type { Stats } from '../../contract';
+import { RANGE_LABELS, tasks } from '@/lib/stats';
 
-import { Section } from './chart-parts';
-import { TimeSavedCalendar } from './charts/calendar';
+import type { Stats, StatsRange } from '../../contract';
+
 import { Clients } from './clients';
-import { Hero } from './hero';
-import { KeyFigures } from './key-figures';
+import { RangeControl } from './range-control';
 import { Storage } from './storage';
-import { TaskSources } from './task-sources';
+import { TaskBreakdown } from './task-breakdown';
 import { TeamsTable } from './teams-table';
+import { Headline, Timeline } from './time-saved';
+import { YearStrip } from './year-strip';
 
-export function Dashboard({ stats }: { stats: Stats }) {
+export function Dashboard({
+  stats,
+  onRangeChange,
+}: {
+  stats: Stats;
+  onRangeChange: (range: StatsRange) => void;
+}) {
+  const { current } = stats.totals;
   return (
-    <>
-      <Hero stats={stats} />
-      <KeyFigures stats={stats} />
-      <TaskSources stats={stats} />
-      <Section
-        title="A year of saved time"
-        description="Time the caches saved each day over the last twelve months, in UTC days."
-      >
-        <TimeSavedCalendar calendar={stats.calendar} />
-      </Section>
-      <Storage stats={stats} />
-      <Clients stats={stats} />
-      {stats.teams.length > 0 ? <TeamsTable teams={stats.teams} /> : null}
-    </>
+    <div className="pt-6 pb-24">
+      <YearStrip
+        stats={stats}
+        control={<RangeControl range={stats.range.name} onChange={onRangeChange} />}
+      />
+      <div className="mt-16 sm:mt-20">
+        <Headline stats={stats} />
+      </div>
+      <div className="mt-12">
+        {tasks(current) === 0 ? (
+          <p className="text-muted-foreground">
+            No tasks used the cache in the {RANGE_LABELS[stats.range.name].toLowerCase()}.
+          </p>
+        ) : (
+          <TaskBreakdown current={current} previous={stats.totals.previous} />
+        )}
+      </div>
+      <div className="mt-20">
+        <Timeline stats={stats} />
+      </div>
+      {stats.teams.length > 1 ? (
+        <div className="mt-20">
+          <TeamsTable teams={stats.teams} />
+        </div>
+      ) : null}
+      <div className="mt-20 grid gap-x-16 gap-y-12 border-t pt-10 lg:grid-cols-[1fr_2fr]">
+        <Storage stats={stats} />
+        <Clients stats={stats} />
+      </div>
+    </div>
   );
 }

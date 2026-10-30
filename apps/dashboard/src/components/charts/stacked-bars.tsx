@@ -5,13 +5,13 @@ import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
 import { useMemo } from 'react';
 
-import { formatBucket, formatPercent } from '@/lib/format';
+import { formatBucket } from '@/lib/format';
 
 import type { ActivityPoint } from '../../../contract';
 import type { SeriesName } from './series';
 
 import { TooltipCard } from '../chart-parts';
-import { GRID, SERIES } from './series';
+import { SERIES } from './series';
 
 export interface Layer {
   series: SeriesName;
@@ -19,8 +19,8 @@ export interface Layer {
 }
 
 /**
- * Bars per time bucket, one stacked segment per layer, drawn bottom-up in layer order. With `share`,
- * every bar is scaled to 100% so the chart shows each layer's share of the bucket.
+ * Bars per time bucket, one stacked segment per layer, drawn bottom-up in layer order. The tooltip
+ * carries the values, so the chart draws no value axis.
  */
 export function StackedBars({
   points,
@@ -29,8 +29,6 @@ export function StackedBars({
   height,
   formatValue,
   ariaLabel,
-  showAxis = true,
-  share = false,
 }: {
   points: readonly ActivityPoint[];
   bucketMs: number;
@@ -38,8 +36,6 @@ export function StackedBars({
   height: number;
   formatValue: (value: number) => string;
   ariaLabel: string;
-  showAxis?: boolean;
-  share?: boolean;
 }) {
   const definition = useMemo(() => {
     const rows = points.flatMap((point) =>
@@ -56,7 +52,7 @@ export function StackedBars({
           x: 'start',
           y: 'value',
           color: 'series',
-          layout: stack(share ? { order, offset: 'normalize' } : { order }),
+          layout: stack({ order }),
           maxThickness: 22,
           radius: { end: 3 },
           stroke: 'var(--background)',
@@ -66,31 +62,19 @@ export function StackedBars({
       scales: {
         x: {
           scale: () => scaleBand<number>().padding(0.22),
-          axis: showAxis
-            ? {
-                line: false,
-                ticks: { size: 0, format: (start: number) => formatBucket(start, bucketMs) },
-                tickLabels: { thin: { minGap: 28, priority: 'ends' } },
-              }
-            : false,
+          axis: {
+            line: false,
+            ticks: { size: 0, format: (start: number) => formatBucket(start, bucketMs) },
+            tickLabels: { thin: { minGap: 36, priority: 'ends' } },
+          },
         },
-        y: {
-          scale: scaleLinear,
-          nice: 4,
-          grid: GRID,
-          axis: showAxis
-            ? {
-                line: false,
-                ticks: { size: 0, count: 4, format: share ? formatPercent : formatValue },
-              }
-            : false,
-        },
+        y: { scale: scaleLinear, axis: false },
       },
       color: { domain: order, range: order.map((series) => SERIES[series].color) },
       focus: 'group-x',
       tooltip,
     });
-  }, [points, layers, bucketMs, formatValue, showAxis, share]);
+  }, [points, layers, bucketMs]);
 
   return (
     <Chart
@@ -105,7 +89,6 @@ export function StackedBars({
         }
         const valueOf = (layer: Layer) =>
           focused.find((point) => point.datum.series === layer.series)?.datum.value ?? 0;
-        const total = layers.reduce((sum, layer) => sum + valueOf(layer), 0);
         return (
           <TooltipCard
             title={formatBucket(first.datum.start, bucketMs, { long: true })}
@@ -113,7 +96,6 @@ export function StackedBars({
               color: SERIES[layer.series].color,
               label: SERIES[layer.series].label,
               value: formatValue(valueOf(layer)),
-              detail: share && total > 0 ? formatPercent(valueOf(layer) / total) : undefined,
             }))}
           />
         );
