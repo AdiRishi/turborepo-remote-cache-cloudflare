@@ -90,14 +90,6 @@ describe('routing', () => {
     expect((await readError(response)).code).toBe('not_found');
   });
 
-  test('redirects the root to the documentation', async () => {
-    const response = await send('/', { redirect: 'manual' });
-    expect(response.status).toBe(302);
-    expect(response.headers.get('location')).toBe(
-      'https://adirishi.github.io/turborepo-remote-cache-cloudflare',
-    );
-  });
-
   test('serves the health check without authentication', async () => {
     const response = await send('/ping');
     expect(response.status).toBe(200);

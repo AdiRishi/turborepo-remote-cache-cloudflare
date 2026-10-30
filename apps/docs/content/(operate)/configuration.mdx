@@ -22,6 +22,7 @@ Bindings exist only on Cloudflare Workers.
 | ---------- | ------------ | -------------------------------------------------------------------- |
 | `KV_STORE` | KV namespace | Stores artifacts in [Workers KV](/storage/kv). Wins over `R2_STORE`. |
 | `R2_STORE` | R2 bucket    | Stores artifacts in [R2](/storage/r2).                               |
+| `STATS_DB` | D1 database  | Stores the stats for the [dashboard](/dashboard). Optional.          |
 
 ## S3 variables
 
@@ -52,11 +53,12 @@ A [custom adapter](/storage/custom-adapter) can read any other variable you defi
 
 ## Endpoints
 
-| Endpoint                                | Auth         | Description                                                                        |
-| --------------------------------------- | ------------ | ---------------------------------------------------------------------------------- |
-| `GET /`                                 | None         | Redirects to this documentation.                                                   |
-| `GET /ping`                             | None         | Answers `pong`. Use it as a health check.                                          |
-| `/v8/artifacts/...`                     | Bearer token | The Remote Cache API. The [API reference](/api) documents every operation.         |
-| `POST /internal/delete-expired-objects` | Bearer token | Runs the expiry task. See [Retention and expiry](/retention#run-expiry-on-demand). |
+| Endpoint                                | Auth         | Description                                                                                |
+| --------------------------------------- | ------------ | ------------------------------------------------------------------------------------------ |
+| `GET /`                                 | None         | Serves the [dashboard](/dashboard).                                                        |
+| `GET /stats`                            | None         | Returns the dashboard's stats as JSON. See [Dashboard](/dashboard#read-the-stats-as-json). |
+| `GET /ping`                             | None         | Answers `pong`. Use it as a health check.                                                  |
+| `/v8/artifacts/...`                     | Bearer token | The Remote Cache API. The [API reference](/api) documents every operation.                 |
+| `POST /internal/delete-expired-objects` | Bearer token | Runs the expiry task. See [Retention and expiry](/retention#run-expiry-on-demand).         |
 
 Responses under `/v8` allow requests from any origin, so a browser can call the API. Errors return a JSON body with a `code` and a `message`, such as `{"code":"unauthorized","message":"Missing or invalid bearer token"}`.

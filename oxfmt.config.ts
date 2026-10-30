@@ -21,6 +21,7 @@ export default defineConfig({
     '**/CHANGELOG.md',
     '**/worker-configuration.d.ts',
     'packages/spec/turborepo.*',
+    'apps/dashboard/src/routeTree.gen.ts',
   ],
   overrides: [
     {

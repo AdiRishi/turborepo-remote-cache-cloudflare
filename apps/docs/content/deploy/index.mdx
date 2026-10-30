@@ -23,6 +23,8 @@ An artifact over the limit can't be uploaded, so its task never hits the remote 
 
 Where the table says **None**, call `POST /internal/delete-expired-objects` from a scheduler once a day. [Retention and expiry](/retention#run-expiry-from-a-scheduler) shows how.
 
+Every build serves the [dashboard](/dashboard). Its stats need a database: Cloudflare Workers and long-running Node.js and Deno servers have one by default, and the serverless platforms need one configured.
+
 The `R2_STORE` and `KV_STORE` bindings exist only on Cloudflare Workers. Everywhere else, use an [S3-compatible bucket](/storage/s3) or a [custom adapter](/storage/custom-adapter).
 
 Nitro has presets for more platforms. CI runs only the Cloudflare build end to end.

@@ -1,0 +1,144 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-sans);
+    --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+
+    /* One step up from Tailwind's scale: the page is read at a glance, so the small sizes stay legible. */
+    --text-xs: 0.8125rem;
+    --text-xs--line-height: 1.25rem;
+    --text-sm: 0.9375rem;
+    --text-sm--line-height: 1.5rem;
+    --text-base: 1.0625rem;
+    --text-base--line-height: 1.65rem;
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    --color-remote: var(--remote);
+    --color-local: var(--local);
+    --color-miss: var(--miss);
+    --color-grid: var(--grid);
+    --color-positive: var(--positive);
+    --color-negative: var(--negative);
+
+    --animate-ping-once: ping-once 1.4s cubic-bezier(0, 0, 0.2, 1);
+
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+}
+
+/* The colours match the documentation site, so the dashboard and the docs read as one product. */
+:root {
+    --background: #ffffff;
+    --foreground: #0e1013;
+    --card: #ffffff;
+    --card-foreground: #0e1013;
+    --popover: #ffffff;
+    --popover-foreground: #0e1013;
+    --primary: #ffb224;
+    --primary-foreground: #1a1405;
+    --secondary: #f5f6f8;
+    --secondary-foreground: #0e1013;
+    --muted: #f5f6f8;
+    --muted-foreground: #5c6370;
+    --accent: #f5f6f8;
+    --accent-foreground: #0e1013;
+    --destructive: #c4321f;
+    --border: #e2e5e9;
+    --input: #e2e5e9;
+    --ring: #cc8400;
+    --radius: 0.5rem;
+
+    /* Amber is reserved for this server. Everything else is ink, so the server's share stands alone. */
+    --remote: #c27c00;
+    --local: #6b7280;
+    --miss: #c9ced6;
+    --grid: #eceef1;
+    --mark: #f2a30f;
+    --positive: #15803d;
+    --negative: #c4321f;
+}
+
+.dark {
+    --background: #0b0c0e;
+    --foreground: #ecedef;
+    --card: #0b0c0e;
+    --card-foreground: #ecedef;
+    --popover: #15171b;
+    --popover-foreground: #ecedef;
+    --secondary: #111317;
+    --secondary-foreground: #ecedef;
+    --muted: #111317;
+    --muted-foreground: #8c929c;
+    --accent: #15171b;
+    --accent-foreground: #ecedef;
+    --destructive: #ff6b57;
+    --border: #23262c;
+    --input: #23262c;
+    --ring: #ffb224;
+
+    --remote: #ffb224;
+    --local: #9aa0aa;
+    --miss: #3a3e46;
+    --grid: #1a1d22;
+    --mark: #ffb224;
+    --positive: #4ade80;
+    --negative: #ff6b57;
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    html {
+        @apply bg-background font-sans text-foreground antialiased;
+    }
+
+    ::selection {
+        background: rgb(255 178 36 / 0.3);
+    }
+}
+
+@keyframes ping-once {
+    to {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+/* Only named elements, such as team rows, animate between ranges; the rest of the page stays live. */
+:root {
+    view-transition-name: none;
+}
+
+::view-transition-group(*) {
+    animation-duration: 450ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}

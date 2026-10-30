@@ -3,8 +3,9 @@ import type { components } from '@turborepo-remote-cache/spec';
 import { defineHandler } from 'nitro';
 import * as v from 'valibot';
 
-import { ClientHeaders } from '../../../utils/artifacts';
+import { ClientHeaders, readTeam } from '../../../utils/artifacts';
 import { parseInput, readJsonBody } from '../../../utils/http';
+import { recordCacheEvents } from '../../../utils/stats';
 
 type CacheEvent = components['schemas']['CacheEvent'];
 
@@ -20,7 +21,8 @@ const CacheEvents = v.array(
 ) satisfies v.GenericSchema<unknown, (Omit<CacheEvent, 'sessionId'> & Partial<CacheEvent>)[]>;
 
 export default defineHandler(async (event) => {
-  parseInput(ClientHeaders, Object.fromEntries(event.req.headers));
-  await readJsonBody(event, CacheEvents);
+  const headers = parseInput(ClientHeaders, Object.fromEntries(event.req.headers));
+  const events = await readJsonBody(event, CacheEvents);
+  recordCacheEvents(event, { team: readTeam(event), ci: headers['x-artifact-client-ci'], events });
   return new Response(null);
 });

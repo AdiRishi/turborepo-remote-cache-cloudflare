@@ -15,7 +15,7 @@
       "inputs": ["$TURBO_DEFAULT$", "!README.md", "!CHANGELOG.md", "!tests/**"]
     },
     "build": {
-      "description": "Builds the server and the documentation site.",
+      "description": "Builds the server, the dashboard it serves, and the documentation site.",
       "dependsOn": ["^transit"],
       "inputs": ["$TURBO_DEFAULT$", "!README.md", "!CHANGELOG.md"],
       "outputs": ["dist/**"]
@@ -33,7 +33,7 @@
       "passThroughEnv": ["CI"]
     },
     "dev": {
-      "description": "Starts the server and the documentation site in development mode.",
+      "description": "Starts the server, the dashboard, and the documentation site in development mode.",
       "cache": false,
       "persistent": true
     },
