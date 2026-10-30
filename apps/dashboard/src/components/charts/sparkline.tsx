@@ -1,6 +1,6 @@
 import { cn } from 'cn';
 
-/** A trend line scaled between its own minimum and maximum, drawn in the current text colour. */
+/** A trend line scaled from zero to its own maximum, drawn in the current text colour. */
 export function Sparkline({
   values,
   className,
