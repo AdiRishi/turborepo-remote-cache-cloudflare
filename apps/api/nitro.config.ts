@@ -1,3 +1,4 @@
+import { clientDir } from '@turborepo-remote-cache/dashboard';
 import { defineConfig } from 'nitro';
 
 export default defineConfig({
@@ -5,6 +6,8 @@ export default defineConfig({
   defaultPreset: 'cloudflare_module',
   compatibilityDate: '2026-06-15',
   errorHandler: './src/error.ts',
+  // The dashboard's build, served at the root. Run `pnpm build` at the repository root to build it first.
+  publicAssets: [{ dir: clientDir }],
   noExternals: true,
   experimental: {
     database: true,

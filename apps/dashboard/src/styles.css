@@ -1,0 +1,124 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/host-grotesk';
+@import '@fontsource-variable/martian-mono/standard.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-sans: 'Host Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-sans);
+    --font-mono: 'Martian Mono Variable', ui-monospace, monospace;
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    --color-remote: var(--remote);
+    --color-local: var(--local);
+    --color-miss: var(--miss);
+    --color-grid: var(--grid);
+
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+}
+
+/* The palette matches the documentation site, so the dashboard and the docs read as one product. */
+:root {
+    --background: #ffffff;
+    --foreground: #0e1013;
+    --card: #ffffff;
+    --card-foreground: #0e1013;
+    --popover: #ffffff;
+    --popover-foreground: #0e1013;
+    --primary: #ffb224;
+    --primary-foreground: #1a1405;
+    --secondary: #f5f6f8;
+    --secondary-foreground: #0e1013;
+    --muted: #f5f6f8;
+    --muted-foreground: #5c6370;
+    --accent: #f5f6f8;
+    --accent-foreground: #0e1013;
+    --destructive: #c4321f;
+    --border: #e2e5e9;
+    --input: #e2e5e9;
+    --ring: #cc8400;
+    --radius: 0.5rem;
+
+    /* Amber always means "replayed by this server". The pair passes CVD separation and 3:1 contrast. */
+    --remote: #c27c00;
+    --local: #3b6fd8;
+    --miss: #ccd1d8;
+    --grid: #eceef1;
+    --mark: #f2a30f;
+    --neutral: color-mix(in oklab, var(--foreground) 62%, var(--background));
+
+    --ts-chart-1: var(--remote);
+    --ts-chart-2: var(--local);
+}
+
+.dark {
+    --background: #0b0c0e;
+    --foreground: #ecedef;
+    --card: #0b0c0e;
+    --card-foreground: #ecedef;
+    --popover: #15171b;
+    --popover-foreground: #ecedef;
+    --secondary: #111317;
+    --secondary-foreground: #ecedef;
+    --muted: #111317;
+    --muted-foreground: #8c929c;
+    --accent: #15171b;
+    --accent-foreground: #ecedef;
+    --destructive: #ff6b57;
+    --border: #23262c;
+    --input: #23262c;
+    --ring: #ffb224;
+
+    /* The brand amber sits above the categorical lightness band; it is kept for identity, and it still
+     clears CVD separation (ΔE 30) and contrast against this surface. */
+    --remote: #ffb224;
+    --local: #5a8dee;
+    --miss: #30343b;
+    --grid: #1a1d22;
+    --mark: #ffb224;
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    html {
+        @apply bg-background font-sans text-foreground antialiased;
+        font-feature-settings: 'ss01';
+    }
+
+    /* Martian Mono runs wide; the semi-condensed width keeps identifiers compact, as in the docs. */
+    code,
+    .font-mono {
+        font-stretch: 87.5%;
+    }
+
+    ::selection {
+        background: rgb(255 178 36 / 0.3);
+    }
+}

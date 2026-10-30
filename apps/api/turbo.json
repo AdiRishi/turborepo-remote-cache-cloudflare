@@ -3,6 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
+      "dependsOn": ["$TURBO_EXTENDS$", "@turborepo-remote-cache/dashboard#build"],
       "env": ["NITRO_*", "SERVER_PRESET"],
       "inputs": ["$TURBO_EXTENDS$", "!tests/**", "!e2e/**"],
       "outputs": [".output/**", ".wrangler/deploy/config.json"]
