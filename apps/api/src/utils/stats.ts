@@ -7,128 +7,7 @@ import type { Inventory } from './inventory';
 
 export type Database = ReturnType<typeof useDatabase>;
 
-type SqlValue = Parameters<ReturnType<Database['prepare']>['all']>[number];
-
-const MILLISECONDS_PER_HOUR = 3_600_000;
-
-// D1 binds at most 100 parameters in one statement.
-const MAX_PARAMETERS = 100;
-
-// The statements are portable between SQLite (D1, node:sqlite, libSQL) and PostgreSQL.
-const SCHEMA = [
-  `CREATE TABLE IF NOT EXISTS cache_events (
-    hour BIGINT NOT NULL,
-    team TEXT NOT NULL,
-    source TEXT NOT NULL,
-    outcome TEXT NOT NULL,
-    lookups BIGINT NOT NULL,
-    time_saved_ms BIGINT NOT NULL,
-    PRIMARY KEY (hour, team, source, outcome)
-  )`,
-  `CREATE TABLE IF NOT EXISTS runs (
-    session_id TEXT PRIMARY KEY,
-    team TEXT NOT NULL,
-    started_at BIGINT NOT NULL,
-    ci TEXT NOT NULL,
-    agent TEXT NOT NULL
-  )`,
-  'CREATE INDEX IF NOT EXISTS runs_started_at ON runs (started_at)',
-  `CREATE TABLE IF NOT EXISTS transfers (
-    hour BIGINT NOT NULL,
-    team TEXT NOT NULL,
-    direction TEXT NOT NULL,
-    turbo_version TEXT NOT NULL,
-    platform TEXT NOT NULL,
-    requests BIGINT NOT NULL,
-    bytes BIGINT NOT NULL,
-    PRIMARY KEY (hour, team, direction, turbo_version, platform)
-  )`,
-  `CREATE TABLE IF NOT EXISTS storage_snapshots (
-    taken_at BIGINT PRIMARY KEY,
-    artifacts BIGINT NOT NULL,
-    bytes BIGINT NOT NULL,
-    ages TEXT NOT NULL,
-    sizes TEXT NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS storage_teams (
-    taken_at BIGINT NOT NULL,
-    team TEXT NOT NULL,
-    artifacts BIGINT NOT NULL,
-    bytes BIGINT NOT NULL,
-    PRIMARY KEY (taken_at, team)
-  )`,
-];
-
-let ready: Database | undefined;
-
-/** Opens the stats database and creates its tables. Resolves to `undefined` when no database is configured. */
-export const openStatsDatabase = async () => {
-  if (ready) {
-    return ready;
-  }
-  let database: Database;
-  try {
-    database = useDatabase();
-    // Connectors open their connection here. The D1 connector throws when STATS_DB is not bound.
-    await database.getInstance();
-  } catch {
-    return undefined;
-  }
-  // D1's `exec` runs each line as its own statement, so the multi-line DDL goes through `prepare`.
-  for (const statement of SCHEMA) {
-    await database.prepare(statement).run();
-  }
-  ready = database;
-  return database;
-};
-
-/** Stats are best effort: a failure is logged and never reaches the caller. */
-const withStatsDatabase = async (write: (database: Database) => Promise<void>) => {
-  try {
-    const database = await openStatsDatabase();
-    if (database) {
-      await write(database);
-    }
-  } catch (error) {
-    console.error('[stats]', error);
-  }
-};
-
-const inBackground = (event: H3Event, write: (database: Database) => Promise<void>) => {
-  event.waitUntil(withStatsDatabase(write));
-};
-
-const insertRows = async <TColumn extends string>(
-  database: Database,
-  {
-    table,
-    columns,
-    rows,
-    onConflict = '',
-  }: {
-    table: string;
-    columns: readonly TColumn[];
-    rows: readonly Record<TColumn, SqlValue>[];
-    onConflict?: string;
-  },
-) => {
-  const rowsPerStatement = Math.floor(MAX_PARAMETERS / columns.length);
-  const tuple = `(${columns.map(() => '?').join(', ')})`;
-  for (let start = 0; start < rows.length; start += rowsPerStatement) {
-    const chunk = rows.slice(start, start + rowsPerStatement);
-    await database
-      .prepare(
-        `INSERT INTO ${table} (${columns.join(', ')}) VALUES ${chunk.map(() => tuple).join(', ')} ${onConflict}`,
-      )
-      .run(...chunk.flatMap((row) => columns.map((column) => row[column])));
-  }
-};
-
-const hourOf = (time: number) => time - (time % MILLISECONDS_PER_HOUR);
-
-// `turbo` sends `x-ai-agent` as `<agent>_<version>_agent`, such as `claude-code_2-1-312_agent`.
-const agentName = (header: string | null) =>
-  header?.split('_')[0]?.slice(0, 50).toLowerCase() ?? '';
+const HOUR = 3_600_000;
 
 // `turbo 2.11.9 1.98.0-nightly macos aarch64`: the turbo version, the Rust version, then the platform.
 const TURBO_USER_AGENT = /^turbo (?<version>\S+) \S+ (?<os>\S+) (?<arch>\S+)/u;
@@ -137,29 +16,85 @@ const TURBO_USER_AGENT = /^turbo (?<version>\S+) \S+ (?<os>\S+) (?<arch>\S+)/u;
 type CacheEvent = Omit<components['schemas']['CacheEvent'], 'sessionId'> &
   Partial<Pick<components['schemas']['CacheEvent'], 'sessionId'>>;
 
-interface OutcomeRow {
-  hour: number;
-  team: string;
-  source: string;
-  outcome: string;
-  lookups: number;
-  time_saved_ms: number;
-}
+let tablesCreated = false;
 
-/** Sums a batch per source and outcome. Only hits save time: their duration is the task they replayed. */
-const outcomeRows = (
-  events: readonly CacheEvent[],
-  { hour, team }: Pick<OutcomeRow, 'hour' | 'team'>,
-) => {
-  const rows = new Map<string, OutcomeRow>();
-  for (const { source, event: outcome, duration = 0 } of events) {
-    const key = `${source}:${outcome}`;
-    const row = rows.get(key) ?? { hour, team, source, outcome, lookups: 0, time_saved_ms: 0 };
-    rows.set(key, row);
-    row.lookups += 1;
-    row.time_saved_ms += outcome === 'HIT' ? duration : 0;
+// The SQL runs on SQLite (D1, node:sqlite, libSQL) and PostgreSQL.
+const createTables = async (db: Database) => {
+  await db.sql`CREATE TABLE IF NOT EXISTS cache_events (
+    hour BIGINT NOT NULL,
+    team TEXT NOT NULL,
+    source TEXT NOT NULL,
+    outcome TEXT NOT NULL,
+    lookups BIGINT NOT NULL,
+    time_saved_ms BIGINT NOT NULL,
+    PRIMARY KEY (hour, team, source, outcome)
+  )`;
+  await db.sql`CREATE TABLE IF NOT EXISTS runs (
+    session_id TEXT PRIMARY KEY,
+    team TEXT NOT NULL,
+    started_at BIGINT NOT NULL,
+    ci TEXT NOT NULL,
+    agent TEXT NOT NULL
+  )`;
+  await db.sql`CREATE INDEX IF NOT EXISTS runs_started_at ON runs (started_at)`;
+  await db.sql`CREATE TABLE IF NOT EXISTS transfers (
+    hour BIGINT NOT NULL,
+    team TEXT NOT NULL,
+    direction TEXT NOT NULL,
+    turbo_version TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    requests BIGINT NOT NULL,
+    bytes BIGINT NOT NULL,
+    PRIMARY KEY (hour, team, direction, turbo_version, platform)
+  )`;
+  await db.sql`CREATE TABLE IF NOT EXISTS storage_snapshots (
+    taken_at BIGINT PRIMARY KEY,
+    artifacts BIGINT NOT NULL,
+    bytes BIGINT NOT NULL
+  )`;
+  await db.sql`CREATE TABLE IF NOT EXISTS storage_teams (
+    taken_at BIGINT NOT NULL,
+    team TEXT NOT NULL,
+    artifacts BIGINT NOT NULL,
+    bytes BIGINT NOT NULL,
+    PRIMARY KEY (taken_at, team)
+  )`;
+  await db.sql`CREATE TABLE IF NOT EXISTS storage_bins (
+    taken_at BIGINT NOT NULL,
+    histogram TEXT NOT NULL,
+    bin INTEGER NOT NULL,
+    artifacts BIGINT NOT NULL,
+    bytes BIGINT NOT NULL,
+    PRIMARY KEY (taken_at, histogram, bin)
+  )`;
+};
+
+/** Returns the stats database with its tables created, or `undefined` when none is configured. */
+export const useStatsDatabase = async () => {
+  let db: Database;
+  try {
+    db = useDatabase();
+    // The D1 connector looks up its binding here, so this throws when STATS_DB is not bound.
+    await db.getInstance();
+  } catch {
+    return undefined;
   }
-  return [...rows.values()];
+  if (!tablesCreated) {
+    await createTables(db);
+    tablesCreated = true;
+  }
+  return db;
+};
+
+/** Writes stats after the response. Stats are best effort, so a failure is logged and dropped. */
+const writeAfterResponse = (event: H3Event, write: (db: Database) => Promise<void>) => {
+  event.waitUntil(
+    useStatsDatabase()
+      .then((db) => db && write(db))
+      .catch((error: unknown) => {
+        console.error('[stats]', error);
+      }),
+  );
 };
 
 /** Adds a batch from `POST /v8/artifacts/events` to the hourly totals, and records each new run. */
@@ -168,31 +103,36 @@ export const recordCacheEvents = (
   { team, ci, events }: { team: string; ci: string | undefined; events: readonly CacheEvent[] },
 ) => {
   const now = Date.now();
-  const outcomes = outcomeRows(events, { hour: hourOf(now), team });
+  const hour = now - (now % HOUR);
+  // `turbo` names CI providers like `GITHUB_ACTIONS`; other clients may send `github-actions`.
+  const provider = ci?.toUpperCase().replaceAll('-', '_') ?? '';
+  // `turbo` sends `x-ai-agent` as `<agent>_<version>_agent`, such as `claude-code_2-1-312_agent`.
+  const agent =
+    event.req.headers.get('x-ai-agent')?.split('_')[0]?.slice(0, 50).toLowerCase() ?? '';
   const sessions = new Set(events.flatMap(({ sessionId }) => (sessionId ? [sessionId] : [])));
-  const run = {
-    team,
-    started_at: now,
-    // `turbo` names CI providers like `GITHUB_ACTIONS`; other clients may send `github-actions`.
-    ci: ci?.toUpperCase().replaceAll('-', '_') ?? '',
-    agent: agentName(event.req.headers.get('x-ai-agent')),
-  };
 
-  inBackground(event, async (database) => {
-    await insertRows(database, {
-      table: 'cache_events',
-      columns: ['hour', 'team', 'source', 'outcome', 'lookups', 'time_saved_ms'],
-      rows: outcomes,
-      onConflict: `ON CONFLICT (hour, team, source, outcome) DO UPDATE SET
-        lookups = cache_events.lookups + excluded.lookups,
-        time_saved_ms = cache_events.time_saved_ms + excluded.time_saved_ms`,
-    });
-    await insertRows(database, {
-      table: 'runs',
-      columns: ['session_id', 'team', 'started_at', 'ci', 'agent'],
-      rows: [...sessions].map((sessionId) => Object.assign({ session_id: sessionId }, run)),
-      onConflict: 'ON CONFLICT (session_id) DO NOTHING',
-    });
+  writeAfterResponse(event, async (db) => {
+    for (const source of ['LOCAL', 'REMOTE'] as const) {
+      for (const outcome of ['HIT', 'MISS'] as const) {
+        const matching = events.filter((e) => e.source === source && e.event === outcome);
+        if (matching.length === 0) {
+          continue;
+        }
+        // A hit's duration is the run time of the task it replayed.
+        const saved =
+          outcome === 'HIT' ? matching.reduce((sum, { duration = 0 }) => sum + duration, 0) : 0;
+        await db.sql`INSERT INTO cache_events (hour, team, source, outcome, lookups, time_saved_ms)
+          VALUES (${hour}, ${team}, ${source}, ${outcome}, ${matching.length}, ${saved})
+          ON CONFLICT (hour, team, source, outcome) DO UPDATE SET
+            lookups = cache_events.lookups + excluded.lookups,
+            time_saved_ms = cache_events.time_saved_ms + excluded.time_saved_ms`;
+      }
+    }
+    for (const sessionId of sessions) {
+      await db.sql`INSERT INTO runs (session_id, team, started_at, ci, agent)
+        VALUES (${sessionId}, ${team}, ${now}, ${provider}, ${agent})
+        ON CONFLICT (session_id) DO NOTHING`;
+    }
   });
 };
 
@@ -201,58 +141,50 @@ export const recordTransfer = (
   event: H3Event,
   { team, direction, bytes }: { team: string; direction: 'upload' | 'download'; bytes: number },
 ) => {
+  const now = Date.now();
+  const hour = now - (now % HOUR);
   const client = TURBO_USER_AGENT.exec(event.req.headers.get('user-agent') ?? '')?.groups;
-  const row = {
-    hour: hourOf(Date.now()),
-    team,
-    direction,
-    turbo_version: client?.version ?? '',
-    platform: client ? `${client.os} ${client.arch}` : '',
-    requests: 1,
-    bytes,
-  };
+  const version = client?.version ?? '';
+  const platform = client ? `${client.os} ${client.arch}` : '';
 
-  inBackground(event, async (database) => {
-    await insertRows(database, {
-      table: 'transfers',
-      columns: ['hour', 'team', 'direction', 'turbo_version', 'platform', 'requests', 'bytes'],
-      rows: [row],
-      onConflict: `ON CONFLICT (hour, team, direction, turbo_version, platform) DO UPDATE SET
+  writeAfterResponse(event, async (db) => {
+    await db.sql`INSERT INTO transfers (hour, team, direction, turbo_version, platform, requests, bytes)
+      VALUES (${hour}, ${team}, ${direction}, ${version}, ${platform}, 1, ${bytes})
+      ON CONFLICT (hour, team, direction, turbo_version, platform) DO UPDATE SET
         requests = transfers.requests + excluded.requests,
-        bytes = transfers.bytes + excluded.bytes`,
-    });
+        bytes = transfers.bytes + excluded.bytes`;
   });
 };
 
 /**
- * Stores the inventory that expiry took of the artifacts it kept. Two expiry runs in the same millisecond
- * describe the same store, so the second snapshot is dropped.
+ * Stores the inventory that expiry took of the artifacts it kept. Two expiry runs in the same
+ * millisecond describe the same store, so the second snapshot is dropped.
  */
-export const recordStorageSnapshot = (inventory: Inventory) =>
-  withStatsDatabase(async (database) => {
-    await insertRows(database, {
-      table: 'storage_snapshots',
-      columns: ['taken_at', 'artifacts', 'bytes', 'ages', 'sizes'],
-      rows: [
-        {
-          taken_at: inventory.takenAt,
-          artifacts: inventory.total.artifacts,
-          bytes: inventory.total.bytes,
-          ages: JSON.stringify(inventory.ages),
-          sizes: JSON.stringify(inventory.sizes),
-        },
-      ],
-      onConflict: 'ON CONFLICT (taken_at) DO NOTHING',
-    });
-    await insertRows(database, {
-      table: 'storage_teams',
-      columns: ['taken_at', 'team', 'artifacts', 'bytes'],
-      rows: [...inventory.teams].map(([team, { artifacts, bytes }]) => ({
-        taken_at: inventory.takenAt,
-        team,
-        artifacts,
-        bytes,
-      })),
-      onConflict: 'ON CONFLICT (taken_at, team) DO NOTHING',
-    });
-  });
+export const recordStorageSnapshot = async ({ takenAt, total, teams, ages, sizes }: Inventory) => {
+  try {
+    const db = await useStatsDatabase();
+    if (!db) {
+      return;
+    }
+    await db.sql`INSERT INTO storage_snapshots (taken_at, artifacts, bytes)
+      VALUES (${takenAt}, ${total.artifacts}, ${total.bytes})
+      ON CONFLICT (taken_at) DO NOTHING`;
+    for (const [team, { artifacts, bytes }] of teams) {
+      await db.sql`INSERT INTO storage_teams (taken_at, team, artifacts, bytes)
+        VALUES (${takenAt}, ${team}, ${artifacts}, ${bytes})
+        ON CONFLICT (taken_at, team) DO NOTHING`;
+    }
+    for (const [histogram, bins] of [
+      ['age', ages],
+      ['size', sizes],
+    ] as const) {
+      for (const [bin, { artifacts, bytes }] of bins.entries()) {
+        await db.sql`INSERT INTO storage_bins (taken_at, histogram, bin, artifacts, bytes)
+          VALUES (${takenAt}, ${histogram}, ${bin}, ${artifacts}, ${bytes})
+          ON CONFLICT (taken_at, histogram, bin) DO NOTHING`;
+      }
+    }
+  } catch (error) {
+    console.error('[stats]', error);
+  }
+};
