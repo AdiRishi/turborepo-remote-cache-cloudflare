@@ -51,7 +51,7 @@ export function Timeline({ stats }: { stats: Stats }) {
   return (
     <section aria-label="Time saved per period">
       <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
-        <h2 className="text-sm font-medium">
+        <h2 className="font-medium">
           Time saved per {stats.range.bucketMs === HOUR ? 'hour' : 'day'}
         </h2>
         <Legend>

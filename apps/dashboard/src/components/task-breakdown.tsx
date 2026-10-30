@@ -92,7 +92,7 @@ function Stat({ label, value, change }: { label: string; value: string; change: 
     <div className="px-5 py-4 first:pl-0 max-lg:odd:pl-0">
       <dt className="text-sm text-muted-foreground">{label}</dt>
       <dd className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1">
-        <span className="text-xl font-semibold tracking-[-0.02em]">{value}</span>
+        <span className="text-2xl font-semibold tracking-[-0.03em]">{value}</span>
         {change}
       </dd>
     </div>
@@ -112,7 +112,7 @@ export function TaskBreakdown({ current, previous }: { current: Activity; previo
     <section aria-label="Tasks" className="tabular-nums">
       <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
         <p className="flex items-baseline gap-2.5">
-          <span className="text-4xl font-semibold tracking-[-0.04em]">
+          <span className="text-5xl font-semibold tracking-[-0.045em]">
             {formatCount(Math.round(shownTotal))}
           </span>
           <span className="text-muted-foreground">tasks</span>
@@ -138,7 +138,7 @@ export function TaskBreakdown({ current, previous }: { current: Activity; previo
         ))}
       </div>
 
-      <ul className="mt-3 divide-y text-sm">
+      <ul className="mt-3 divide-y">
         {OUTCOMES.map((outcome) => (
           <OutcomeRow key={outcome.name} outcome={outcome} current={current} previous={previous} />
         ))}

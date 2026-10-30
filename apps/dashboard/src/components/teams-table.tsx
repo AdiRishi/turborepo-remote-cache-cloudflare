@@ -40,7 +40,7 @@ const columns = column.columns([
   column.accessor('team', {
     header: 'Team',
     sortFn: 'alphanumeric',
-    cell: (info) => <span className="font-mono text-[13px]">{info.getValue()}</span>,
+    cell: (info) => <span className="font-mono">{info.getValue()}</span>,
   }),
   column.accessor('runs', {
     header: 'Runs',
@@ -98,7 +98,7 @@ export function TeamsTable({ teams }: { teams: readonly TeamActivity[] }) {
 
   return (
     <section>
-      <h2 className="mb-2 text-sm font-medium">Teams</h2>
+      <h2 className="mb-2 font-medium">Teams</h2>
       <Table className="min-w-[720px] tabular-nums">
         <TableHeader>
           {table.getHeaderGroups().map((group) => (
