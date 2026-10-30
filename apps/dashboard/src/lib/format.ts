@@ -38,10 +38,6 @@ export const formatDuration = (ms: number) =>
     .map(({ value, unit }) => `${integer.format(value)}${unit}`)
     .join(' ');
 
-/** Hours with one decimal, for chart axes where a single unit keeps ticks comparable. */
-export const formatHours = (ms: number) =>
-  `${new Intl.NumberFormat('en-US', { maximumFractionDigits: ms < 10 * HOUR ? 1 : 0 }).format(ms / HOUR)}h`;
-
 const days = new Intl.NumberFormat('en-US', { style: 'unit', unit: 'day', unitDisplay: 'long' });
 const hours = new Intl.NumberFormat('en-US', { style: 'unit', unit: 'hour', unitDisplay: 'long' });
 

@@ -4,7 +4,6 @@ import {
   durationParts,
   formatCount,
   formatDuration,
-  formatHours,
   formatPercent,
   relativeChange,
 } from '@/lib/format';
@@ -196,7 +195,7 @@ export function Timeline({ stats }: { stats: Stats }) {
         bucketMs={stats.range.bucketMs}
         layers={LAYERS}
         height={140}
-        formatValue={formatHours}
+        formatValue={formatDuration}
         ariaLabel="Time saved by this server and by local caches per period"
       />
     </section>
