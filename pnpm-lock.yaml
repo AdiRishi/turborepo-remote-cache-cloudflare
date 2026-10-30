@@ -203,6 +203,9 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(typescript@7.0.2)
     devDependencies:
+      '@turborepo-remote-cache/dashboard':
+        specifier: workspace:*
+        version: link:../dashboard
       '@turborepo-remote-cache/spec':
         specifier: workspace:*
         version: link:../../packages/spec
@@ -230,6 +233,15 @@ importers:
       wrangler:
         specifier: ^4.151.1
         version: 4.151.1(@cloudflare/workers-types@5.20261019.1)(@types/node@24.19.2)
+
+  apps/dashboard:
+    devDependencies:
+      '@types/node':
+        specifier: ^24.19.2
+        version: 24.19.2
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
 
   apps/docs:
     devDependencies:

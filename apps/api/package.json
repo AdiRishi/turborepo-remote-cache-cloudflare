@@ -25,6 +25,7 @@
     "valibot": "^1.5.0"
   },
   "devDependencies": {
+    "@turborepo-remote-cache/dashboard": "workspace:*",
     "@turborepo-remote-cache/spec": "workspace:*",
     "@types/node": "^24.19.2",
     "@vitest/coverage-istanbul": "^5.0.5",

@@ -16,6 +16,13 @@
       "bucket_name": "turborepo-cache",
       "preview_bucket_name": "turborepo-cache-preview"
     }
+  ],
+  // Usage stats for the dashboard. Remove the binding to turn them off.
+  "d1_databases": [
+    {
+      "binding": "STATS_DB",
+      "database_name": "turborepo-cache-stats"
+    }
   ]
   // Bind a KV namespace to store artifacts in KV instead. KV wins when both are bound.
   // "kv_namespaces": [{ "binding": "KV_STORE", "id": "<namespace id>" }]

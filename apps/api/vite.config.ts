@@ -20,7 +20,15 @@ const closeNitroWithVite = (): Plugin => {
 };
 
 export default defineConfig({
-  plugins: [nitro(), closeNitroWithVite()],
+  plugins: [
+    nitro(
+      // Each test file runs in its own process, so an in-memory database keeps their stats apart.
+      process.env.VITEST
+        ? { devDatabase: { default: { connector: 'sqlite', options: { name: ':memory:' } } } }
+        : {},
+    ),
+    closeNitroWithVite(),
+  ],
   test: {
     coverage: {
       provider: 'istanbul',

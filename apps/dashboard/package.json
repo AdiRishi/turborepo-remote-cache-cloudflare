@@ -1,0 +1,19 @@
+{
+  "name": "@turborepo-remote-cache/dashboard",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The usage dashboard that the Turborepo Remote Cache server serves at its root",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./contract": "./contract.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^7.0.2"
+  }
+}
