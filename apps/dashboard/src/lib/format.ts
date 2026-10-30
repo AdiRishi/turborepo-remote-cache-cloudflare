@@ -42,6 +42,13 @@ export const formatDuration = (ms: number) =>
 export const formatHours = (ms: number) =>
   `${new Intl.NumberFormat('en-US', { maximumFractionDigits: ms < 10 * HOUR ? 1 : 0 }).format(ms / HOUR)}h`;
 
+const days = new Intl.NumberFormat('en-US', { style: 'unit', unit: 'day', unitDisplay: 'long' });
+const hours = new Intl.NumberFormat('en-US', { style: 'unit', unit: 'hour', unitDisplay: 'long' });
+
+/** A whole number of hours, in days when it divides evenly, such as `30 days` or `36 hours`. */
+export const formatHourCount = (count: number) =>
+  count % 24 === 0 ? days.format(count / 24) : hours.format(count);
+
 const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 });
 
 export const formatCount = (value: number) =>

@@ -1,11 +1,9 @@
-import { formatAge, formatBytes, formatCount, relativeChange } from '@/lib/format';
+import { formatAge, formatBytes, formatCount, formatHourCount, relativeChange } from '@/lib/format';
 
 import type { Stats } from '../../contract';
 
 import { Sparkline } from './charts/sparkline';
 import { Delta } from './delta';
-
-const HOURS_PER_DAY = 24;
 
 export function Storage({ stats }: { stats: Stats }) {
   const { latest, history, expirationHours } = stats.storage;
@@ -32,9 +30,8 @@ export function Storage({ stats }: { stats: Stats }) {
             ) : null}
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            {formatCount(latest.artifacts)} artifacts, kept{' '}
-            {Math.round(expirationHours / HOURS_PER_DAY)} days. Measured{' '}
-            {formatAge(latest.takenAt, stats.generatedAt)}.
+            {formatCount(latest.artifacts)} artifacts, kept {formatHourCount(expirationHours)}.
+            Measured {formatAge(latest.takenAt, stats.generatedAt)}.
           </p>
         </>
       ) : (
