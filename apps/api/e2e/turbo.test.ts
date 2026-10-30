@@ -42,6 +42,10 @@ const readStats = async (): Promise<Stats> => {
   return body;
 };
 
+// Version shares cover every team, and other tests and runs already count transfers under this version.
+const installedVersionTransfers = async () =>
+  (await readStats()).clients.versions.find((share) => share.name === TURBO_VERSION)?.count ?? 0;
+
 describe('restoring from the remote cache', () => {
   test.each([
     ['plain requests', {}],
@@ -136,6 +140,7 @@ describe('usage stats', () => {
     const team = randomTeam();
     const producer = await workspace.clone('producer', { team });
     const consumer = await workspace.clone('consumer', { team });
+    const transfersBefore = await installedVersionTransfers();
 
     await producer.build();
     const restore = await consumer.build();
@@ -155,9 +160,7 @@ describe('usage stats', () => {
     const row = await activity();
     expect(row?.uploadedBytes).toBeGreaterThan(0);
     expect(row?.downloadedBytes).toBe(row?.uploadedBytes);
-    expect((await readStats()).clients.versions).toContainEqual(
-      expect.objectContaining({ name: TURBO_VERSION }),
-    );
+    expect(await installedVersionTransfers()).toBe(transfersBefore + 2 * PACKAGES.length);
   });
 });
 
