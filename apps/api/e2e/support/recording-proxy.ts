@@ -2,13 +2,13 @@ import { createServer, request } from 'node:http';
 
 /** Forwards every request to `target` and records each one as `METHOD /path`. */
 export const startRecordingProxy = async (target: string) => {
+  const { hostname, port } = new URL(target);
   const requests: string[] = [];
   const server = createServer((incoming, outgoing) => {
-    const url = new URL(incoming.url ?? '/', target);
-    requests.push(`${incoming.method} ${url.pathname}`);
+    const path = incoming.url ?? '/';
+    requests.push(`${incoming.method} ${path.split('?')[0]}`);
     const upstream = request(
-      url.href,
-      { method: incoming.method, headers: incoming.headers },
+      { hostname, port, path, method: incoming.method, headers: incoming.headers },
       (response) => {
         outgoing.writeHead(response.statusCode ?? 502, response.headers);
         response.pipe(outgoing);
