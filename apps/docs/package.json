@@ -14,8 +14,8 @@
   "devDependencies": {
     "@turborepo-remote-cache/spec": "workspace:*",
     "@types/react": "^19.3.0",
-    "blume": "^2.2.4",
+    "blume": "^2.2.6",
     "react": "^19.3.1",
-    "wrangler": "^4.151.1"
+    "wrangler": "^4.156.0"
   }
 }

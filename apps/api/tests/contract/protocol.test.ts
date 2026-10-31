@@ -84,10 +84,11 @@ describe('routing', () => {
     },
   );
 
-  test('answers an unsupported method on an artifact with a JSON 404', async () => {
+  test('answers an unsupported method on an artifact with a JSON 405 that lists the allowed methods', async () => {
     const response = await authorized(`/v8/artifacts/${randomHash()}`, { method: 'DELETE' });
-    expect(response.status).toBe(404);
-    expect((await readError(response)).code).toBe('not_found');
+    expect(response.status).toBe(405);
+    expect(response.headers.get('allow')).toBe('GET, HEAD, PUT');
+    expect((await readError(response)).code).toBe('method_not_allowed');
   });
 
   test('serves the health check without authentication', async () => {
