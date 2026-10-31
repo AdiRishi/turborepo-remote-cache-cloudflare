@@ -4,7 +4,13 @@
   "compatibility_date": "2026-06-15",
   "upload_source_maps": true,
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "traces": {
+      "enabled": true
+    },
+    "issues": {
+      "enabled": true
+    }
   },
   // Set the bearer token with `wrangler secret put TURBO_TOKEN`.
   "vars": {

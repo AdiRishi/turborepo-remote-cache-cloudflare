@@ -9,6 +9,9 @@ export default defineConfig({
   // The dashboard's build, served at the root. Run `pnpm build` at the repository root to build it first.
   publicAssets: [{ dir: clientDir }],
   noExternals: true,
+  // Wrangler uploads the maps, so Cloudflare shows stack traces at the source lines.
+  sourcemap: true,
+  tracingChannel: true,
   experimental: {
     database: true,
     tasks: true,
@@ -25,6 +28,10 @@ export default defineConfig({
           { default: { connector: 'cloudflare-d1', options: { bindingName: 'STATS_DB' } } },
           nitro.options.database,
         );
+        // Workers tracing already records each D1 query, with its SQL.
+        if (nitro.options.tracingChannel) {
+          nitro.options.tracingChannel.db0 = false;
+        }
       }
     },
   ],
