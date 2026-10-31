@@ -20,8 +20,8 @@
   },
   "dependencies": {
     "@turborepo-remote-cache/files-sdk-kv": "workspace:*",
-    "files-sdk": "3.1.1",
-    "nitro": "3.0.260903-beta",
+    "files-sdk": "3.1.2",
+    "nitro": "3.0.261029-rc",
     "valibot": "^1.5.0"
   },
   "devDependencies": {
@@ -29,12 +29,12 @@
     "@turborepo-remote-cache/spec": "workspace:*",
     "@types/node": "^24.19.2",
     "@vitest/coverage-istanbul": "^5.0.5",
-    "db0": "^0.4.1",
-    "miniflare": "5.20261012.1-beta",
-    "srvx": "^1.0.6",
+    "db0": "^0.4.2",
+    "miniflare": "5.20261023.3-beta",
+    "srvx": "^1.0.8",
     "typescript": "^7.0.2",
-    "vite": "^8.3.4",
+    "vite": "^8.3.5",
     "vitest": "^5.0.5",
-    "wrangler": "^4.151.1"
+    "wrangler": "^4.156.0"
   }
 }
