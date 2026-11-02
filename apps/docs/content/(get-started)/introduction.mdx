@@ -27,3 +27,7 @@ Every client sends the same bearer token, the server's `TURBO_TOKEN`. Teams keep
 ## Where it runs
 
 The server is a [Nitro](https://nitro.build) app, and every build serves the same API. The default build targets Cloudflare Workers. It is the only build with built-in R2 and KV storage, and the only one that CI runs end to end against a real `turbo` client. [Deploy to Cloudflare](/get-started) to start there, or see [Platforms](/deploy) for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
+
+## Documentation analytics
+
+This documentation site uses Google Analytics on `turborepo-remote-cache.dev` and its GitHub Pages copy. Local previews and preview deployments disable analytics collection.

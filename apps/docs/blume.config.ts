@@ -1,5 +1,5 @@
 import { defineConfig } from 'blume';
-import { googleAnalytics } from 'blume/analytics';
+import { googleAnalytics, script } from 'blume/analytics';
 import { openapi } from 'blume/reference';
 import { fileURLToPath } from 'node:url';
 
@@ -7,6 +7,7 @@ import apiPackage from '../api/package.json' with { type: 'json' };
 
 const repositoryUrl = 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare';
 const changelogUrl = `${repositoryUrl}/blob/master/apps/api/CHANGELOG.md`;
+const measurementId = 'G-4FKXFQBLZR';
 
 const deployment =
   process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true'
@@ -71,6 +72,16 @@ export default defineConfig({
     { from, to },
     { from: `${from}.html`, to },
   ]),
-  analytics: [googleAnalytics({ id: 'G-4FKXFQBLZR' })],
+  analytics: [
+    script({
+      content: `window['ga-disable-${measurementId}'] = !(
+        location.hostname === 'turborepo-remote-cache.dev' ||
+        (location.hostname === 'adirishi.github.io' &&
+          (location.pathname === '/turborepo-remote-cache-cloudflare' ||
+            location.pathname.startsWith('/turborepo-remote-cache-cloudflare/')))
+      );`,
+    }),
+    googleAnalytics({ id: measurementId }),
+  ],
   deployment,
 });
