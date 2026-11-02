@@ -85,7 +85,7 @@ Cached:    1 cached, 1 total
 
 And that's it 🎉🎉
 
-[Get started](https://turborepo-remote-cache.dev/get-started) walks through the same steps with more detail. [Connect turbo](https://turborepo-remote-cache.dev/connect-turbo) sets up your team and CI. Your copy doesn't follow new releases on its own, so [Update your deployment](https://turborepo-remote-cache.dev/update) when you want one.
+[Get started](https://turborepo-remote-cache.dev/get-started) walks through the same steps with more detail. [Connect turbo](https://turborepo-remote-cache.dev/connect-turbo) sets up your team and CI. While you're there, [sign your artifacts](https://turborepo-remote-cache.dev/sign-artifacts) too. It's optional, takes one shared key, and stops `turbo` from replaying anything your own machines didn't sign. Your copy doesn't follow new releases on its own, so [Update your deployment](https://turborepo-remote-cache.dev/update) when you want one.
 
 ## 🤝 Contributing
 

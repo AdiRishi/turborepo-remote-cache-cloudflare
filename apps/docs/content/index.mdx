@@ -10,7 +10,7 @@ sidebar:
 
 # A Turborepo remote cache you host yourself
 
-Every laptop and CI runner on your team shares build outputs through storage you own. Deploy the server to Cloudflare Workers with one button, or build it for Node.js, Vercel, AWS Lambda, and other platforms.
+Build it once, anywhere on your team, and every other laptop and CI runner replays it instead of building it again. The artifacts live in storage you own, on a server you deploy to Cloudflare Workers with one button, or build for Node.js, Vercel, AWS Lambda, and more.
 
 [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) [Read the docs](/introduction)
 
@@ -54,10 +54,13 @@ Every laptop and CI runner on your team shares build outputs through storage you
         export TURBO_TEAM=my-team
         ```
     </Step>
+    <Step title="Sign your artifacts (optional, recommended)">
+        Turn on `remoteCache.signature` and give every machine the same `TURBO_REMOTE_CACHE_SIGNATURE_KEY`. `turbo` then rejects any artifact your own machines didn't sign, even one uploaded with a valid token.
+    </Step>
 
 </Steps>
 
-[Get started](/get-started) has every step, and [Connect turbo](/connect-turbo) brings in your team and CI.
+[Get started](/get-started) has every step, [Connect turbo](/connect-turbo) brings in your team and CI, and [Sign artifacts](/sign-artifacts) locks it down.
 
 </HomeSection>
 
