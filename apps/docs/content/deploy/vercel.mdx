@@ -9,6 +9,8 @@ Vercel limits a request or response body to 4.5 MB, so larger artifacts never re
 
 ## Create the project
 
+Before importing your copy, remove or replace the root `turbo.json` file's `remoteCache` entry. It points at the maintainer's cache and must not receive your server's token.
+
 1. Import your copy of the repository into Vercel.
 2. Set **Root Directory** to `apps/api`. Keep **Include source files outside of the Root Directory in the Build Step** on, because the server uses packages from `packages/`.
 3. Set the build command to `pnpm exec turbo run build`. Run from `apps/api`, it builds the [dashboard](/dashboard) and then the server. Nitro detects Vercel and builds the `vercel` preset. To make the choice explicit, set the `NITRO_PRESET` environment variable to `vercel`.
@@ -23,6 +25,10 @@ Vercel limits a request or response body to 4.5 MB, so larger artifacts never re
 ## Point turbo at the production URL
 
 Set `TURBO_API` to the project's production URL, such as `https://<project>.vercel.app`. Vercel's default Deployment Protection puts preview URLs behind a Vercel login, which `turbo` can't pass.
+
+## Verify the deployment
+
+[Connect turbo](/connect-turbo) to the production URL and verify a remote hit. For dashboard history, [configure a hosted stats database](/stats-database).
 
 ## The expiry task
 

@@ -1,0 +1,40 @@
+---
+title: Client configuration
+description: The URL, token, and team that Turbo sends to this server.
+---
+
+| Value       | Environment variable               | `turbo.json` key       | Meaning                                                                                      |
+| ----------- | ---------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------- |
+| URL         | `TURBO_API`                        | `remoteCache.apiUrl`   | The server's origin, such as `https://cache.example.com`, without a trailing slash or `/v8`. |
+| Token       | `TURBO_TOKEN`                      | None                   | The server's bearer token.                                                                   |
+| Team slug   | `TURBO_TEAM`                       | `remoteCache.teamSlug` | The artifact namespace shared by participating clients.                                      |
+| Team ID     | `TURBO_TEAMID`                     | `remoteCache.teamId`   | An alternative to a slug. Turbo sends IDs that start with `team_`.                           |
+| Signing key | `TURBO_REMOTE_CACHE_SIGNATURE_KEY` | None                   | The shared key used when `remoteCache.signature` is `true`.                                  |
+
+Environment variables override `turbo.json`. Turbo also accepts command-line options and local and user configuration files. Its [configuration reference](https://turborepo.dev/docs/reference/configuration#remotecache) and [system environment variables](https://turborepo.dev/docs/reference/system-environment-variables) describe those sources.
+
+## Environment-only configuration
+
+When no project configuration is committed, all three connection values are needed:
+
+```sh
+export TURBO_API='https://cache.example.com'
+export TURBO_TOKEN='replace-with-your-server-token'
+export TURBO_TEAM='my-team'
+```
+
+## Checkout-local configuration
+
+`.turbo/config.json` stores settings for one checkout:
+
+```json .turbo/config.json
+{
+    "apiUrl": "https://cache.example.com",
+    "teamSlug": "my-team",
+    "token": "replace-with-your-server-token"
+}
+```
+
+This file contains a credential. The `.turbo` directory belongs in `.gitignore`.
+
+[Connect turbo](/connect-turbo) covers the recommended setup and verification procedure.

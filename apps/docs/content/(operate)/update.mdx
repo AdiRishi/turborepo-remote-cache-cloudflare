@@ -1,0 +1,67 @@
+---
+title: Update your deployment
+description: Bring upstream changes into your copy of the server, preserve its configuration, and verify the deployment.
+---
+
+You deploy this server from source. The Deploy to Cloudflare button creates a repository in your account, and Workers Builds deploys changes from that copy. New upstream releases do not update your copy automatically. Updating dependencies with pnpm does not update the server's source either.
+
+For a version 4 deployment, first read [Upgrade from v4](/upgrade-from-v4).
+
+## Prepare the update
+
+1. Read the [server changelog](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/apps/api/CHANGELOG.md) and choose a release. Check for configuration changes and database migrations.
+2. Clone your deployed repository and commit any local changes before merging an update. Record the commit currently deployed so you can rebuild it if needed.
+3. Identify the settings you must retain:
+    - `apps/api/wrangler.jsonc`: Worker name, resource names and IDs, routes, and variables.
+    - `apps/api/nitro.config.ts`: database connection and expiry schedule.
+    - `apps/api/src/custom-adapter.ts`: custom storage, if used.
+    - `.github/workflows/ci.yml` and `turbo.json`: your deployment and build-cache settings.
+4. Back up the stats database before an update that changes its schema. Artifacts are disposable build outputs, but lost usage history cannot be reconstructed from them.
+
+Keep tokens and storage credentials in the platform's secret store. Do not copy them into Git while preparing the update.
+
+## Merge an upstream release
+
+Run these commands from your server checkout. Add the upstream remote once. If it already exists, check its URL with `git remote -v`:
+
+```sh
+git remote add upstream https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
+git fetch upstream --tags
+git switch -c chore/update-cache
+```
+
+Copy the tag for the server release from [GitHub Releases](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/releases). The repository also tags its packages, so choose the server release rather than the KV adapter release. Set it below:
+
+```sh
+CACHE_RELEASE='replace-with-the-server-release-tag'
+git merge-base HEAD "$CACHE_RELEASE"
+```
+
+If the last command prints a commit, the histories share an ancestor. Merge the release without committing yet:
+
+```sh
+git merge --no-ff --no-commit "$CACHE_RELEASE"
+```
+
+Resolve conflicts by preserving your deployment's resource names, IDs, and settings while incorporating upstream changes. Review the resulting configuration even when Git reports no conflicts. Do not replace your entire Wrangler file with the upstream version.
+
+If `git merge-base` finds no common ancestor, your copy has independent history. Create a fresh fork or checkout of the chosen release, then reapply the deployment settings listed above. Keep the old repository available until the replacement is verified. Reconnect Workers Builds to the new repository when ready. Avoid merging unrelated histories just to import an update.
+
+## Validate and deploy
+
+1. Install the pinned dependencies and run the project checks:
+
+    ```sh
+    pnpm install --frozen-lockfile
+    pnpm check
+    pnpm test:e2e
+    ```
+
+    The end-to-end suite runs a local Worker. It does not deploy to your account.
+
+2. Review the diff and commit the update. Keep the existing Worker name and storage bindings to continue using the same artifacts and stats database.
+3. If you use the included GitHub Actions workflow in your copy, set the repository variable `CACHE_DEPLOY_ENABLED=true`. Deployment is now opt-in outside the upstream repository. Workers Builds users should leave it unset.
+4. Deploy through your existing service. Push to the production branch for Workers Builds or the configured CI workflow. For a manual Cloudflare deployment, run `pnpm run deploy` after the checks build the Worker. Other hosts use their [platform guide](/deploy).
+5. Check `/ping`, check the authenticated `/v8/artifacts/status` endpoint, and [verify a remote hit](/connect-turbo#verify-remote-hits). Check the dashboard and logs for database errors.
+
+If you rebuild a previous commit to roll back, first check whether the update migrated the database. Reverting application code does not undo a database migration. Restore a compatible backup when required by the release.

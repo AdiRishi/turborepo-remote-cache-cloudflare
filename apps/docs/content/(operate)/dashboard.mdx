@@ -18,56 +18,23 @@ The range control at the top picks the last 24 hours, 7 days, 30 days, or 90 day
 - **Storage.** What the server stores, and how the total changed over the range.
 - **Clients.** The CI providers that ran `turbo`, the AI coding agents that started runs, and the `turbo` versions and platforms that moved artifacts.
 
-:::warning
-The dashboard is public. Anyone with the server's URL can see your team names and usage. To restrict it, put `/` and `/stats` behind your own access control, such as [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/), and leave `/v8` open to `turbo`.
-:::
+## Restrict access
 
-## Where stats are stored
+The dashboard is public. Anyone with the server's URL can see your team names and usage. To restrict it, put `/` and `/stats` behind your own access control, such as [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/), and leave `/v8/*` reachable with Turbo's bearer token. Protect both dashboard routes. Protecting only `/` leaves the data accessible through `/stats`.
 
-The server records stats in a database through [Nitro's database layer](https://nitro.build/docs/database). It writes after each response, so stats never slow the cache down. Without a database, the cache works the same and the dashboard explains that stats are off.
+<a id="where-stats-are-stored" />
+<a id="configure-a-database" />
+<a id="turn-stats-off" />
 
-| Platform                                                                               | Database                                                                                                                                                              |
-| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Cloudflare Workers](/get-started)                                                     | A D1 database bound as `STATS_DB`. Wrangler creates it, named `turborepo-cache-stats`, on the first deploy.                                                           |
-| [Node.js and Deno](/deploy/node)                                                       | Nitro's default SQLite database, a file at `.data/db.sqlite` in the working directory. Keep it on a persistent volume. For Bun, configure the `bun-sqlite` connector. |
-| [Vercel](/deploy/vercel), [Netlify](/deploy/netlify), [AWS Lambda](/deploy/aws-lambda) | None that works. Their file systems are read-only, so the SQLite default can't open its file and stats stay off. Configure a hosted database.                         |
+## Stats availability
 
-D1's free plan allows 100,000 rows written a day. The server writes about four rows per `turbo` run and one per artifact upload or download.
-
-### Configure a database
-
-Set the `default` connection in `apps/api/nitro.config.ts`. Use a hosted database on serverless platforms, whose file systems don't keep files between requests. For example, with [Turso](https://turso.tech):
-
-```ts title="apps/api/nitro.config.ts"
-export default defineConfig({
-    // ...
-    database: {
-        default: {
-            connector: 'libsql',
-            options: { url: process.env.TURSO_URL, authToken: process.env.TURSO_AUTH_TOKEN },
-        },
-    },
-});
-```
-
-The server creates its tables on first use. Its queries run on SQLite and PostgreSQL, so choose a SQLite, libSQL, PostgreSQL, Neon, or PGlite [connector](https://nitro.build/docs/database#connectors). MySQL isn't supported.
-
-:::tip
-Nitro writes the connector options into the build output. A value read from `process.env` here is read when you build, not when the server starts.
-:::
-
-### Turn stats off
-
-On Cloudflare, remove the `d1_databases` entry from `apps/api/wrangler.jsonc`. Elsewhere, set `database: {}` in `apps/api/nitro.config.ts`.
+Stats need a database. Cloudflare creates D1 during deployment. Other hosts may need configuration. See [Configure the stats database](/stats-database).
 
 ## When storage numbers update
 
-The [expiry task](/retention) measures storage while it deletes expired artifacts, daily at 03:00 UTC. A new server shows no storage numbers until that first run. To measure now, run expiry on demand:
+The [expiry task](/retention) measures storage while it deletes expired artifacts. A new server shows no storage numbers until that task first succeeds.
 
-```sh
-curl -X POST -H "Authorization: Bearer <your token>" \
-  https://<your server>/internal/delete-expired-objects
-```
+To measure now, [run expiry on demand](/retention#run-expiry-on-demand). This also deletes expired objects. On Netlify and Lambda, configure an [external schedule](/retention#run-expiry-from-a-scheduler) to keep measurements current.
 
 ## Read the stats as JSON
 

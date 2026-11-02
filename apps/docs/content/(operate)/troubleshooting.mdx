@@ -1,0 +1,84 @@
+---
+title: Troubleshooting
+description: Diagnose failed connections, repeated cache misses, rejected uploads, and missing dashboard stats.
+---
+
+Start with the symptom below. Use your deployed server's URL for `TURBO_API` and its token for `TURBO_TOKEN`. Keep credentials out of logs and issue reports.
+
+## Turbo cannot connect
+
+Check the server independently of Turbo:
+
+```sh
+curl --fail-with-body "$TURBO_API/ping"
+curl --fail-with-body -H "Authorization: Bearer $TURBO_TOKEN"   "$TURBO_API/v8/artifacts/status"
+```
+
+Expect `pong`, then `{"status":"enabled"}`.
+
+| Result                                            | What to check                                                                                                           |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| DNS, TLS, or connection error                     | Confirm the deployment URL and that your network can reach it. Use the HTTPS origin, without a trailing slash or `/v8`. |
+| HTML or a login redirect                          | A proxy or deployment protection is intercepting the API. Let Turbo reach `/v8/*` with its bearer token.                |
+| `401`                                             | The client token is missing or differs from the server's `TURBO_TOKEN`.                                                 |
+| `500`                                             | Read the server logs. Missing or invalid server configuration and storage failures are reported there.                  |
+| Status succeeds but Turbo disables remote caching | Set the team as well as the URL and token. Check for stale environment variables overriding `turbo.json`.               |
+
+`/ping` checks only that the server responds. It does not verify authentication or artifact storage. The [remote-hit check](/connect-turbo#verify-remote-hits) tests the complete path.
+
+## Builds keep missing
+
+1. Run the [remote-only verification](/connect-turbo#verify-remote-hits). A normal build can use the local cache without contacting the server.
+2. Confirm that the task has caching enabled. Compare task hashes in the run summaries under `.turbo/runs/`. If the hash changes, Turbo sees different inputs. Check its [cache troubleshooting guide](https://turborepo.dev/docs/crafting-your-repository/caching#troubleshooting).
+3. Confirm that clients use the same server and team. A different team uses a different artifact namespace.
+4. Check the first run for upload errors. A successful task can still fail to upload its artifact. Check the platform and storage limits below.
+5. If signatures are enabled, confirm that every client has the same `TURBO_REMOTE_CACHE_SIGNATURE_KEY`. A rejected signature is a cache miss. See [Sign artifacts](/sign-artifacts).
+
+After changing storage or after an artifact expires, a miss is expected. The task must run and upload again. With KV, newly written artifacts can take 60 seconds or more to reach another region.
+
+If an S3-compatible store reports every artifact as missing, check the endpoint, bucket, permissions, and whether the provider requires `S3_FORCE_PATH_STYLE=true`. See [S3-compatible storage](/storage/s3).
+
+## Uploads fail
+
+Check the response status and the server's [logs](/observability):
+
+- `413` usually means the host or a proxy rejected the request size. Compare your artifact size with the [platform limits](/deploy#artifact-size-limits).
+- KV rejects artifacts larger than 25 MiB. Use R2 or an S3-compatible bucket for larger outputs.
+- S3 uploads are buffered in memory. A large upload can exhaust the host's memory even below its HTTP request limit.
+- A custom adapter must support user metadata. An adapter that rejects metadata cannot store these artifacts.
+
+The storage credentials need read, write, list, and delete permissions. The last two are needed for expiry and storage measurements.
+
+## The server returns 500
+
+Look for `Invalid server configuration:` in the logs. The message identifies the missing token, invalid retention value, or missing storage. The HTTP response deliberately omits those configuration details.
+
+Check the [server configuration reference](/configuration) and [storage selection order](/storage#how-the-server-picks-a-backend). An existing KV or R2 binding takes precedence over S3 variables. Setting S3 variables alone does not switch a Worker away from its bound store.
+
+If configuration is valid, inspect the error's stack trace and the storage provider's response. Include those details, with credentials removed, when reporting a bug.
+
+## Dashboard stats are unavailable
+
+Request the stats endpoint:
+
+```sh
+curl --fail-with-body "$TURBO_API/stats"
+```
+
+`"enabled": false` means the server could not use its stats database. Check for `[stats]` errors in the logs and [configure a database](/stats-database). Cache reads and writes can work while stats are unavailable.
+
+On Node.js and Deno, keep `.data/db.sqlite` on persistent storage. Serverless hosts need a hosted database. After changing a database connection in `nitro.config.ts`, rebuild the server.
+
+## Storage figures are empty or stale
+
+Storage measurements come from the expiry task, not from each upload. A new deployment has no measurements until that task runs successfully.
+
+[Run expiry on demand](/retention#run-expiry-on-demand), then refresh the dashboard. This also deletes expired objects. On Netlify and Lambda, [schedule the request](/retention#run-expiry-from-a-scheduler), because those builds do not run the schedule automatically.
+
+## Expiry returns 400
+
+The expiry endpoint requires a JSON body, even when you want the default retention period. Send `{}` with `Content-Type: application/json`, as shown in [Run expiry on demand](/retention#run-expiry-on-demand).
+
+## Report a problem
+
+Include the server version or deployed commit, Turbo version, hosting platform, storage backend, and the failing command or request. Include the response status and relevant logs, with tokens and credentials removed. Report bugs in [GitHub Issues](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/issues). Report vulnerabilities through the [security policy](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/security/policy).

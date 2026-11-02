@@ -1,0 +1,97 @@
+---
+title: Deploy to Cloudflare
+description: Build and deploy the Worker from your own checkout, or deploy changes automatically from Git.
+---
+
+For your first deployment, [Get started](/get-started) walks through the Deploy to Cloudflare button and verifies a remote cache hit. Use this guide to deploy from the command line or configure continuous deployment.
+
+## Before the first deploy
+
+The default deployment creates a Worker, an R2 bucket for artifacts, and a D1 database for stats. Use a dedicated bucket: the expiry task deletes old objects throughout that bucket.
+
+The dashboard at `/` and its `/stats` endpoint are public. Cache requests require a shared token that grants access to every team. Read [the access model](/introduction#who-can-access-the-cache) before sharing the server.
+
+Enable R2 in your Cloudflare account. To choose the bucket's location, [create it before deploying](/storage/r2#choose-where-the-bucket-lives). Otherwise, Wrangler creates it near the machine that runs the first deploy.
+
+Generate a token once and save it in your secret manager:
+
+```sh
+openssl rand -hex 32
+```
+
+## Build and deploy
+
+You need [Node.js](https://nodejs.org) 24 or later and [pnpm](https://pnpm.io). Install pnpm using its [installation guide](https://pnpm.io/installation). Use the version in the repository's `packageManager` field.
+
+1. Clone the repository and install its dependencies:
+
+    ```sh
+    git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
+    cd turborepo-remote-cache-cloudflare
+    pnpm install
+    ```
+
+2. Remove the root `turbo.json` file's `remoteCache` entry, or replace its URL and team with your own cache. It points at the maintainer's cache, so do this before supplying your token to builds.
+
+3. Build the Worker and deploy it:
+
+    ```sh
+    pnpm build
+    pnpm run deploy
+    ```
+
+    Wrangler opens a browser to sign you in to Cloudflare if you aren't signed in yet. On the first deploy, it creates the `turborepo-cache` R2 bucket and the `turborepo-cache-stats` D1 database for the [dashboard](/dashboard). When it finishes, it prints the Worker's URL, such as `https://turborepo-remote-cache.<your-subdomain>.workers.dev`.
+
+4. Set the token:
+
+    ```sh
+    cd apps/api
+    pnpm exec wrangler secret put TURBO_TOKEN
+    ```
+
+    Wrangler asks for the value. Paste your token.
+
+## Check the deployment
+
+`/ping` needs no token. Replace the URL with your Worker's URL:
+
+```sh
+export TURBO_API='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
+curl --fail "$TURBO_API/ping"
+```
+
+The Worker answers `pong`. Now check the token:
+
+```sh
+export TURBO_TOKEN='replace-with-your-saved-token'
+curl --fail -H "Authorization: Bearer $TURBO_TOKEN" "$TURBO_API/v8/artifacts/status"
+```
+
+The Worker answers `{"status":"enabled"}`. A `401` response means the token doesn't match `TURBO_TOKEN`.
+
+[Connect turbo](/connect-turbo) to verify that your builds use the server.
+
+## Deploy changes from Git
+
+Choose one deployment service for a Worker. Using both Workers Builds and GitHub Actions can deploy the same commit twice.
+
+### Workers Builds
+
+The Deploy to Cloudflare button connects your repository to [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/). Push changes to its configured production branch to deploy them. Use the repository root as the build directory, `pnpm run build` as the build command, and `pnpm run deploy` as the deploy command.
+
+Keep `TURBO_TOKEN` as a Worker secret. Leave the GitHub Actions variable `CACHE_DEPLOY_ENABLED` unset when Workers Builds handles deployment.
+
+### GitHub Actions
+
+The included CI workflow verifies changes and deploys pushes to `master`. Deployment is opt-in for copies of this repository. Before enabling it, remove or replace the maintainer's `remoteCache` settings in the root `turbo.json`.
+
+1. Under your repository's **Settings** > **Secrets and variables** > **Actions**, add these secrets:
+    - `CLOUDFLARE_API_TOKEN`: a token with permission to deploy Workers and manage the R2 and D1 resources in the target account.
+    - `CLOUDFLARE_ACCOUNT_ID`: the target account ID.
+    - `TURBO_TOKEN`: the same token your clients use.
+2. Add a repository variable named `CACHE_DEPLOY_ENABLED` with the value `true`.
+3. Push to `master`. If you use a different production branch, update the workflow's branch filters and deployment condition.
+
+The deploy job stops if `TURBO_TOKEN` is missing. It writes the configured token to the Worker on every deployment. Documentation publishing and release jobs run only in the upstream repository.
+
+[Update your deployment](/update) explains how to bring in upstream releases without losing your configuration.

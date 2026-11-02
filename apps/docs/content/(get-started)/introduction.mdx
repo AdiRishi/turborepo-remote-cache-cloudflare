@@ -20,10 +20,22 @@ Each artifact is one object with the key `<team>/<hash>`. The team is the `teamI
 
 The server deletes artifacts older than 30 days by default. [Retention and expiry](/retention) explains how to change that.
 
-## One token opens every team
+<a id="one-token-opens-every-team" />
+
+## Who can access the cache
 
 Every client sends the same bearer token, the server's `TURBO_TOKEN`. Teams keep artifacts apart, but they don't restrict access: anyone with the token can read and write every team's artifacts. Give the token only to people and CI jobs you trust to write to your cache. Run a separate deployment for each group that must stay apart.
 
+The dashboard at `/` and the JSON stats at `/stats` are public. They expose team names and usage without the token. You can [restrict access](/dashboard#restrict-access) separately from the artifact API.
+
+## What you maintain
+
+You run a copy of this repository in your own account. The Deploy to Cloudflare button creates that copy and connects it to Workers Builds. It does not keep your source in sync with upstream releases.
+
+On Cloudflare, resource bindings and server variables live in `apps/api/wrangler.jsonc`, while secrets live in your Cloudflare account. Other platforms read server variables from their runtime environment. Changes to the expiry schedule, database configuration, or custom adapter require a source edit and a rebuild.
+
+[Update your deployment](/update) explains how to bring in releases and preserve your settings.
+
 ## Where it runs
 
-The server is a [Nitro](https://nitro.build) app, and every build serves the same API. The default build targets Cloudflare Workers. It is the only build with built-in R2 and KV storage, and the only one that CI runs end to end against a real `turbo` client. [Deploy to Cloudflare](/get-started) to start there, or see [Platforms](/deploy) for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
+The server is a [Nitro](https://nitro.build) app, and every build serves the same API. The default build targets Cloudflare Workers. It is the only build with built-in R2 and KV storage, and the only one that CI runs end to end against a real `turbo` client. [Get started](/get-started) to deploy there, or [choose a platform](/deploy) for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.

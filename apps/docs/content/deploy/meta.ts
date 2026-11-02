@@ -1,7 +1,7 @@
 import { defineMeta } from 'blume';
 
 export default defineMeta({
-  title: 'Other platforms',
+  title: 'Deploy',
   order: 2,
-  pages: ['node', 'vercel', 'netlify', 'aws-lambda'],
+  pages: ['cloudflare', 'node', 'vercel', 'netlify', 'aws-lambda'],
 });

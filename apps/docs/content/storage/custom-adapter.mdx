@@ -56,10 +56,10 @@ This example uses the Files SDK `fs` adapter on one Node.js server with a persis
 
     ```sh
     cd apps/api
-    CACHE_DIR=/var/lib/turborepo-cache TURBO_TOKEN=<your token> PORT=3000 pnpm start
+    CACHE_DIR=/var/lib/turborepo-cache TURBO_TOKEN='replace-with-your-server-token' PORT=3000 pnpm start
     ```
 
-4. Set `TURBO_API=http://<server>:3000` and run a build twice, as in [Connect turbo](/connect-turbo#check-that-hits-come-from-the-server). The second run prints `cache hit, replaying logs`.
+4. For a local check, set `TURBO_API=http://localhost:3000` and follow [Connect turbo](/connect-turbo#verify-remote-hits). Before exposing the server to other machines, [serve it over HTTPS](/deploy/node#serve-it-over-https).
 
 The server writes each artifact to `<CACHE_DIR>/<team>/<hash>`, with its metadata in a `<hash>.meta.json` file beside it.
 

@@ -1,40 +1,37 @@
 # Contributing
 
-Welcome! We're thrilled that you're interested in contributing to `turborepo-remote-cache-cf`. Your contributions will help improve the project and benefit the community.
+## Set up the repository
 
----
+Install Node.js 24 or later and the pnpm version in `package.json`. Then clone the repository:
 
-Here are some guidelines to help you get started:
+```sh
+git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
+cd turborepo-remote-cache-cloudflare
+pnpm install --frozen-lockfile
+```
 
-## Setting Up the Repository
+The server lives in `apps/api`, the dashboard in `apps/dashboard`, and the documentation site in `apps/docs`. `packages/files-sdk-kv` is a standalone Files SDK adapter. `packages/spec` contains the upstream API specification and generated types.
 
-To set up the repository on your local machine, follow these steps:
+Run commands from the repository root. You do not need the maintainer's remote-cache credentials to contribute. Without them, Turbo uses the local cache.
 
-1. Clone the repository using `git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git`.
-2. Move into the project directory with `cd turborepo-remote-cache-cf`.
-3. Install the project dependencies by running `pnpm install`.
+## Run locally
 
-## Making a Pull Request
+`pnpm dev` starts the workspace development tasks. For the built Cloudflare Worker, run `pnpm build` followed by `pnpm preview`.
 
-Before submitting a pull request, ensure you adhere to the following:
+For the documentation site alone, run `pnpm --filter @turborepo-remote-cache/docs dev`. Before changing the site, read the relevant Blume documentation in `apps/docs/node_modules/blume/docs`.
 
-1. Run lint and test commands to check for any errors. You can do this by running `pnpm lint` and `pnpm test`.
-2. Write unit tests for any changes you make. This helps maintain the quality of the code and ensures that your changes don't accidentally break anything.
-3. Always sign your commits. This confirms that the changes come from a trusted source. Read [this documentation](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification) to learn how to sign commits.
+## Check a change
 
-To create a pull request:
+Run `pnpm check` for every change. It runs lint, typechecking, tests, and builds. Use `pnpm lint:fix` to fix formatting and supported lint findings.
 
-1. Push your changes to your fork of the repository.
-2. Go to the `turborepo-remote-cache-cf` page in your GitHub account.
-3. Click the `New pull request` button.
+If a change affects the deployed server, also run `pnpm test:e2e`. This builds a Worker, starts Wrangler locally on port 8787, and tests the HTTP contract and real Turbo clients. It does not deploy to Cloudflare.
 
-In the `New pull request` page:
+After changing `wrangler.jsonc` or the API specification, run `pnpm codegen` and include the generated files. Check them with `pnpm codegen:check`. Keep the upstream specification unmodified; put documentation corrections in `apps/docs/openapi-overlay.yaml`.
 
-1. Choose the original repository as base repository and your fork as the head repository.
-2. Confirm your changes and submit your pull request.
+Add or update focused tests for changed behavior. Update the matching page in `apps/docs/content` when behavior or configuration changes. When moving a public page, preserve its URL or add a redirect in `apps/docs/blume.config.ts`.
 
----
+## Open a pull request
 
-By contributing to this project, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md).
+Use a branch such as `fix/cache-expiry` or `docs/client-setup`. Keep the change focused and sign your commits. The pull request should explain the problem, the resulting behavior, and how you verified it.
 
-We appreciate your interest in contributing and look forward to your pull requests!
+Repository-specific engineering constraints are recorded in [AGENTS.md](../AGENTS.md). Contributors follow the [Code of Conduct](CODE_OF_CONDUCT.md). Report vulnerabilities privately through the [security policy](SECURITY.md).

@@ -1,0 +1,42 @@
+---
+title: Sign artifacts
+description: Configure Turbo to verify downloaded artifacts with a shared signing key.
+---
+
+Turbo signs uploads with HMAC-SHA256 and rejects downloads whose signatures do not verify. The server stores each signature and returns it unchanged. Signing is optional and separate from the bearer token that controls access to the server.
+
+## Enable signatures
+
+1. Add `signature` to the existing `remoteCache` configuration in your application's `turbo.json`:
+
+    ```json
+    {
+        "remoteCache": {
+            "signature": true
+        }
+    }
+    ```
+
+2. Generate a key once:
+
+    ```sh
+    openssl rand -hex 32
+    ```
+
+3. Save that value in your secret manager. Set the same value on every developer machine and CI job that shares artifacts:
+
+    ```sh
+    export TURBO_REMOTE_CACHE_SIGNATURE_KEY='replace-with-your-saved-signing-key'
+    ```
+
+    Do not generate a new key for each run or machine. Keep it out of version control and use a separate value from `TURBO_TOKEN`.
+
+4. Run the [remote cache verification](/connect-turbo#verify-remote-hits).
+
+Previously unsigned artifacts and artifacts signed with a different key are treated as misses. Turbo runs those tasks again and uploads signed replacements. A missing key prevents signed uploads.
+
+## Change the signing key
+
+Replace the key on all clients that share artifacts. During a staggered rollout, clients with different keys reject each other's artifacts. Once they use the same key, newly uploaded artifacts can be shared again.
+
+See [Turborepo's signature documentation](https://turborepo.dev/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification) for the client-side behavior.

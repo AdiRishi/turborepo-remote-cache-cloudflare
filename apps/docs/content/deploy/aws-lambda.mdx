@@ -4,10 +4,14 @@ description: Build the server as an AWS Lambda handler with Amazon S3 storage, u
 ---
 
 :::warning
-Lambda caps a synchronous request or response at 6 MB, so larger artifacts never reach the cache.
+Lambda caps a synchronous invocation payload at 6 MB. The event envelope and Base64 encoding reduce the size available for a binary artifact. Check the [artifact size limits](/deploy#artifact-size-limits) before choosing Lambda.
 :::
 
 ## Build the handler
+
+Clone your copy of the repository and install dependencies with `pnpm install --frozen-lockfile`. Use Node.js 24 or later and the pnpm version in `package.json`. Run the build from the repository root:
+
+Remove or replace the root `turbo.json` file's `remoteCache` entry before giving builds your token. It points at the maintainer's cache.
 
 ```sh
 NITRO_PRESET=aws_lambda pnpm build
@@ -28,6 +32,10 @@ S3_ENDPOINT=https://s3.us-east-1.amazonaws.com
 ```
 
 Leave the `S3_*` keys and `S3_REGION` unset to use the function's execution role. Lambda puts the role's credentials in `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN`, and its region in `AWS_REGION`, and the server reads all four. The role needs `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject`, and `s3:ListBucket` on the bucket.
+
+## Verify the deployment
+
+[Connect turbo](/connect-turbo) to the production URL and verify a remote hit. For dashboard history, [configure a hosted stats database](/stats-database).
 
 ## The expiry task
 

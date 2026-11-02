@@ -5,16 +5,6 @@ description: Find each request's logs, trace, and errors on Cloudflare, send the
 
 On Cloudflare Workers, `apps/api/wrangler.jsonc` turns on [Workers Logs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/), [traces](https://developers.cloudflare.com/workers/observability/traces/), and [Issues](https://developers.cloudflare.com/workers/observability/issues/). Find all three in the Cloudflare dashboard, under the Worker's observability pages.
 
-```jsonc apps/api/wrangler.jsonc
-{
-    "observability": {
-        "enabled": true,
-        "traces": { "enabled": true },
-        "issues": { "enabled": true },
-    },
-}
-```
-
 ## What the server records
 
 | Feature | What you get                                                                                                                                                                                                                                                       |
@@ -27,7 +17,7 @@ The build writes source maps and Wrangler uploads them, so stack traces point at
 
 ## Sample requests
 
-`turbo` sends at least one request for every task in a run. Each request writes one log and about six spans. From December 1, 2026, Cloudflare bills logs and traces under [Cloudflare Observability pricing](https://developers.cloudflare.com/workers/observability/logs/workers-logs/#pricing).
+Request volume and trace collection affect observability usage. Review [Cloudflare's current pricing](https://developers.cloudflare.com/workers/observability/logs/workers-logs/#pricing) when choosing how much to retain.
 
 To keep only a share of requests, set a sampling rate between `0` and `1`. Each request is kept or dropped as a whole. This keeps 10% of logs and 5% of traces:
 

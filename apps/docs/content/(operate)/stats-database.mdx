@@ -1,0 +1,44 @@
+---
+title: Configure the stats database
+description: Keep dashboard history on persistent storage, or disable stats while retaining the cache.
+---
+
+The server records stats in a database through [Nitro's database layer](https://nitro.build/docs/database). It schedules stats writes after the response. Stats failures do not fail cache requests. Without a database, the cache works the same and the dashboard explains that stats are off.
+
+| Platform                                                                               | Database                                                                                                                                                              |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Cloudflare Workers](/deploy/cloudflare)                                               | A D1 database bound as `STATS_DB`. Wrangler creates it, named `turborepo-cache-stats`, on the first deploy.                                                           |
+| [Node.js and Deno](/deploy/node)                                                       | Nitro's default SQLite database, a file at `.data/db.sqlite` in the working directory. Keep it on a persistent volume. For Bun, configure the `bun-sqlite` connector. |
+| [Vercel](/deploy/vercel), [Netlify](/deploy/netlify), [AWS Lambda](/deploy/aws-lambda) | Configure a hosted database. Local files are not a durable shared database on these hosts.                                                                            |
+
+For D1 usage limits and charges, see [D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/).
+
+## Configure a hosted database
+
+Set the `default` connection in `apps/api/nitro.config.ts`. Use a hosted database on serverless platforms, whose file systems don't keep files between requests. For example, with [Turso](https://turso.tech):
+
+```ts title="apps/api/nitro.config.ts"
+// Add database to the existing defineConfig call.
+export default defineConfig({
+    database: {
+        default: {
+            connector: 'libsql',
+            options: { url: process.env.TURSO_URL, authToken: process.env.TURSO_AUTH_TOKEN },
+        },
+    },
+});
+```
+
+The server creates its tables on first use. Its queries run on SQLite and PostgreSQL, so choose a SQLite, libSQL, PostgreSQL, Neon, or PGlite [connector](https://nitro.build/docs/database#connectors). MySQL isn't supported.
+
+:::tip
+Nitro writes the connector options into the build output. A value read from `process.env` here is read when you build, not when the server starts.
+:::
+
+Rebuild and redeploy after changing database settings. Check `/stats` and the server logs to confirm that stats are enabled. See [Troubleshooting](/troubleshooting#dashboard-stats-are-unavailable) if they remain unavailable.
+
+## Turn stats off
+
+On Cloudflare, remove the `d1_databases` entry from `apps/api/wrangler.jsonc`. Elsewhere, set `database: {}` in `apps/api/nitro.config.ts`.
+
+Rebuild and redeploy. The dashboard then reports that stats are disabled; artifact caching continues to work.
