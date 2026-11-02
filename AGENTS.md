@@ -30,6 +30,7 @@ Test this project's behaviour, and trust Files SDK, Nitro, and the platforms to 
 - `packages/spec` holds the spec unmodified, so `pnpm spec:sync` can replace it. Fix spec problems in `apps/docs/openapi-overlay.yaml`.
 - The `master` ruleset requires the checks `Verify`, `End-to-end`, and `Dependency review` by name. Renaming those jobs blocks merges until the ruleset changes too. Add new CI work as a job in `ci.yml`.
 - Type-aware Oxlint needs TypeScript 7, which rejects `baseUrl`. Use `paths` relative to the tsconfig.
+- In the docs and README, write every `turbo` command a reader runs in their own repository as `npm exec -- turbo ...`. It works without a global install and with any package manager. The `--` stops npm from taking `turbo` flags such as `--cache` and `--manual` as its own. Build commands for this repository keep `pnpm`.
 - In the docs, Blume renders the frontmatter `title` as the page's H1 and the `description` below it, so start the body with new information. Write callouts as `:::tip`, with no space after the colons. When you move a page, add a redirect in `apps/docs/blume.config.ts`.
 
 <!-- BEGIN:turborepo-agent-rules -->

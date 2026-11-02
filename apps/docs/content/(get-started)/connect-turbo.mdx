@@ -37,6 +37,12 @@ Keep the token out of Git. `TURBO_API` and `TURBO_TEAM` in a machine's environme
 
 `turbo login --manual` asks for each value and checks the token against your server:
 
+```sh
+npm exec -- turbo login --manual
+```
+
+Answer its prompts:
+
 1. At **Remote Cache URL**, enter the server's URL.
 2. At **How do you want to specify your team?**, choose **slug** and enter the team name. Choose **id** only for a name that starts with `team_`.
 3. At **Enter token**, paste the token.
@@ -63,7 +69,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7
             # Install Node.js and your dependencies here.
-            - run: pnpm turbo run build
+            - run: npm exec -- turbo run build
 ```
 
 </Tab>
@@ -75,9 +81,8 @@ Add a masked `TURBO_TOKEN` variable under **Settings** > **CI/CD** > **Variables
 build:
     image: node:24
     script:
-        - corepack enable
-        - pnpm install --frozen-lockfile
-        - pnpm turbo run build
+        # Install your dependencies here.
+        - npm exec -- turbo run build
 ```
 
 </Tab>
@@ -87,7 +92,7 @@ Read the token from the provider's secret store before the step that runs `turbo
 
 ```sh
 export TURBO_TOKEN="$CACHE_TOKEN_SECRET"
-turbo run build
+npm exec -- turbo run build
 ```
 
 </Tab>

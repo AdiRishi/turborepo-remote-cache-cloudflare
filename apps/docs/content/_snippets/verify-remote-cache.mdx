@@ -1,9 +1,11 @@
-Run a cacheable task twice with the local cache switched off. No global `turbo`? Swap in `pnpm exec turbo` or `npx turbo`:
+Run a cacheable task twice with the local cache switched off.:
 
 ```sh
-turbo run build --cache=remote:rw
-turbo run build --cache=remote:r --summarize
+npm exec -- turbo run build --cache=remote:rw
+npm exec -- turbo run build --cache=remote:r --summarize
 ```
+
+The `--` matters. Without it, npm keeps `--cache` for itself and `turbo` never sees it.
 
 The first run builds anything the server doesn't have yet and uploads it. The second run can read from the server and nothing else, so every hit it reports came from your server. Look for these lines:
 
