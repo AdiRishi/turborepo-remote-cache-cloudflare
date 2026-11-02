@@ -86,7 +86,7 @@ jobs:
   # Pull requests get a Worker Preview; master deploys https://turborepo-remote-cache.dev.
   docs-cloudflare:
     name: Docs · Cloudflare Workers
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+    if: github.repository == 'AdiRishi/turborepo-remote-cache-cloudflare' && (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master'))
     needs: verify
     runs-on: ubuntu-latest
     environment:
@@ -116,7 +116,7 @@ jobs:
 
   docs-github-pages:
     name: Docs · GitHub Pages
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.repository == 'AdiRishi/turborepo-remote-cache-cloudflare' && (github.event_name == 'push' && github.ref == 'refs/heads/master')
     needs: verify
     runs-on: ubuntu-latest
     permissions:
@@ -155,7 +155,7 @@ jobs:
 
   deploy:
     name: Deploy · Cloudflare Workers
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && (github.repository == 'AdiRishi/turborepo-remote-cache-cloudflare' || vars.CACHE_DEPLOY_ENABLED == 'true')
     needs: [verify, e2e]
     runs-on: ubuntu-latest
     steps:
@@ -165,14 +165,19 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Check deployment token
+        run: |
+          if [ -z "$TURBO_TOKEN" ]; then
+            echo '::error::Set the TURBO_TOKEN repository secret before deploying.'
+            exit 1
+          fi
+
       - name: Build
         run: pnpm build --filter=@turborepo-remote-cache/api
 
       # Wrangler creates the R2 bucket named in wrangler.jsonc on the first deploy.
       - name: Deploy
         uses: cloudflare/wrangler-action@v4
-        env:
-          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN || 'SECRET' }}
         with:
           accountId: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
@@ -184,7 +189,7 @@ jobs:
 
   release:
     name: Release
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.repository == 'AdiRishi/turborepo-remote-cache-cloudflare' && (github.event_name == 'push' && github.ref == 'refs/heads/master')
     needs: verify
     runs-on: ubuntu-latest
     concurrency:
