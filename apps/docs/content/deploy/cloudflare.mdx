@@ -52,15 +52,15 @@ You need [Node.js](https://nodejs.org) 24 or later and [pnpm](https://pnpm.io). 
 `/ping` needs no token. Replace the URL with your Worker's URL:
 
 ```sh
-export TURBO_API='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
-curl --fail "$TURBO_API/ping"
+CACHE_URL='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
+curl --fail "$CACHE_URL/ping"
 ```
 
 The Worker answers `pong`. Now check the token:
 
 ```sh
 export TURBO_TOKEN='<your token>'
-curl --fail -H "Authorization: Bearer $TURBO_TOKEN" "$TURBO_API/v8/artifacts/status"
+curl --fail -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/artifacts/status"
 ```
 
 The Worker answers `{"status":"enabled"}`. A `401` response means the token doesn't match `TURBO_TOKEN`.

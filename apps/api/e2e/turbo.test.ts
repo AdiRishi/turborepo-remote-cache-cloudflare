@@ -63,18 +63,6 @@ describe('restoring from the remote cache', () => {
     expect(restore.output).toContain('built app on producer');
   });
 
-  test('remote-only verification populates a new server even when the local cache is warm', async () => {
-    const machine = await workspace.clone('developer', { team: randomTeam() });
-    await machine.build(['--cache=local:rw']);
-
-    expect(cacheSources((await machine.build(['--cache=remote:rw'])).tasks)).toEqual(
-      forEachPackage('MISS'),
-    );
-    expect(cacheSources((await machine.build(['--cache=remote:r'])).tasks)).toEqual(
-      forEachPackage('REMOTE'),
-    );
-  });
-
   test('a change rebuilds only the packages it affects, and the next clone restores work from both machines', async () => {
     const team = randomTeam();
     const first = await workspace.clone('first', { team });

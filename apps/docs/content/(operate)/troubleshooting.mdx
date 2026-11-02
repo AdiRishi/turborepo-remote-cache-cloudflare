@@ -3,7 +3,7 @@ title: Troubleshooting
 description: Diagnose failed connections, repeated cache misses, rejected uploads, and missing dashboard stats.
 ---
 
-A green build doesn't prove the remote cache worked. When `turbo` can't reach the server, it keeps going with the local cache and prints one line about it. Find your symptom below. The commands expect your server's URL in `TURBO_API` and its token in `TURBO_TOKEN`.
+A green build doesn't prove the remote cache worked. When `turbo` can't reach the server, it keeps going with the local cache and prints one line about it. Find your symptom below. The commands expect your server's URL in `CACHE_URL` and its token in `TURBO_TOKEN`.
 
 ## Turbo cannot connect
 
@@ -18,8 +18,8 @@ A green build doesn't prove the remote cache worked. When `turbo` can't reach th
 To narrow it down, check that the server is reachable and accepts your token:
 
 ```sh
-curl --fail-with-body "$TURBO_API/ping"
-curl --fail-with-body -H "Authorization: Bearer $TURBO_TOKEN" "$TURBO_API/v8/artifacts/status"
+curl --fail-with-body "$CACHE_URL/ping"
+curl --fail-with-body -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/artifacts/status"
 ```
 
 Expect `pong`, then `{"status":"enabled"}`.
@@ -36,11 +36,12 @@ Expect `pong`, then `{"status":"enabled"}`.
 
 ## Builds keep missing
 
-1. Run the [remote-only verification](/connect-turbo#check-that-hits-come-from-the-server). A normal build can use the local cache without contacting the server.
-2. Confirm that the task has caching enabled. Compare task hashes in the run summaries under `.turbo/runs/`. If the hash changes, Turbo sees different inputs. Check its [cache troubleshooting guide](https://turborepo.dev/docs/crafting-your-repository/caching#troubleshooting).
-3. Confirm that clients use the same server and team. A different team uses a different artifact namespace.
-4. Check the first run for upload errors. A task can succeed and still fail to upload its artifact. See [Uploads fail](#uploads-fail).
-5. If signatures are enabled, confirm that every client has the same `TURBO_REMOTE_CACHE_SIGNATURE_KEY`. A rejected signature is a cache miss. See [Sign artifacts](/sign-artifacts).
+1. Check whether the tasks were ever uploaded. `turbo` uploads a task only when it runs it, and a task it restores from the local cache never reaches the server. If you built before connecting the cache, the producing machine keeps getting local hits and the server stays empty. Delete `.turbo/cache` on that machine and build once. The [remote-hit check](/connect-turbo#check-that-hits-come-from-the-server) does exactly this.
+2. Find out where each hit came from. `npm exec -- turbo run build --summarize` writes a JSON summary to `.turbo/runs/`, and each task's `cache.source` is `LOCAL`, `REMOTE`, or absent for a miss.
+3. Confirm that the task has caching enabled. Compare the task hashes in two machines' run summaries. If the hash changes, Turbo sees different inputs. Check its [cache troubleshooting guide](https://turborepo.dev/docs/crafting-your-repository/caching#troubleshooting).
+4. Confirm that clients use the same server and team. A different team uses a different artifact namespace.
+5. Check the first run for upload errors. A task can succeed and still fail to upload its artifact. See [Uploads fail](#uploads-fail).
+6. If signatures are enabled, confirm that every client has the same `TURBO_REMOTE_CACHE_SIGNATURE_KEY`. A rejected signature is a cache miss. See [Sign artifacts](/sign-artifacts).
 
 After changing storage or after an artifact expires, a miss is expected. The task must run and upload again. With KV, newly written artifacts can take 60 seconds or more to reach another region.
 
@@ -70,7 +71,7 @@ If configuration is valid, inspect the error's stack trace and the storage provi
 Request the stats endpoint:
 
 ```sh
-curl --fail-with-body "$TURBO_API/stats"
+curl --fail-with-body "$CACHE_URL/stats"
 ```
 
 `"enabled": false` means the server couldn't use its stats database. Look for `[stats]` errors in the logs and [configure a database](/stats-database). The cache keeps working without stats.

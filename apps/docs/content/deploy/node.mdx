@@ -68,7 +68,7 @@ Check it with `curl http://localhost:3000/ping`, which answers `pong`.
 
 ## Serve it over HTTPS
 
-`turbo` sends the token with every request. Run the server behind a reverse proxy or load balancer that terminates TLS, and set `TURBO_API` to the HTTPS address.
+`turbo` sends the token with every request. Run the server behind a reverse proxy or load balancer that terminates TLS, and use the HTTPS address as `remoteCache.apiUrl` in `turbo.json`.
 
 [Connect turbo](/connect-turbo) using that HTTPS address, then verify a remote hit.
 

@@ -60,19 +60,27 @@ cd apps/api && pnpm exec wrangler secret put TURBO_TOKEN
 
 ## ▲ Point turbo at your cache
 
-In your Turborepo repository, set these variables with your Worker's URL and no trailing slash:
+Add your Worker to the root `turbo.json` of your Turborepo repository:
+
+```json
+{
+    "remoteCache": {
+        "apiUrl": "https://turborepo-remote-cache.<your-subdomain>.workers.dev",
+        "teamSlug": "my-team"
+    }
+}
+```
+
+Then give every machine that runs `turbo` the token, in its environment:
 
 ```sh
-export TURBO_API='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
 export TURBO_TOKEN='<your token>'
-export TURBO_TEAM=my-team
 ```
 
-Then build twice with the local cache switched off. The first run uploads to your Worker, and the second replays everything from it.:
+Run a build, and every task that runs uploads its outputs to your Worker. A task restored from your local cache doesn't upload, so clear `.turbo/cache` first if you've built this repository before. Then run the same build on any other machine, a teammate's laptop or a CI runner, and it replays:
 
 ```
-$ npm exec -- turbo run build --cache=remote:rw
-$ npm exec -- turbo run build --cache=remote:r
+$ npm exec -- turbo run build
 
 • Remote caching enabled
 

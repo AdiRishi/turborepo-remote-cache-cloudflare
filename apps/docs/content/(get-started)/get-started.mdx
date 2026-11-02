@@ -54,23 +54,32 @@ R2 creates the bucket near the machine that runs the first deploy. To pick its l
 Put your Worker's URL and token in the terminal, then knock on the door:
 
 ```sh
-export TURBO_API='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
+CACHE_URL='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
 export TURBO_TOKEN='<your token>'
-curl "$TURBO_API/ping"
-curl -H "Authorization: Bearer $TURBO_TOKEN" "$TURBO_API/v8/artifacts/status"
+curl "$CACHE_URL/ping"
+curl -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/artifacts/status"
 ```
 
 The first request answers `pong`, and needs no token. The second answers `{"status":"enabled"}`. A `401` means the token doesn't match the Worker's secret. For anything else, see [Turbo cannot connect](/troubleshooting#turbo-cannot-connect).
 
 <a id="run-your-first-remote-hit" />
 
-## Get your first remote hit
+## Connect your repository
 
-In the same terminal, switch to your Turborepo repository, so the URL and token come with you. Then pick a team name. Any name works, as long as every machine that shares builds uses the same one:
+In the same terminal, switch to your Turborepo repository, so the token comes with you. Add the cache to the root `turbo.json`, beside your existing settings:
 
-```sh
-export TURBO_TEAM=my-team
+```json turbo.json
+{
+    "remoteCache": {
+        "apiUrl": "https://turborepo-remote-cache.<your-subdomain>.workers.dev",
+        "teamSlug": "my-team"
+    }
+}
 ```
+
+Use your Worker's URL, with no trailing slash. The team is any name you like, as long as every machine that shares builds uses the same one. `turbo` reads the token from `TURBO_TOKEN`, which you already set.
+
+## Get your first remote hit
 
 <include>/_snippets/verify-remote-cache.mdx</include>
 

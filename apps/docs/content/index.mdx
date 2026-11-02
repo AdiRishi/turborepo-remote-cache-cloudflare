@@ -10,7 +10,7 @@ sidebar:
 
 # A Turborepo remote cache you host yourself
 
-Build it once, anywhere on your team, and every other laptop and CI runner replays it instead of building it again. The artifacts live in storage you own, on a server you deploy to Cloudflare Workers with one button, or build for Node.js, Vercel, AWS Lambda, and more.
+Build once, and every laptop and CI runner on your team replays the result from storage you own. One button deploys it to Cloudflare Workers.
 
 [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) [Read the docs](/introduction)
 
@@ -46,12 +46,15 @@ Build it once, anywhere on your team, and every other laptop and CI runner repla
         ```
     </Step>
     <Step title="Point turbo at the Worker">
-        Set these variables in your Turborepo repository, then build twice with `--cache=remote:rw` and `--cache=remote:r`. The second run ends with `FULL TURBO`, because every task came back from your Worker.
+        Add the Worker to your root `turbo.json`, and give every machine the token as `TURBO_TOKEN`. From then on, a task that runs anywhere replays everywhere else.
 
-        ```sh
-        export TURBO_API='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
-        export TURBO_TOKEN='<your token>'
-        export TURBO_TEAM=my-team
+        ```json turbo.json
+        {
+            "remoteCache": {
+                "apiUrl": "https://turborepo-remote-cache.<your-subdomain>.workers.dev",
+                "teamSlug": "my-team"
+            }
+        }
         ```
     </Step>
     <Step title="Sign your artifacts (optional, recommended)">
