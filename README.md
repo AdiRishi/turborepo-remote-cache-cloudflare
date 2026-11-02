@@ -10,7 +10,7 @@
 
 [![CI](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/actions/workflows/ci.yml/badge.svg)](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/github/AdiRishi/turborepo-remote-cache-cloudflare/badge.svg)](https://coveralls.io/github/AdiRishi/turborepo-remote-cache-cloudflare) ![GitHub License](https://img.shields.io/github/license/AdiRishi/turborepo-remote-cache-cloudflare) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](.github/CONTRIBUTING.md)
 
-<a href="https://adirishi.github.io/turborepo-remote-cache-cloudflare" target="_blank">
+<a href="https://turborepo-remote-cache.dev" target="_blank">
   <img src="https://img.shields.io/badge/Visit-Developer%20Docs-%230572BE?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Visit Developer Docs">
 </a>
 
@@ -20,7 +20,7 @@
 
 An open-source [Turborepo remote cache](https://turborepo.dev/docs/core-concepts/remote-caching) server that you host yourself, **built first for [Cloudflare Workers](https://developers.cloudflare.com/workers/)**. Deploy it in one click, and every laptop and CI runner on your team shares build outputs through storage you own.
 
-📚 The [documentation](https://adirishi.github.io/turborepo-remote-cache-cloudflare) covers every storage option, platform, and setting.
+📚 The [documentation](https://turborepo-remote-cache.dev) covers every storage option, platform, and setting.
 
 ## 🤔 Why should I use this?
 
@@ -28,9 +28,9 @@ An open-source [Turborepo remote cache](https://turborepo.dev/docs/core-concepts
 - 🌐 **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never leave your storage.
 - 💰 **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges [nothing for egress](https://www.cloudflare.com/learning/cloud/what-are-data-egress-fees/), so the bandwidth of every cache download is free.
 - 🌍 **Close to your builds.** The Worker runs in Cloudflare data centers around the world.
-- 💿 **Your choice of storage.** 🪣 [R2](https://adirishi.github.io/turborepo-remote-cache-cloudflare/storage/r2), 🔑 [KV](https://adirishi.github.io/turborepo-remote-cache-cloudflare/storage/kv), any [S3-compatible bucket](https://adirishi.github.io/turborepo-remote-cache-cloudflare/storage/s3), or anything with a [Files SDK](https://files-sdk.dev) adapter.
+- 💿 **Your choice of storage.** 🪣 [R2](https://turborepo-remote-cache.dev/storage/r2), 🔑 [KV](https://turborepo-remote-cache.dev/storage/kv), any [S3-compatible bucket](https://turborepo-remote-cache.dev/storage/s3), or anything with a [Files SDK](https://files-sdk.dev) adapter.
 - 📊 **A dashboard at the root.** See how much time the cache saves, its hit rate, what it stores, and which teams, CI providers, and coding agents use it.
-- 🧳 **Not only Cloudflare.** The same server builds for [Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda](https://adirishi.github.io/turborepo-remote-cache-cloudflare/deploy).
+- 🧳 **Not only Cloudflare.** The same server builds for [Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda](https://turborepo-remote-cache.dev/deploy).
 
 ## ⚡️ Quick start
 
@@ -85,7 +85,7 @@ Cached:    1 cached, 1 total
 
 And that's it 🎉🎉
 
-[Connect turbo](https://adirishi.github.io/turborepo-remote-cache-cloudflare/connect-turbo) covers CI, signed artifacts, and keeping the URL and team in `turbo.json`.
+[Connect turbo](https://turborepo-remote-cache.dev/connect-turbo) covers CI, signed artifacts, and keeping the URL and team in `turbo.json`.
 
 ## 🤝 Contributing
 
