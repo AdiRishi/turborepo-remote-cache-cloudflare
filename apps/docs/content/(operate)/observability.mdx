@@ -17,7 +17,7 @@ The build writes source maps and Wrangler uploads them, so stack traces point at
 
 ## Sample requests
 
-Request volume and trace collection affect observability usage. Review [Cloudflare's current pricing](https://developers.cloudflare.com/workers/observability/logs/workers-logs/#pricing) when choosing how much to retain.
+`turbo` sends at least one request for every task in a run. Each request writes one log and about six spans. From December 1, 2026, Cloudflare bills logs and traces under [Cloudflare Observability pricing](https://developers.cloudflare.com/workers/observability/logs/workers-logs/#pricing).
 
 To keep only a share of requests, set a sampling rate between `0` and `1`. Each request is kept or dropped as a whole. This keeps 10% of logs and 5% of traces:
 

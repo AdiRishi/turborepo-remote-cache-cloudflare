@@ -1,28 +1,24 @@
 ---
 title: Get started
-description: Deploy a cache on Cloudflare Workers and verify a remote hit from your Turborepo project.
+description: Deploy the cache to Cloudflare Workers with one button, then watch a build come back from it.
 ---
 
-Let's deploy a cache and use it for a real build. Cloudflare creates the Worker, an R2 bucket for your artifacts, and a D1 database for the dashboard. We'll finish by restoring a build from the server with the local cache turned off, so you can see that it works.
+We'll deploy the server with one button, give it a token, and run a build twice. The second time, `turbo` doesn't build anything. It replays the whole build from your Worker.
 
-You need a Cloudflare account, a GitHub or GitLab account, and a Turborepo project with a cacheable build task.
+You need a Cloudflare account, a GitHub or GitLab account, and a Turborepo repository with a cacheable `build` task.
 
-Prefer a terminal? [Deploy to Cloudflare](/deploy/cloudflare) covers Wrangler. For another host, [choose a platform](/deploy).
+Prefer a terminal? [Deploy with Wrangler](/deploy/cloudflare) instead. Running somewhere other than Cloudflare? [Choose a platform](/deploy).
 
-## Prepare your account and token
+## Before you deploy
 
-1. Open **R2 Object Storage** in the [Cloudflare dashboard](https://dash.cloudflare.com/) and enable R2 if you have not used it before. R2 has a [free tier](https://developers.cloudflare.com/r2/pricing/).
-2. Generate a token and save the value for the next steps:
+1. Turn on R2. If your account has never used it, open **R2 Object Storage** in the [Cloudflare dashboard](https://dash.cloudflare.com/) and follow the steps there. The [free tier](https://developers.cloudflare.com/r2/pricing/) includes 10 GB a month.
+2. Generate a token, and keep it somewhere safe:
 
     ```sh
     openssl rand -hex 32
     ```
 
-    This is the shared token your Worker and Turbo clients will use. It grants access to every team's artifacts.
-
-The dashboard shows your team's cache hits and time saved. It is public by default; [restrict access](/dashboard#restrict-access) if you want to keep team names and usage private.
-
-If bucket location matters, [create the bucket first](/storage/r2#choose-where-the-bucket-lives). The button otherwise creates it during deployment.
+    Your Worker and every `turbo` client share this one token. Anyone who has it can read and write every artifact on the server, so treat it like a password.
 
 ## Deploy your copy
 
@@ -35,46 +31,54 @@ If bucket location matters, [create the bucket first](/storage/r2#choose-where-t
     />
 </a>
 
-1. Select **Deploy to Cloudflare** and sign in.
-2. Connect your GitHub or GitLab account. Cloudflare copies this repository into your account and connects it to Workers Builds.
-3. Keep the build command `pnpm run build` and deploy command `pnpm run deploy`. Both run from the repository root.
-4. Wait for deployment to finish. It creates the Worker, the `turborepo-cache` R2 bucket, and the `turborepo-cache-stats` D1 database.
-5. Open the Worker under **Workers & Pages**. Under **Settings** > **Variables and Secrets**, add a secret named `TURBO_TOKEN` with the value you saved.
+1. Select **Deploy to Cloudflare** and sign in to Cloudflare.
+2. Connect your GitHub or GitLab account. Cloudflare copies this repository into it and creates a Worker that builds from the copy.
+3. Keep the build command, `pnpm run build`, and the deploy command, `pnpm run deploy`. Both run from the repository root, because the server depends on other packages in the workspace.
+4. Wait for the first deploy to finish. It creates the `turborepo-remote-cache` Worker, the `turborepo-cache` R2 bucket, and the `turborepo-cache-stats` D1 database for the [dashboard](/dashboard).
+5. Go to **Workers & Pages**, select the Worker, and open **Settings** > **Variables and Secrets**. Add a secret named `TURBO_TOKEN` with your token as its value.
 6. Copy the Worker's URL, such as `https://turborepo-remote-cache.<your-subdomain>.workers.dev`.
 
-With the token set, the server is ready for a client. If you check it before setting the secret, cache requests return `500`.
+Until `TURBO_TOKEN` is set, every cache request gets a `500`. The deploy worked. The server just won't serve anyone without a token.
+
+:::tip
+R2 creates the bucket near the machine that runs the first deploy. To pick its location, create the bucket before you deploy. [Cloudflare R2](/storage/r2#choose-where-the-bucket-lives) shows how.
+:::
+
+<a id="check-the-deployment" />
 
 ## Check the server
 
-Replace the example URL and token in these commands:
+Put your Worker's URL and token in the terminal, then knock on the door:
 
 ```sh
 export TURBO_API='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
-export TURBO_TOKEN='replace-with-your-saved-token'
-curl --fail "$TURBO_API/ping"
-curl --fail -H "Authorization: Bearer $TURBO_TOKEN" "$TURBO_API/v8/artifacts/status"
+export TURBO_TOKEN='<your token>'
+curl "$TURBO_API/ping"
+curl -H "Authorization: Bearer $TURBO_TOKEN" "$TURBO_API/v8/artifacts/status"
 ```
 
-The first request returns `pong`. The second returns `{"status":"enabled"}`. A `401` means the token does not match the Worker's secret. For a `500`, check the server logs for a configuration error. [Troubleshooting](/troubleshooting) shows what to check.
+The first request answers `pong`, and needs no token. The second answers `{"status":"enabled"}`. A `401` means the token doesn't match the Worker's secret. For anything else, see [Turbo cannot connect](/troubleshooting#turbo-cannot-connect).
 
-## Verify your first remote hit
+<a id="run-your-first-remote-hit" />
 
-Now switch to your application's Turborepo repository in the same terminal. Keep the URL and token you just checked, and choose a team name:
+## Get your first remote hit
+
+In the same terminal, switch to your Turborepo repository, so the URL and token come with you. Then pick a team name. Any name works, as long as every machine that shares builds uses the same one:
 
 ```sh
-export TURBO_TEAM='my-team'
+export TURBO_TEAM=my-team
 ```
 
 <include>/_snippets/verify-remote-cache.mdx</include>
 
-That build is now available to your other machines too. Open the Worker's URL to see it on the [dashboard](/dashboard), then [connect your team and CI](/connect-turbo) to share the cache.
+## See it on the dashboard
 
-Your deployment lives in the repository Cloudflare copied into your account. When you want a newer release, [update that copy](/update) and redeploy.
+Open your Worker's URL in a browser. The [dashboard](/dashboard) at the root already counts the hits you just made and the time they saved.
 
-## Deploy with Wrangler
+The dashboard is public, so anyone with the URL can see your team names and usage. [Restrict access](/dashboard#restrict-access) before you share the URL.
 
-For command-line deployment, use [Deploy to Cloudflare](/deploy/cloudflare#build-and-deploy).
+## Where to next
 
-## Deploy on every push
-
-[Configure Workers Builds or GitHub Actions](/deploy/cloudflare#deploy-changes-from-git) to deploy changes from your copy of the repository.
+- [Connect turbo](/connect-turbo) so your team and CI use the cache on every build.
+- [Sign artifacts](/sign-artifacts) so `turbo` rejects any artifact your own machines didn't sign.
+- Your copy of the repository doesn't follow new releases on its own. [Update your deployment](/update) when you want one.

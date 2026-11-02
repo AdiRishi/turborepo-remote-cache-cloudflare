@@ -22,10 +22,10 @@ Every laptop and CI runner on your team shares build outputs through storage you
 
 ## Why host your own cache
 
-- **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and you choose where your artifacts live.
-- **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges nothing for egress, so cache downloads have no R2 bandwidth charge. See [Cloudflare pricing](https://developers.cloudflare.com/r2/pricing/) for storage and operations.
+- **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never touch Vercel.
+- **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges nothing for egress, so the bandwidth of every cache download is free.
 - **Your choice of storage.** Keep artifacts in R2, Workers KV, any S3-compatible bucket, or anything with a [Files SDK](https://files-sdk.dev) adapter.
-- **See what you save.** The [dashboard](/dashboard) shows cache hits, time saved, and which teams and CI runners use the server.
+- **A dashboard at the root.** Open the server's URL to see the time the cache saved you, its hit rate, and which teams, CI providers, and coding agents use it.
 - **Signed artifacts.** The server stores each artifact's signature and returns it unchanged, so `turbo` can reject anything it didn't sign.
 
 </HomeSection>
@@ -36,7 +36,7 @@ Every laptop and CI runner on your team shares build outputs through storage you
 
 <Steps>
     <Step title="Deploy the Worker">
-        The [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) button copies this repository to your GitHub or GitLab account and deploys it with an R2 bucket. You can also [deploy with Wrangler](/deploy/cloudflare#build-and-deploy).
+        The [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) button copies this repository to your GitHub or GitLab account and deploys it with an R2 bucket. You can also [deploy with Wrangler](/deploy/cloudflare).
     </Step>
     <Step title="Set a token">
         Generate a long random token and add it to the Worker as a secret named `TURBO_TOKEN`.
@@ -46,18 +46,18 @@ Every laptop and CI runner on your team shares build outputs through storage you
         ```
     </Step>
     <Step title="Point turbo at the Worker">
-        Give your application repository the server's URL, token, and a team name:
+        Set these variables in your Turborepo repository, then build twice with `--cache=remote:rw` and `--cache=remote:r`. The second run ends with `FULL TURBO`, because every task came back from your Worker.
 
         ```sh
         export TURBO_API='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
-        export TURBO_TOKEN='replace-with-your-token'
+        export TURBO_TOKEN='<your token>'
         export TURBO_TEAM=my-team
         ```
     </Step>
 
 </Steps>
 
-[Get started](/get-started) takes you through your first remote cache hit. Then [connect your team and CI](/connect-turbo) so they can reuse those builds too.
+[Get started](/get-started) has every step, and [Connect turbo](/connect-turbo) brings in your team and CI.
 
 </HomeSection>
 
@@ -65,7 +65,7 @@ Every laptop and CI runner on your team shares build outputs through storage you
 
 ## Run it anywhere
 
-Cloudflare Workers with R2 is the default. Already have a server or a bucket? The same API runs on other hosts and uses the storage you choose. [Compare platforms](/deploy) for their artifact limits and setup requirements.
+The same server builds for other platforms and stores artifacts wherever you choose. [Choose a platform](/deploy) compares their artifact size limits.
 
 <Columns cols={2}>
     <Column>

@@ -1,12 +1,28 @@
-Let's check that a build really comes back from your server. Run a cacheable task twice, with the local cache disabled for both runs. These commands use the Turbo installed in your project:
+Run a cacheable task twice with the local cache switched off:
 
 ```sh
-pnpm exec turbo run build --cache=remote:rw
-pnpm exec turbo run build --cache=remote:r --summarize
+turbo run build --cache=remote:rw
+turbo run build --cache=remote:r --summarize
 ```
 
-The first run builds and uploads any missing artifacts. The second reads only from the server. For tasks with unchanged inputs and caching enabled, expect `cache hit, replaying logs` on the second run.
+The first run builds anything the server doesn't have yet and uploads it. The second run can read from the server and nothing else, so every hit it reports came from your server. Look for these lines:
 
-For a closer look, open the JSON summary in `.turbo/runs/`. A task restored from the server has `"remote": true` and `"status": "HIT"` in its `cache` field. The `Remote caching enabled` message alone means the connection is configured, not that a task hit the cache.
+```text
+   • Remote caching enabled
 
-If a task still misses, use [Troubleshooting](/troubleshooting#builds-keep-missing). Once verified, run builds normally to use both the local and remote caches.
+build: cache hit, replaying logs edf677b2880f0799
+
+  Tasks:    1 successful, 1 total
+ Cached:    1 cached, 1 total
+   Time:    19ms >>> FULL TURBO
+```
+
+`FULL TURBO` means every task came back from the cache. `Remote caching enabled` on its own only means `turbo` found a URL, a token, and a team. It doesn't mean anything hit.
+
+`--summarize` writes a JSON summary to `.turbo/runs/`. A task restored from the server has this `cache` field:
+
+```json
+{ "local": false, "remote": true, "status": "HIT", "source": "REMOTE", "timeSaved": 118 }
+```
+
+If tasks still miss, see [Builds keep missing](/troubleshooting#builds-keep-missing). Once it works, drop the `--cache` flag. `turbo` then checks the local cache first and your server second.

@@ -3,11 +3,11 @@ title: Deploy to Cloudflare
 description: Build and deploy the Worker from your own checkout, or deploy changes automatically from Git.
 ---
 
-Prefer to deploy from your terminal? Wrangler builds the Worker and creates its R2 bucket and stats database on the first deploy. This guide also covers deployment from Git. For the button-based setup, use [Get started](/get-started).
+Wrangler builds the Worker from your checkout and creates its R2 bucket and stats database on the first deploy. For the one-button setup, use [Get started](/get-started).
 
 ## Before you begin
 
-Enable R2 in your Cloudflare account. To choose the bucket's location, [create it before deploying](/storage/r2#choose-where-the-bucket-lives). Otherwise, Wrangler creates it near the machine that runs the first deploy.
+Turn on R2 in your Cloudflare account. Wrangler creates the bucket near the machine that runs the first deploy. To pick its location, [create it before you deploy](/storage/r2#choose-where-the-bucket-lives).
 
 Generate a token for the Worker and your Turbo clients:
 
@@ -17,7 +17,7 @@ openssl rand -hex 32
 
 ## Build and deploy
 
-You need [Node.js](https://nodejs.org) 24 or later and [pnpm](https://pnpm.io). Install pnpm using its [installation guide](https://pnpm.io/installation). Use the version in the repository's `packageManager` field.
+You need [Node.js](https://nodejs.org) 24 or later and [pnpm](https://pnpm.io). Install the version in the repository's `packageManager` field, using the [pnpm installation guide](https://pnpm.io/installation).
 
 1. Clone the repository and install its dependencies:
 
@@ -27,7 +27,7 @@ You need [Node.js](https://nodejs.org) 24 or later and [pnpm](https://pnpm.io). 
     pnpm install
     ```
 
-2. Remove the root `turbo.json` file's `remoteCache` entry, or replace its URL and team with your own cache. It points at the maintainer's cache, so do this before supplying your token to builds.
+2. Remove `remoteCache` from the root `turbo.json`, or point it at your own server. It sends this repository's builds to the maintainer's cache, and with `TURBO_TOKEN` in your shell, `turbo` would send your token there too.
 
 3. Build the Worker and deploy it:
 
@@ -59,7 +59,7 @@ curl --fail "$TURBO_API/ping"
 The Worker answers `pong`. Now check the token:
 
 ```sh
-export TURBO_TOKEN='replace-with-your-saved-token'
+export TURBO_TOKEN='<your token>'
 curl --fail -H "Authorization: Bearer $TURBO_TOKEN" "$TURBO_API/v8/artifacts/status"
 ```
 
@@ -69,13 +69,11 @@ The Worker answers `{"status":"enabled"}`. A `401` response means the token does
 
 ## Deploy changes from Git
 
-The button sets up Workers Builds for you. If you prefer to keep builds and deployment in GitHub Actions, the repository includes a workflow for that too.
+Pick one service to deploy pushes to your copy. If you set up both, both deploy the same commit.
 
 ### Workers Builds
 
-[Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/) deploys pushes to the production branch of your copy. Keep the build directory at the repository root, the build command at `pnpm run build`, and the deploy command at `pnpm run deploy`. Set `TURBO_TOKEN` as a Worker secret.
-
-If you also configure GitHub Actions below, both services can deploy the same commit. Choose the one you want to handle deployment.
+If you used the Deploy to Cloudflare button, [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/) is already set up. It deploys every push to your copy's production branch. Keep the build directory at the repository root, the build command at `pnpm run build`, and the deploy command at `pnpm run deploy`.
 
 ### GitHub Actions
 
@@ -85,11 +83,8 @@ The repository's [CI workflow](https://github.com/AdiRishi/turborepo-remote-cach
 2. Add these repository secrets under **Settings** > **Secrets and variables** > **Actions**:
     - `CLOUDFLARE_API_TOKEN`: a token that can edit Workers, R2, and D1.
     - `CLOUDFLARE_ACCOUNT_ID`: your Cloudflare account ID.
-    - `TURBO_TOKEN`: the same token your clients use. The workflow sets it as the Worker's secret on each deployment.
-3. Push to `master`. If you use a different production branch, update the workflow's branch filters and deployment condition.
+    - `TURBO_TOKEN`: the same token your clients use. The workflow sets it as the Worker's secret on each deployment. If this secret is missing, the Worker's token becomes `SECRET`.
+3. Remove `remoteCache` from the root `turbo.json`, or point it at your own server. The workflow passes `TURBO_TOKEN` to every `turbo` run, so without this step it sends your token to the maintainer's cache.
+4. Push to `master`. If you use a different production branch, update the workflow's branch filters and deployment condition.
 
-If the repository secret `TURBO_TOKEN` is absent, the workflow deploys with `SECRET` as the token. Set the secret to use your own value.
-
-The root `turbo.json` points this repository's builds at the maintainer's cache. Remove its `remoteCache` entry or point it at your own server before supplying your token to CI.
-
-When a new release is available, [Update your deployment](/update) shows how to bring it into your copy while keeping your settings.
+When a new release comes out, [Update your deployment](/update) shows how to merge it into your copy.

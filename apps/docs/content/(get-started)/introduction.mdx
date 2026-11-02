@@ -20,21 +20,19 @@ Each artifact is one object with the key `<team>/<hash>`. The team is the `teamI
 
 The server deletes artifacts older than 30 days by default. [Retention and expiry](/retention) explains how to change that.
 
-<a id="one-token-opens-every-team" />
-
-## Who can access the cache
+## One token opens every team
 
 Every client sends the same bearer token, the server's `TURBO_TOKEN`. Teams keep artifacts apart, but they don't restrict access: anyone with the token can read and write every team's artifacts. Give the token only to people and CI jobs you trust to write to your cache. Run a separate deployment for each group that must stay apart.
 
-The dashboard at `/` and the JSON stats at `/stats` are public. They expose team names and usage without the token. You can [restrict access](/dashboard#restrict-access) separately from the artifact API.
+The dashboard at `/` and its JSON at `/stats` need no token at all. They show team names and usage to anyone with the URL, until you [restrict access](/dashboard#restrict-access).
 
-## What you maintain
+## Your copy is yours to update
 
-You run a copy of this repository in your own account. The Deploy to Cloudflare button creates that copy and connects it to Workers Builds. It does not keep your source in sync with upstream releases.
+The Deploy to Cloudflare button copies this repository into your account. From then on, the copy is yours. It doesn't follow upstream releases, and nothing upgrades it for you.
 
-On Cloudflare, resource bindings and server variables live in `apps/api/wrangler.jsonc`, while secrets live in your Cloudflare account. Other platforms read server variables from their runtime environment. Changes to the expiry schedule, database configuration, or custom adapter require a source edit and a rebuild.
+Your settings live in that copy too. On Cloudflare, bindings and server variables are in `apps/api/wrangler.jsonc`, and the expiry schedule and stats database are in `apps/api/nitro.config.ts`. Secrets such as `TURBO_TOKEN` stay in your Cloudflare account. On other platforms, server variables come from the host's environment.
 
-[Update your deployment](/update) explains how to bring in releases and preserve your settings.
+[Update your deployment](/update) shows how to merge a release without losing any of it.
 
 ## Where it runs
 

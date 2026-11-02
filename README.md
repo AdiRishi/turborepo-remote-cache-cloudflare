@@ -25,7 +25,7 @@ An open-source [Turborepo remote cache](https://turborepo.dev/docs/core-concepts
 ## 🤔 Why should I use this?
 
 - ⚡ **Faster builds.** A task that ran on any machine, with the same inputs, replays from the cache instead of running again.
-- 🌐 **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and you choose where your artifacts live.
+- 🌐 **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never touch Vercel.
 - 💰 **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges [nothing for egress](https://www.cloudflare.com/learning/cloud/what-are-data-egress-fees/), so the bandwidth of every cache download is free.
 - 🌍 **Close to your builds.** The Worker runs in Cloudflare data centers around the world.
 - 💿 **Your choice of storage.** 🪣 [R2](https://turborepo-remote-cache.dev/storage/r2), 🔑 [KV](https://turborepo-remote-cache.dev/storage/kv), any [S3-compatible bucket](https://turborepo-remote-cache.dev/storage/s3), or anything with a [Files SDK](https://files-sdk.dev) adapter.
@@ -38,23 +38,41 @@ An open-source [Turborepo remote cache](https://turborepo.dev/docs/core-concepts
 
 The button copies this repository to your GitHub or GitLab account and deploys it as a Worker with an R2 bucket. When it finishes, add a secret named `TURBO_TOKEN` to the Worker, with a long random value such as the output of `openssl rand -hex 32`.
 
-[Get started](https://turborepo-remote-cache.dev/get-started) walks through the deployment and your first remote hit. Prefer a terminal? [Deploy with Wrangler](https://turborepo-remote-cache.dev/deploy/cloudflare#build-and-deploy).
+### Deploy with the CLI
+
+You need Node.js 24 or later and pnpm. [Wrangler](https://developers.cloudflare.com/workers/wrangler/) comes with the repository and creates the R2 bucket on the first deploy.
+
+```sh
+# 1. Clone the repository
+git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
+cd turborepo-remote-cache-cloudflare
+
+# 2. Install packages
+pnpm install
+
+# 3. Build and deploy the Worker
+pnpm build
+pnpm run deploy
+
+# 4. Set the bearer token
+cd apps/api && pnpm exec wrangler secret put TURBO_TOKEN
+```
 
 ## ▲ Point turbo at your cache
 
-In your application repository, set these variables with your Worker's URL and no trailing slash:
+In your Turborepo repository, set these variables with your Worker's URL and no trailing slash:
 
 ```sh
 export TURBO_API='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
-export TURBO_TOKEN='replace-with-your-token'
+export TURBO_TOKEN='<your token>'
 export TURBO_TEAM=my-team
 ```
 
-Run a cacheable build twice, using only the remote cache for this check. With unchanged inputs, the second run restores the build from your Worker:
+Then build twice with the local cache switched off. The first run uploads to your Worker, and the second replays everything from it:
 
 ```
-$ pnpm exec turbo run build --cache=remote:rw
-$ pnpm exec turbo run build --cache=remote:r
+$ turbo run build --cache=remote:rw
+$ turbo run build --cache=remote:r
 
 • Remote caching enabled
 
@@ -65,9 +83,9 @@ Cached:    1 cached, 1 total
   Time:    19ms >>> FULL TURBO
 ```
 
-Your next machine can reuse that build too. 🎉
+And that's it 🎉🎉
 
-[Connect turbo](https://turborepo-remote-cache.dev/connect-turbo) makes this permanent for your team and CI. You can also [sign artifacts](https://turborepo-remote-cache.dev/sign-artifacts), [troubleshoot a cache miss](https://turborepo-remote-cache.dev/troubleshooting), or [update your deployment](https://turborepo-remote-cache.dev/update).
+[Get started](https://turborepo-remote-cache.dev/get-started) walks through the same steps with more detail. [Connect turbo](https://turborepo-remote-cache.dev/connect-turbo) sets up your team and CI. Your copy doesn't follow new releases on its own, so [Update your deployment](https://turborepo-remote-cache.dev/update) when you want one.
 
 ## 🤝 Contributing
 

@@ -1,66 +1,50 @@
 ---
 title: Update your deployment
-description: Bring upstream changes into your copy of the server, preserve its configuration, and verify the deployment.
+description: Merge a new release into your copy of the repository, keep your settings, and deploy it.
 ---
 
-Your deployment runs from your own copy of this repository. To pick up a new feature or a fix, bring the release into that copy and deploy it. Your bucket, token, and other settings can stay the same.
+Your server runs from your own copy of this repository, and that copy doesn't follow upstream releases on its own. To get a release, merge it into your copy and deploy. Your bucket, database, and token stay where they are.
 
-The Deploy to Cloudflare button connects your copy to Workers Builds, but it does not sync future releases from upstream.
+Coming from version 4? Read [Upgrade from v4](/upgrade-from-v4) first.
 
-For a version 4 deployment, first read [Upgrade from v4](/upgrade-from-v4).
+## Before you merge
 
-## Prepare the update
+1. Read the [server changelog](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/apps/api/CHANGELOG.md) for the release you want. Look for configuration changes and stats database migrations.
+2. If the release migrates the stats database, back it up. Rolling back the code doesn't roll back a migration. Artifacts need no backup, since `turbo` rebuilds any it can't find.
+3. Note the files that hold your settings. You'll keep your side of these when you merge:
+    - `apps/api/wrangler.jsonc`: Worker name, bindings, resource IDs, routes, and variables.
+    - `apps/api/nitro.config.ts`: stats database and expiry schedule.
+    - `apps/api/src/custom-adapter.ts`: custom storage, if you use it.
+    - `.github/workflows/ci.yml` and the root `turbo.json`: your deployment and build cache.
 
-1. Read the [server changelog](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/apps/api/CHANGELOG.md) and choose a release. Check for configuration changes and database migrations.
-2. Clone your deployed repository and commit any local changes before merging an update. Record the commit currently deployed so you can rebuild it if needed.
-3. Identify the settings you must retain:
-    - `apps/api/wrangler.jsonc`: Worker name, resource names and IDs, routes, and variables.
-    - `apps/api/nitro.config.ts`: database connection and expiry schedule.
-    - `apps/api/src/custom-adapter.ts`: custom storage, if used.
-    - `.github/workflows/ci.yml` and `turbo.json`: your deployment and build-cache settings.
-4. Back up the stats database before an update that changes its schema. Artifacts are disposable build outputs, but lost usage history cannot be reconstructed from them.
+## Merge the release
 
-## Merge an upstream release
-
-Run these commands from your server checkout. Add the upstream remote once. If it already exists, check its URL with `git remote -v`:
+In a checkout of your copy, add this repository as a remote and fetch its tags:
 
 ```sh
 git remote add upstream https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
 git fetch upstream --tags
-git switch -c chore/update-cache
 ```
 
-Copy the tag for the server release from [GitHub Releases](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/releases). The repository also tags its packages, so choose the server release rather than the KV adapter release. Set it below:
+Server releases are tagged `@turborepo-remote-cache/api@<version>`. Merge the one you want, such as 5.3.0:
 
 ```sh
-CACHE_RELEASE='replace-with-the-server-release-tag'
-git merge-base HEAD "$CACHE_RELEASE"
+git merge @turborepo-remote-cache/api@5.3.0
 ```
 
-If the last command prints a commit, the histories share an ancestor. Merge the release without committing yet:
+Where the files above conflict, keep your names, IDs, and settings, and take everything else from upstream. Review those files even when Git reports no conflict.
 
-```sh
-git merge --no-ff --no-commit "$CACHE_RELEASE"
-```
+If Git refuses with `refusing to merge unrelated histories`, your copy doesn't share history with this repository. Fork the repository instead, check out the release, and copy your settings from the files above into it. Then point Workers Builds or your CI at the new repository. Future updates merge cleanly from there.
 
-Resolve conflicts by preserving your deployment's resource names, IDs, and settings while incorporating upstream changes. Review the resulting configuration even when Git reports no conflicts. The upstream Wrangler file contains defaults, so keep your existing resource bindings when you merge it.
+## Deploy and check
 
-If `git merge-base` finds no common ancestor, your copy has independent history. Create a fresh fork or checkout of the chosen release, then reapply the deployment settings listed above. Keep the old repository available until the replacement is verified. Reconnect Workers Builds to the new repository when ready. This gives future updates a shared history to merge.
-
-## Validate and deploy
-
-1. Install the pinned dependencies and run the project checks:
+1. Install dependencies and run the checks:
 
     ```sh
     pnpm install --frozen-lockfile
     pnpm check
-    pnpm test:e2e
     ```
 
-    The end-to-end suite runs a local Worker. It does not deploy to your account.
-
-2. Review the diff and commit the update. Keep the existing Worker name and storage bindings to continue using the same artifacts and stats database.
-3. Deploy through your existing service. Push to the production branch for Workers Builds or the configured CI workflow. For a manual Cloudflare deployment, run `pnpm run deploy` after the checks build the Worker. Other hosts use their [platform guide](/deploy).
-4. Check `/ping`, check the authenticated `/v8/artifacts/status` endpoint, and [verify a remote hit](/connect-turbo#verify-remote-hits). Check the dashboard and logs for database errors.
-
-If you rebuild a previous commit to roll back, first check whether the update migrated the database. Reverting application code does not undo a database migration. Restore a compatible backup when required by the release.
+2. Commit the merge and deploy it the way you deploy today. Push to your production branch for Workers Builds or GitHub Actions, or run `pnpm run deploy` for a manual Cloudflare deploy. Other hosts follow their [platform guide](/deploy).
+3. Check that the server answers `/ping` and `/v8/artifacts/status`, as in [Check the server](/get-started#check-the-deployment), and [check that hits come from the server](/connect-turbo#check-that-hits-come-from-the-server).
+4. Open the dashboard. If stats stopped, look for `[stats]` errors in the [logs](/observability).

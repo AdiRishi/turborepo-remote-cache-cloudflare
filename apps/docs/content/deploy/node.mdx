@@ -13,15 +13,15 @@ The [build setup](/deploy#build-from-source) covers the repository's own remote-
 
 ## Configure the server
 
-Before starting the server, export these values in the same terminal. Replace the token and credentials with your own:
+Export these values in the terminal that starts the server:
 
 ```sh
-export TURBO_TOKEN='replace-with-your-server-token'
+export TURBO_TOKEN='<your token>'
 export S3_BUCKET=turborepo-cache
 export S3_ENDPOINT=https://s3.us-east-1.amazonaws.com
 export S3_REGION=us-east-1
-export S3_ACCESS_KEY_ID='replace-with-your-access-key'
-export S3_SECRET_ACCESS_KEY='replace-with-your-secret-key'
+export S3_ACCESS_KEY_ID='<access key ID>'
+export S3_SECRET_ACCESS_KEY='<secret access key>'
 ```
 
 ## Build and start

@@ -1,17 +1,17 @@
 ---
 title: Sign artifacts
-description: Configure Turbo to verify downloaded artifacts with a shared signing key.
+description: Make turbo sign every artifact it uploads and reject any download it can't verify.
 ---
 
-Artifact signatures let your clients check that a downloaded build was signed with your team's key. Turbo signs uploads with HMAC-SHA256 and verifies them on download. The server keeps the signature alongside the artifact and returns it unchanged.
+With signatures on, `turbo` signs every artifact it uploads with an HMAC-SHA256 key, and it rejects any download whose signature doesn't verify. The server never sees the key. It stores each signature beside its artifact and returns it unchanged, so even someone holding your `TURBO_TOKEN` can't slip in a build that your machines will run.
 
-Signing is optional. Keep using `TURBO_TOKEN` for access to the server; the signing key is a separate value shared by your clients.
+The signing key is a second secret, separate from `TURBO_TOKEN`. The token lets a client talk to the server. The key decides which artifacts `turbo` trusts.
 
-## Enable signatures
+## Turn on signatures
 
-1. Add `signature` to the existing `remoteCache` configuration in your application's `turbo.json`:
+1. Add `signature` to `remoteCache` in your root `turbo.json`:
 
-    ```json
+    ```json turbo.json
     {
         "remoteCache": {
             "signature": true
@@ -19,26 +19,26 @@ Signing is optional. Keep using `TURBO_TOKEN` for access to the server; the sign
     }
     ```
 
-2. Generate a key once:
+2. Generate a key once, and store it in your secret manager:
 
     ```sh
     openssl rand -hex 32
     ```
 
-3. Save that value in your secret manager. Set the same value on every developer machine and CI job that shares artifacts:
+3. Give every machine and CI job that shares artifacts that same key:
 
     ```sh
-    export TURBO_REMOTE_CACHE_SIGNATURE_KEY='replace-with-your-saved-signing-key'
+    export TURBO_REMOTE_CACHE_SIGNATURE_KEY='<your signing key>'
     ```
 
-    Do not generate a new key for each run or machine. Keep it out of version control and use a separate value from `TURBO_TOKEN`.
+    In CI, store it as a secret beside `TURBO_TOKEN`. Use at least 32 bytes. `turbo` accepts shorter keys today, but its [`longerSignatureKey`](https://turborepo.dev/docs/reference/configuration#longersignaturekey) future flag rejects them.
 
-4. Run the [remote cache verification](/connect-turbo#verify-remote-hits).
+4. [Check that hits come from the server](/connect-turbo#check-that-hits-come-from-the-server).
 
-Previously unsigned artifacts and artifacts signed with a different key are treated as misses. Turbo runs those tasks again and uploads signed replacements. A missing key prevents signed uploads.
+`turbo` treats an artifact it can't verify as a miss. A machine with a different key misses on every signed artifact and runs the task again. A machine with no key can't sign, so it uploads nothing. Artifacts uploaded before you turned signatures on miss once, and the next run replaces them with signed ones.
 
-## Change the signing key
+## Change the key
 
-Replace the key on all clients that share artifacts. During a staggered rollout, clients with different keys reject each other's artifacts. Once they use the same key, newly uploaded artifacts can be shared again.
+Give every machine the new key at once. While some machines have the old key and some the new one, each side misses on the other's artifacts. Once they all match, they share builds again.
 
-See [Turborepo's signature documentation](https://turborepo.dev/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification) for the client-side behavior.
+[Turborepo's signature documentation](https://turborepo.dev/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification) covers the client side in more depth.

@@ -3,15 +3,15 @@ title: Configure the stats database
 description: Keep dashboard history on persistent storage, or disable stats while retaining the cache.
 ---
 
-The server records stats in a database through [Nitro's database layer](https://nitro.build/docs/database). It schedules stats writes after the response. Stats failures do not fail cache requests. Without a database, the cache works the same and the dashboard explains that stats are off.
+The server records stats in a database through [Nitro's database layer](https://nitro.build/docs/database). It writes after each response, so stats never slow the cache down, and a failed write never fails a cache request. Without a database, the cache works the same and the dashboard explains that stats are off.
 
 | Platform                                                                               | Database                                                                                                                                                              |
 | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Cloudflare Workers](/deploy/cloudflare)                                               | A D1 database bound as `STATS_DB`. Wrangler creates it, named `turborepo-cache-stats`, on the first deploy.                                                           |
 | [Node.js and Deno](/deploy/node)                                                       | Nitro's default SQLite database, a file at `.data/db.sqlite` in the working directory. Keep it on a persistent volume. For Bun, configure the `bun-sqlite` connector. |
-| [Vercel](/deploy/vercel), [Netlify](/deploy/netlify), [AWS Lambda](/deploy/aws-lambda) | Configure a hosted database. Local files are not a durable shared database on these hosts.                                                                            |
+| [Vercel](/deploy/vercel), [Netlify](/deploy/netlify), [AWS Lambda](/deploy/aws-lambda) | None that works. Their file systems are read-only, so the SQLite default can't open its file and stats stay off. Configure a hosted database.                         |
 
-For D1 usage limits and charges, see [D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/).
+D1's free plan allows 100,000 rows written a day. The server writes about four rows per `turbo` run and one per artifact upload or download. See [D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/) for the paid limits.
 
 ## Configure a hosted database
 

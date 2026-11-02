@@ -1,6 +1,8 @@
 # Contributing
 
-You can develop and test the server locally without a Cloudflare account. The end-to-end suite runs a real Worker and Turbo clients on your machine, so you can check a fix before deploying anything.
+Welcome, and thanks for wanting to help! Fixes, docs improvements, and good bug reports are all welcome.
+
+You don't need a Cloudflare account to work on the server. The end-to-end suite runs a real Worker and real `turbo` clients on your machine, so you can prove a fix before anything gets deployed.
 
 ## Set up the repository
 

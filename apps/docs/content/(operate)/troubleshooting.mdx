@@ -3,11 +3,19 @@ title: Troubleshooting
 description: Diagnose failed connections, repeated cache misses, rejected uploads, and missing dashboard stats.
 ---
 
-A successful build does not always mean the remote cache worked. Turbo can fall back to running tasks locally, so start with the symptom you see below. The commands use your server's URL in `TURBO_API` and its token in `TURBO_TOKEN`.
+A green build doesn't prove the remote cache worked. When `turbo` can't reach the server, it keeps going with the local cache and prints one line about it. Find your symptom below. The commands expect your server's URL in `TURBO_API` and its token in `TURBO_TOKEN`.
 
 ## Turbo cannot connect
 
-First, find out whether the server is reachable and accepts your token:
+`turbo` prints the reason in place of `Remote caching enabled`:
+
+| Message                                                                          | Cause                                               |
+| -------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `Remote caching disabled (TURBO_TOKEN set without TURBO_TEAM)`                   | No team is set.                                     |
+| `Remote caching unavailable (Authentication failed ...)`                         | The token doesn't match the server's `TURBO_TOKEN`. |
+| `Remote caching unavailable (Could not connect to "https://cache.example.com/")` | The URL is wrong or ends in a slash.                |
+
+To narrow it down, check that the server is reachable and accepts your token:
 
 ```sh
 curl --fail-with-body "$TURBO_API/ping"
@@ -21,17 +29,17 @@ Expect `pong`, then `{"status":"enabled"}`.
 | DNS, TLS, or connection error                     | Confirm the deployment URL and that your network can reach it. Use the HTTPS origin, without a trailing slash or `/v8`. |
 | HTML or a login redirect                          | A proxy or deployment protection is intercepting the API. Let Turbo reach `/v8/*` with its bearer token.                |
 | `401`                                             | The client token is missing or differs from the server's `TURBO_TOKEN`.                                                 |
-| `500`                                             | Read the server logs. Missing or invalid server configuration and storage failures are reported there.                  |
+| `500`                                             | Read the server logs. See [The server returns 500](#the-server-returns-500).                                            |
 | Status succeeds but Turbo disables remote caching | Set the team as well as the URL and token. Check for stale environment variables overriding `turbo.json`.               |
 
-`/ping` checks only that the server responds. It does not verify authentication or artifact storage. The [remote-hit check](/connect-turbo#verify-remote-hits) tests the complete path.
+`/ping` only proves the server is up. The [remote-hit check](/connect-turbo#check-that-hits-come-from-the-server) tests the complete path.
 
 ## Builds keep missing
 
-1. Run the [remote-only verification](/connect-turbo#verify-remote-hits). A normal build can use the local cache without contacting the server.
+1. Run the [remote-only verification](/connect-turbo#check-that-hits-come-from-the-server). A normal build can use the local cache without contacting the server.
 2. Confirm that the task has caching enabled. Compare task hashes in the run summaries under `.turbo/runs/`. If the hash changes, Turbo sees different inputs. Check its [cache troubleshooting guide](https://turborepo.dev/docs/crafting-your-repository/caching#troubleshooting).
 3. Confirm that clients use the same server and team. A different team uses a different artifact namespace.
-4. Check the first run for upload errors. A successful task can still fail to upload its artifact. Check the platform and storage limits below.
+4. Check the first run for upload errors. A task can succeed and still fail to upload its artifact. See [Uploads fail](#uploads-fail).
 5. If signatures are enabled, confirm that every client has the same `TURBO_REMOTE_CACHE_SIGNATURE_KEY`. A rejected signature is a cache miss. See [Sign artifacts](/sign-artifacts).
 
 After changing storage or after an artifact expires, a miss is expected. The task must run and upload again. With KV, newly written artifacts can take 60 seconds or more to reach another region.
@@ -42,7 +50,7 @@ If an S3-compatible store reports every artifact as missing, check the endpoint,
 
 Check the response status and the server's [logs](/observability):
 
-- `413` usually means the host or a proxy rejected the request size. Compare your artifact size with the [platform limits](/deploy#artifact-size-limits).
+- `413` means the host or a proxy rejected the request size. Compare your artifact size with the [platform limits](/deploy#artifact-size-limits).
 - KV rejects artifacts larger than 25 MiB. Use R2 or an S3-compatible bucket for larger outputs.
 - S3 uploads are buffered in memory. A large upload can exhaust the host's memory even below its HTTP request limit.
 - A custom adapter must support user metadata. An adapter that rejects metadata cannot store these artifacts.
@@ -51,7 +59,7 @@ The storage credentials need read, write, list, and delete permissions. The last
 
 ## The server returns 500
 
-Look for `Invalid server configuration:` in the logs. The message identifies the missing token, invalid retention value, or missing storage. The HTTP response deliberately omits those configuration details.
+Look for `Invalid server configuration:` in the logs. The log line names the missing token, the invalid retention value, or the missing storage. The HTTP response leaves those details out, so the logs are the only place to find them.
 
 Check the [server configuration reference](/configuration) and [storage selection order](/storage#how-the-server-picks-a-backend). An existing KV or R2 binding takes precedence over S3 variables. Setting S3 variables alone does not switch a Worker away from its bound store.
 
@@ -65,7 +73,7 @@ Request the stats endpoint:
 curl --fail-with-body "$TURBO_API/stats"
 ```
 
-`"enabled": false` means the server could not use its stats database. Check for `[stats]` errors in the logs and [configure a database](/stats-database). Cache reads and writes can work while stats are unavailable.
+`"enabled": false` means the server couldn't use its stats database. Look for `[stats]` errors in the logs and [configure a database](/stats-database). The cache keeps working without stats.
 
 On Node.js and Deno, keep `.data/db.sqlite` on persistent storage. Serverless hosts need a hosted database. After changing a database connection in `nitro.config.ts`, rebuild the server.
 

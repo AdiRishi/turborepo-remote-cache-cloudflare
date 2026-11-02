@@ -11,7 +11,15 @@ description: The URL, token, and team that Turbo sends to this server.
 | Team ID     | `TURBO_TEAMID`                     | `remoteCache.teamId`   | An alternative to a slug. Turbo sends IDs that start with `team_`.                           |
 | Signing key | `TURBO_REMOTE_CACHE_SIGNATURE_KEY` | None                   | The shared key used when `remoteCache.signature` is `true`.                                  |
 
-Environment variables override `turbo.json`. Turbo also accepts command-line options and local and user configuration files. Its [configuration reference](https://turborepo.dev/docs/reference/configuration#remotecache) and [system environment variables](https://turborepo.dev/docs/reference/system-environment-variables) describe those sources.
+`turbo` reads these values from the following sources. An earlier source wins over a later one:
+
+1. Command-line flags
+2. `TURBO_*` environment variables
+3. `.turbo/config.json` in the repository
+4. The user configuration that `turbo login` writes
+5. `turbo.json`
+
+Turborepo's [configuration reference](https://turborepo.dev/docs/reference/configuration#remotecache) and [system environment variables](https://turborepo.dev/docs/reference/system-environment-variables) describe each source.
 
 ## Environment-only configuration
 
@@ -19,7 +27,7 @@ When no project configuration is committed, all three connection values are need
 
 ```sh
 export TURBO_API='https://cache.example.com'
-export TURBO_TOKEN='replace-with-your-server-token'
+export TURBO_TOKEN='<your token>'
 export TURBO_TEAM='my-team'
 ```
 
@@ -31,10 +39,10 @@ export TURBO_TEAM='my-team'
 {
     "apiUrl": "https://cache.example.com",
     "teamSlug": "my-team",
-    "token": "replace-with-your-server-token"
+    "token": "<your token>"
 }
 ```
 
-This file contains a credential. The `.turbo` directory belongs in `.gitignore`.
+The file holds the token, so keep `.turbo` in your `.gitignore`.
 
-[Connect turbo](/connect-turbo) covers the recommended setup and verification procedure.
+[Connect turbo](/connect-turbo) covers the recommended setup and how to check it.
