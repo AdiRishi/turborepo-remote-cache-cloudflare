@@ -3,7 +3,9 @@ title: Update your deployment
 description: Bring upstream changes into your copy of the server, preserve its configuration, and verify the deployment.
 ---
 
-You deploy this server from source. The Deploy to Cloudflare button creates a repository in your account, and Workers Builds deploys changes from that copy. New upstream releases do not update your copy automatically. Updating dependencies with pnpm does not update the server's source either.
+Your deployment runs from your own copy of this repository. To pick up a new feature or a fix, bring the release into that copy and deploy it. Your bucket, token, and other settings can stay the same.
+
+The Deploy to Cloudflare button connects your copy to Workers Builds, but it does not sync future releases from upstream.
 
 For a version 4 deployment, first read [Upgrade from v4](/upgrade-from-v4).
 
@@ -17,8 +19,6 @@ For a version 4 deployment, first read [Upgrade from v4](/upgrade-from-v4).
     - `apps/api/src/custom-adapter.ts`: custom storage, if used.
     - `.github/workflows/ci.yml` and `turbo.json`: your deployment and build-cache settings.
 4. Back up the stats database before an update that changes its schema. Artifacts are disposable build outputs, but lost usage history cannot be reconstructed from them.
-
-Keep tokens and storage credentials in the platform's secret store. Do not copy them into Git while preparing the update.
 
 ## Merge an upstream release
 
@@ -43,9 +43,9 @@ If the last command prints a commit, the histories share an ancestor. Merge the 
 git merge --no-ff --no-commit "$CACHE_RELEASE"
 ```
 
-Resolve conflicts by preserving your deployment's resource names, IDs, and settings while incorporating upstream changes. Review the resulting configuration even when Git reports no conflicts. Do not replace your entire Wrangler file with the upstream version.
+Resolve conflicts by preserving your deployment's resource names, IDs, and settings while incorporating upstream changes. Review the resulting configuration even when Git reports no conflicts. The upstream Wrangler file contains defaults, so keep your existing resource bindings when you merge it.
 
-If `git merge-base` finds no common ancestor, your copy has independent history. Create a fresh fork or checkout of the chosen release, then reapply the deployment settings listed above. Keep the old repository available until the replacement is verified. Reconnect Workers Builds to the new repository when ready. Avoid merging unrelated histories just to import an update.
+If `git merge-base` finds no common ancestor, your copy has independent history. Create a fresh fork or checkout of the chosen release, then reapply the deployment settings listed above. Keep the old repository available until the replacement is verified. Reconnect Workers Builds to the new repository when ready. This gives future updates a shared history to merge.
 
 ## Validate and deploy
 
@@ -60,8 +60,7 @@ If `git merge-base` finds no common ancestor, your copy has independent history.
     The end-to-end suite runs a local Worker. It does not deploy to your account.
 
 2. Review the diff and commit the update. Keep the existing Worker name and storage bindings to continue using the same artifacts and stats database.
-3. If you use the included GitHub Actions workflow in your copy, set the repository variable `CACHE_DEPLOY_ENABLED=true`. Deployment is now opt-in outside the upstream repository. Workers Builds users should leave it unset.
-4. Deploy through your existing service. Push to the production branch for Workers Builds or the configured CI workflow. For a manual Cloudflare deployment, run `pnpm run deploy` after the checks build the Worker. Other hosts use their [platform guide](/deploy).
-5. Check `/ping`, check the authenticated `/v8/artifacts/status` endpoint, and [verify a remote hit](/connect-turbo#verify-remote-hits). Check the dashboard and logs for database errors.
+3. Deploy through your existing service. Push to the production branch for Workers Builds or the configured CI workflow. For a manual Cloudflare deployment, run `pnpm run deploy` after the checks build the Worker. Other hosts use their [platform guide](/deploy).
+4. Check `/ping`, check the authenticated `/v8/artifacts/status` endpoint, and [verify a remote hit](/connect-turbo#verify-remote-hits). Check the dashboard and logs for database errors.
 
 If you rebuild a previous commit to roll back, first check whether the update migrated the database. Reverting application code does not undo a database migration. Restore a compatible backup when required by the release.

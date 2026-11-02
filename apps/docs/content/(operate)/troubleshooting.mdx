@@ -3,15 +3,15 @@ title: Troubleshooting
 description: Diagnose failed connections, repeated cache misses, rejected uploads, and missing dashboard stats.
 ---
 
-Start with the symptom below. Use your deployed server's URL for `TURBO_API` and its token for `TURBO_TOKEN`. Keep credentials out of logs and issue reports.
+A successful build does not always mean the remote cache worked. Turbo can fall back to running tasks locally, so start with the symptom you see below. The commands use your server's URL in `TURBO_API` and its token in `TURBO_TOKEN`.
 
 ## Turbo cannot connect
 
-Check the server independently of Turbo:
+First, find out whether the server is reachable and accepts your token:
 
 ```sh
 curl --fail-with-body "$TURBO_API/ping"
-curl --fail-with-body -H "Authorization: Bearer $TURBO_TOKEN"   "$TURBO_API/v8/artifacts/status"
+curl --fail-with-body -H "Authorization: Bearer $TURBO_TOKEN" "$TURBO_API/v8/artifacts/status"
 ```
 
 Expect `pong`, then `{"status":"enabled"}`.

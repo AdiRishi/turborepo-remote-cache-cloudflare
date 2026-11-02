@@ -3,22 +3,24 @@ title: Get started
 description: Deploy a cache on Cloudflare Workers and verify a remote hit from your Turborepo project.
 ---
 
-This guide uses the recommended setup: Cloudflare Workers, R2 artifact storage, and a D1 database for usage stats. You need a Cloudflare account, a GitHub or GitLab account, and an existing Turborepo project with a cacheable build task.
+Let's deploy a cache and use it for a real build. Cloudflare creates the Worker, an R2 bucket for your artifacts, and a D1 database for the dashboard. We'll finish by restoring a build from the server with the local cache turned off, so you can see that it works.
+
+You need a Cloudflare account, a GitHub or GitLab account, and a Turborepo project with a cacheable build task.
 
 Prefer a terminal? [Deploy to Cloudflare](/deploy/cloudflare) covers Wrangler. For another host, [choose a platform](/deploy).
 
 ## Prepare your account and token
 
-1. Open **R2 Object Storage** in the [Cloudflare dashboard](https://dash.cloudflare.com/) and enable R2 if you have not used it before. Review [R2 pricing](https://developers.cloudflare.com/r2/pricing/) before enabling it.
-2. Generate a token and save it in your secret manager:
+1. Open **R2 Object Storage** in the [Cloudflare dashboard](https://dash.cloudflare.com/) and enable R2 if you have not used it before. R2 has a [free tier](https://developers.cloudflare.com/r2/pricing/).
+2. Generate a token and save the value for the next steps:
 
     ```sh
     openssl rand -hex 32
     ```
 
-    Use this same value for the Worker and every client. Anyone with the token can read and write every team's artifacts.
+    This is the shared token your Worker and Turbo clients will use. It grants access to every team's artifacts.
 
-The deployment also serves a public dashboard that shows team names and usage. To keep those private, [restrict dashboard access](/dashboard#restrict-access) before connecting your projects.
+The dashboard shows your team's cache hits and time saved. It is public by default; [restrict access](/dashboard#restrict-access) if you want to keep team names and usage private.
 
 If bucket location matters, [create the bucket first](/storage/r2#choose-where-the-bucket-lives). The button otherwise creates it during deployment.
 
@@ -40,7 +42,7 @@ If bucket location matters, [create the bucket first](/storage/r2#choose-where-t
 5. Open the Worker under **Workers & Pages**. Under **Settings** > **Variables and Secrets**, add a secret named `TURBO_TOKEN` with the value you saved.
 6. Copy the Worker's URL, such as `https://turborepo-remote-cache.<your-subdomain>.workers.dev`.
 
-Until you set the secret, cache requests return `500`. Your copy does not automatically receive upstream releases. [Update your deployment](/update) explains how to maintain it.
+With the token set, the server is ready for a client. If you check it before setting the secret, cache requests return `500`.
 
 ## Check the server
 
@@ -53,11 +55,11 @@ curl --fail "$TURBO_API/ping"
 curl --fail -H "Authorization: Bearer $TURBO_TOKEN" "$TURBO_API/v8/artifacts/status"
 ```
 
-The first request returns `pong`. The second returns `{"status":"enabled"}`. A `401` means the token does not match the Worker's secret. A `500` means the server needs attention. [Troubleshooting](/troubleshooting) shows what to check.
+The first request returns `pong`. The second returns `{"status":"enabled"}`. A `401` means the token does not match the Worker's secret. For a `500`, check the server logs for a configuration error. [Troubleshooting](/troubleshooting) shows what to check.
 
 ## Verify your first remote hit
 
-In the same terminal, change to the Turborepo project whose builds you want to cache. This is your application repository, not the cache server's checkout. Leave `TURBO_API` without a trailing slash and choose a team name:
+Now switch to your application's Turborepo repository in the same terminal. Keep the URL and token you just checked, and choose a team name:
 
 ```sh
 export TURBO_TEAM='my-team'
@@ -65,7 +67,9 @@ export TURBO_TEAM='my-team'
 
 <include>/_snippets/verify-remote-cache.mdx</include>
 
-Open the Worker's URL to see usage on the [dashboard](/dashboard). Then [connect your team and CI](/connect-turbo) so they use the same URL, token, and team.
+That build is now available to your other machines too. Open the Worker's URL to see it on the [dashboard](/dashboard), then [connect your team and CI](/connect-turbo) to share the cache.
+
+Your deployment lives in the repository Cloudflare copied into your account. When you want a newer release, [update that copy](/update) and redeploy.
 
 ## Deploy with Wrangler
 

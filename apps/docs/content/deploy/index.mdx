@@ -3,9 +3,11 @@ title: Choose a platform
 description: Compare hosting requirements before deploying the cache server.
 ---
 
-Use **Cloudflare Workers with R2** unless you need another host. It includes artifact storage, scheduled expiry, and a stats database without configuring separate services. CI tests this deployment end to end with the real Turbo CLI.
+Cloudflare Workers with R2 is the default: deploy the Worker, and you get artifact storage, daily expiry, and a stats database together. It is a good place to start if you do not already have a host in mind.
 
-The other builds use Nitro's platform presets. They serve the same API, but this project's CI does not test their deployed behavior end to end. Choose a long-running Node.js server if you need control over memory and proxy limits for large artifacts.
+Already running Node.js, or keeping your infrastructure on AWS? The same server builds for those hosts through Nitro. A long-running server gives you control over memory and proxy limits; managed function platforms handle the process for you but have smaller request limits.
+
+CI runs the Cloudflare deployment end to end with the real Turbo CLI. Other presets serve the same API, but do not have that deployment coverage.
 
 ## Hosting requirements
 
@@ -21,7 +23,7 @@ The other builds use Nitro's platform presets. They serve the same API, but this
 
 ## Artifact size limits
 
-These are transport limits, not guarantees that every artifact below them succeeds. Memory, storage, and proxies can impose lower limits. An artifact that cannot upload will not produce a remote hit.
+Check the size of your build artifacts before choosing a host. If an artifact is too large to upload, its task has to run again on the next machine. Your storage backend and any reverse proxy can set lower limits than the host itself.
 
 | Host                   | Request limit                                                                                                                                                                                                                                    |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

@@ -1,6 +1,6 @@
 ---
 title: Turborepo Remote Cache
-description: Share Turborepo build outputs through a cache server and storage you control.
+description: A Turborepo remote cache you host yourself, on Cloudflare Workers or any platform Nitro builds for.
 mode: custom
 sidebar:
     hidden: true
@@ -8,11 +8,11 @@ sidebar:
 
 <HomeHero>
 
-# Share builds through your own cache
+# A Turborepo remote cache you host yourself
 
-Run a Turborepo remote cache in your own account. A build uploaded by one developer or CI runner can be restored by the next machine with the same task inputs.
+Every laptop and CI runner on your team shares build outputs through storage you own. Deploy the server to Cloudflare Workers with one button, or build it for Node.js, Vercel, AWS Lambda, and other platforms.
 
-[Get started on Cloudflare](/get-started) [How it works](/introduction)
+[Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) [Read the docs](/introduction)
 
 </HomeHero>
 
@@ -20,32 +20,72 @@ Run a Turborepo remote cache in your own account. A build uploaded by one develo
 
 <HomeSection>
 
-## A cache you operate
+## Why host your own cache
 
-The server implements Turborepo's Remote Cache API. You choose who receives its shared token, where artifacts are stored, and how long to keep them. No Vercel account is required.
-
-Cloudflare Workers with R2 is the recommended deployment and the one tested end to end in CI. The default setup includes a usage dashboard and deletes artifacts after 30 days.
-
-You maintain a copy of this repository and deploy updates from source. The dashboard is public by default. [The introduction](/introduction) explains access and maintenance before you deploy.
-
-</HomeSection>
-
-<HomeSection>
-
-## Deploy and verify a remote hit
-
-[Get started](/get-started) takes you through deployment, a shared token, and a build that reads only from your remote cache. Then [connect your developers and CI](/connect-turbo).
-
-Already running a server? [Troubleshoot cache misses](/troubleshooting), [read the dashboard](/dashboard), or [update your deployment](/update).
+- **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and you choose where your artifacts live.
+- **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges nothing for egress, so cache downloads have no R2 bandwidth charge. See [Cloudflare pricing](https://developers.cloudflare.com/r2/pricing/) for storage and operations.
+- **Your choice of storage.** Keep artifacts in R2, Workers KV, any S3-compatible bucket, or anything with a [Files SDK](https://files-sdk.dev) adapter.
+- **See what you save.** The [dashboard](/dashboard) shows cache hits, time saved, and which teams and CI runners use the server.
+- **Signed artifacts.** The server stores each artifact's signature and returns it unchanged, so `turbo` can reject anything it didn't sign.
 
 </HomeSection>
 
 <HomeSection>
 
-## Use another host or storage provider
+## Set it up
 
-The server also builds for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda through Nitro. Those targets have different size limits and operational requirements, and do not receive the same end-to-end CI coverage as Cloudflare.
+<Steps>
+    <Step title="Deploy the Worker">
+        The [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) button copies this repository to your GitHub or GitLab account and deploys it with an R2 bucket. You can also [deploy with Wrangler](/deploy/cloudflare#build-and-deploy).
+    </Step>
+    <Step title="Set a token">
+        Generate a long random token and add it to the Worker as a secret named `TURBO_TOKEN`.
 
-[Choose a platform](/deploy) before deploying. Use [R2](/storage/r2) on Workers, an [S3-compatible bucket](/storage/s3) on other hosts, or a [custom adapter](/storage/custom-adapter) when your storage has no S3 API.
+        ```sh
+        openssl rand -hex 32
+        ```
+    </Step>
+    <Step title="Point turbo at the Worker">
+        Give your application repository the server's URL, token, and a team name:
+
+        ```sh
+        export TURBO_API='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
+        export TURBO_TOKEN='replace-with-your-token'
+        export TURBO_TEAM=my-team
+        ```
+    </Step>
+
+</Steps>
+
+[Get started](/get-started) takes you through your first remote cache hit. Then [connect your team and CI](/connect-turbo) so they can reuse those builds too.
+
+</HomeSection>
+
+<HomeSection>
+
+## Run it anywhere
+
+Cloudflare Workers with R2 is the default. Already have a server or a bucket? The same API runs on other hosts and uses the storage you choose. [Compare platforms](/deploy) for their artifact limits and setup requirements.
+
+<Columns cols={2}>
+    <Column>
+        ### Platforms
+
+        - [Cloudflare Workers](/deploy/cloudflare)
+        - [Node.js, Bun, and Deno](/deploy/node)
+        - [Vercel](/deploy/vercel)
+        - [Netlify](/deploy/netlify)
+        - [AWS Lambda](/deploy/aws-lambda)
+    </Column>
+    <Column>
+        ### Storage
+
+        - [Cloudflare R2](/storage/r2)
+        - [Cloudflare KV](/storage/kv)
+        - [S3-compatible storage](/storage/s3)
+        - [A custom Files SDK adapter](/storage/custom-adapter)
+    </Column>
+
+</Columns>
 
 </HomeSection>

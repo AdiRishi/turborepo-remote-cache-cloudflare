@@ -1,5 +1,7 @@
 # Contributing
 
+You can develop and test the server locally without a Cloudflare account. The end-to-end suite runs a real Worker and Turbo clients on your machine, so you can check a fix before deploying anything.
+
 ## Set up the repository
 
 Install Node.js 24 or later and the pnpm version in `package.json`. Then clone the repository:

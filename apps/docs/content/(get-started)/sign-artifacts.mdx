@@ -3,7 +3,9 @@ title: Sign artifacts
 description: Configure Turbo to verify downloaded artifacts with a shared signing key.
 ---
 
-Turbo signs uploads with HMAC-SHA256 and rejects downloads whose signatures do not verify. The server stores each signature and returns it unchanged. Signing is optional and separate from the bearer token that controls access to the server.
+Artifact signatures let your clients check that a downloaded build was signed with your team's key. Turbo signs uploads with HMAC-SHA256 and verifies them on download. The server keeps the signature alongside the artifact and returns it unchanged.
+
+Signing is optional. Keep using `TURBO_TOKEN` for access to the server; the signing key is a separate value shared by your clients.
 
 ## Enable signatures
 

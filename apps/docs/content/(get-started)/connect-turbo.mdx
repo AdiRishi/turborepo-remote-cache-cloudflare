@@ -3,7 +3,9 @@ title: Connect turbo
 description: Share your cache with developers and CI, then verify that builds use it.
 ---
 
-Start with a deployed server and its `TURBO_TOKEN`. These steps configure your application repository, not the cache server's repository.
+Once one machine has uploaded a build, the next machine with the same inputs can reuse it. Give your developers and CI the same server URL, token, and team name to share those artifacts.
+
+Start in your application repository with a deployed server and its `TURBO_TOKEN`.
 
 <a id="turbojson" />
 <a id="choose-where-to-set-them" />
@@ -21,15 +23,15 @@ Add `remoteCache` to your existing `turbo.json`. Keep your other settings:
 }
 ```
 
-Use the server's origin without a trailing slash or `/v8` path. Choose any team name, and use the same name everywhere that should share artifacts. Teams separate object names, not permissions. The server's token grants access to all teams.
+Use the server's origin without a trailing slash or `/v8` path. The team name is yours to choose; use the same one wherever builds should be shared. Teams keep artifacts apart, but the [shared token grants access to all of them](/introduction#who-can-access-the-cache).
 
-Commit the URL and team. Give each developer the token through your secret manager, then set it in the environment that runs `turbo`:
+Commit the URL and team so every clone knows where to find the cache. Each developer then needs only the token:
 
 ```sh
 export TURBO_TOKEN='replace-with-your-server-token'
 ```
 
-Keep the token out of `turbo.json` and version control. Environment variables such as `TURBO_API` and `TURBO_TEAM` override the committed settings. Remove old values if a client connects to the wrong server or team.
+Keep the token in your environment or secret manager rather than in Git. If a client connects to the wrong server or team, check for old `TURBO_API` or `TURBO_TEAM` values in its environment. Those override `turbo.json`.
 
 <a id="turbo-login---manual" />
 
@@ -68,7 +70,7 @@ For GitHub Actions, add a repository secret named `TURBO_TOKEN`, then add `env` 
 
 For GitLab, add a masked `TURBO_TOKEN` under **Settings** > **CI/CD** > **Variables**. Other CI providers need the same environment variable.
 
-If you do not commit the URL and team, also set `TURBO_API` and `TURBO_TEAM` in CI. Untrusted pull requests must not receive the token, because it grants write access to the cache.
+If you do not commit the URL and team, also set `TURBO_API` and `TURBO_TEAM` in CI.
 
 ## Sign artifacts
 

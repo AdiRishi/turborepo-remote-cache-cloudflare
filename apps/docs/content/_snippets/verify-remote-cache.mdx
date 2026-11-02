@@ -1,4 +1,4 @@
-Run a cacheable task twice, with the local cache disabled for both runs. These examples use the `turbo` installed in your project through pnpm:
+Let's check that a build really comes back from your server. Run a cacheable task twice, with the local cache disabled for both runs. These commands use the Turbo installed in your project:
 
 ```sh
 pnpm exec turbo run build --cache=remote:rw
@@ -7,6 +7,6 @@ pnpm exec turbo run build --cache=remote:r --summarize
 
 The first run builds and uploads any missing artifacts. The second reads only from the server. For tasks with unchanged inputs and caching enabled, expect `cache hit, replaying logs` on the second run.
 
-`Remote caching enabled` confirms configuration, but does not prove a hit. The JSON summary in `.turbo/runs/` records `"remote": true` and `"status": "HIT"` in each task's `cache` field when the server supplied its artifact.
+For a closer look, open the JSON summary in `.turbo/runs/`. A task restored from the server has `"remote": true` and `"status": "HIT"` in its `cache` field. The `Remote caching enabled` message alone means the connection is configured, not that a task hit the cache.
 
 If a task still misses, use [Troubleshooting](/troubleshooting#builds-keep-missing). Once verified, run builds normally to use both the local and remote caches.
