@@ -22,7 +22,7 @@ Run commands from the repository root. You do not need the maintainer's remote-c
 
 `pnpm dev` starts the workspace development tasks. For the built Cloudflare Worker, run `pnpm build` followed by `pnpm preview`.
 
-For the documentation site alone, run `pnpm --filter @turborepo-remote-cache/docs dev`. Before changing the site, read the relevant Blume documentation in `apps/docs/node_modules/blume/docs`.
+For the documentation site alone, run `pnpm docs:dev`. Before changing the site, read the relevant Blume documentation in `apps/docs/node_modules/blume/docs`.
 
 ## Check a change
 

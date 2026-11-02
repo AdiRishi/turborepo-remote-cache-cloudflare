@@ -32,7 +32,7 @@
     "codegen:check": "pnpm --recursive run codegen:check",
     "deploy": "pnpm --filter @turborepo-remote-cache/api run deploy",
     "dev": "dotenv -e .env.turbo.local -- turbo run dev",
-    "docs:preview": "pnpm --filter @turborepo-remote-cache/docs run preview",
+    "docs:dev": "pnpm --filter @turborepo-remote-cache/docs run dev",
     "format": "oxfmt .",
     "lint": "oxlint && oxfmt --check .",
     "lint:fix": "oxlint --fix && oxfmt .",
