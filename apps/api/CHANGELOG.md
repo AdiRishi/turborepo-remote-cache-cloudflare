@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- [#1078](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/1078) [`abc5b78`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/abc5b78dc60729339c35f9177c83fe538a064502) Thanks [@AdiRishi](https://github.com/AdiRishi)! - Fix the first build after the Deploy to Cloudflare button. Workers Builds could not install Node.js from `.nvmrc`, which named the `lts/krypton` alias. `.nvmrc` now names Node.js 26, the current LTS.
+- [#1078](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/1078) [`abc5b78`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/abc5b78dc60729339c35f9177c83fe538a064502) Thanks [@jorgemasta](https://github.com/jorgemasta)! - Fix the first build after the Deploy to Cloudflare button. Workers Builds could not install Node.js from `.nvmrc`, which named the `lts/krypton` alias. `.nvmrc` now names Node.js 26, the current LTS.
 
 ## 5.2.0
 
