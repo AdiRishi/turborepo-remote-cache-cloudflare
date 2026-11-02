@@ -68,7 +68,7 @@ export TURBO_TOKEN='<your token>'
 export TURBO_TEAM=my-team
 ```
 
-Then build twice with the local cache switched off. The first run uploads to your Worker, and the second replays everything from it:
+Then build twice with the local cache switched off. The first run uploads to your Worker, and the second replays everything from it. No global `turbo`? Swap in `pnpm exec turbo` or `npx turbo`:
 
 ```
 $ turbo run build --cache=remote:rw
