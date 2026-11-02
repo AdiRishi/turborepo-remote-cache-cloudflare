@@ -25,10 +25,19 @@ Build once, and every laptop and CI runner on your team replays the result from 
 - **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never touch Vercel.
 - **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges nothing for egress, so the bandwidth of every cache download is free.
 - **Your choice of storage.** Keep artifacts in R2, Workers KV, any S3-compatible bucket, or anything with a [Files SDK](https://files-sdk.dev) adapter.
-- **A dashboard at the root.** Open the server's URL to see the time the cache saved you, its hit rate, and which teams, CI providers, and coding agents use it.
 - **Signed artifacts.** The server stores each artifact's signature and returns it unchanged, so `turbo` can reject anything it didn't sign.
 
 </HomeSection>
+
+<HomeSection>
+
+## See what it saves
+
+Every server shows this dashboard at its root. This one runs on made-up numbers, so click around.
+
+</HomeSection>
+
+<DashboardPreview />
 
 <HomeSection>
 

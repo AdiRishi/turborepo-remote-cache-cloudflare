@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["es2024", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    // The homepage renders the dashboard's own components, which import each other through this alias.
+    "paths": { "@/*": ["../dashboard/src/*"] }
+  },
+  "include": ["islands", "lib"]
+}
