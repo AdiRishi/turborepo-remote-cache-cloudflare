@@ -1,6 +1,6 @@
 ---
 title: Client configuration
-description: The URL, token, and team that Turbo sends to this server.
+description: The URL, token, and team that turbo sends to this server.
 ---
 
 | Value       | Environment variable               | `turbo.json` key       | Meaning                                                                                      |
@@ -8,7 +8,7 @@ description: The URL, token, and team that Turbo sends to this server.
 | URL         | `TURBO_API`                        | `remoteCache.apiUrl`   | The server's origin, such as `https://cache.example.com`, without a trailing slash or `/v8`. |
 | Token       | `TURBO_TOKEN`                      | None                   | The server's bearer token.                                                                   |
 | Team slug   | `TURBO_TEAM`                       | `remoteCache.teamSlug` | The artifact namespace shared by participating clients.                                      |
-| Team ID     | `TURBO_TEAMID`                     | `remoteCache.teamId`   | An alternative to a slug. Turbo sends IDs that start with `team_`.                           |
+| Team ID     | `TURBO_TEAMID`                     | `remoteCache.teamId`   | An alternative to a slug. `turbo` sends IDs that start with `team_`.                         |
 | Signing key | `TURBO_REMOTE_CACHE_SIGNATURE_KEY` | None                   | The shared key used when `remoteCache.signature` is `true`.                                  |
 
 `turbo` reads these values from the following sources. An earlier source wins over a later one:

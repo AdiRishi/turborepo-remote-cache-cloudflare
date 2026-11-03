@@ -5,7 +5,7 @@ description: Diagnose failed connections, repeated cache misses, rejected upload
 
 A green build doesn't prove the remote cache worked. When `turbo` can't reach the server, it keeps going with the local cache and prints one line about it. Find your symptom below. The commands expect your server's URL in `CACHE_URL` and its token in `TURBO_TOKEN`.
 
-## Turbo cannot connect
+## `turbo` cannot connect
 
 `turbo` prints the reason in place of `Remote caching enabled`:
 
@@ -24,13 +24,13 @@ curl --fail-with-body -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/art
 
 Expect `pong`, then `{"status":"enabled"}`.
 
-| Result                                            | What to check                                                                                                           |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| DNS, TLS, or connection error                     | Confirm the deployment URL and that your network can reach it. Use the HTTPS origin, without a trailing slash or `/v8`. |
-| HTML or a login redirect                          | A proxy or deployment protection is intercepting the API. Let Turbo reach `/v8/*` with its bearer token.                |
-| `401`                                             | The client token is missing or differs from the server's `TURBO_TOKEN`.                                                 |
-| `500`                                             | Read the server logs. See [The server returns 500](#the-server-returns-500).                                            |
-| Status succeeds but Turbo disables remote caching | Set the team as well as the URL and token. Check for stale environment variables overriding `turbo.json`.               |
+| Result                                              | What to check                                                                                                           |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| DNS, TLS, or connection error                       | Confirm the deployment URL and that your network can reach it. Use the HTTPS origin, without a trailing slash or `/v8`. |
+| HTML or a login redirect                            | A proxy or deployment protection is intercepting the API. Let `turbo` reach `/v8/*` with its bearer token.              |
+| `401`                                               | The client token is missing or differs from the server's `TURBO_TOKEN`.                                                 |
+| `500`                                               | Read the server logs. See [The server returns 500](#the-server-returns-500).                                            |
+| Status succeeds but `turbo` disables remote caching | Set the team as well as the URL and token. Check for stale environment variables overriding `turbo.json`.               |
 
 `/ping` only proves the server is up. The [remote-hit check](/connect-turbo#check-that-hits-come-from-the-server) tests the complete path.
 
@@ -38,7 +38,7 @@ Expect `pong`, then `{"status":"enabled"}`.
 
 1. Check whether the tasks were ever uploaded. `turbo` uploads a task only when it runs it, and a task it restores from the local cache never reaches the server. If you built before connecting the cache, the producing machine keeps getting local hits and the server stays empty. Delete `.turbo/cache` on that machine and build once. The [remote-hit check](/connect-turbo#check-that-hits-come-from-the-server) does exactly this.
 2. Find out where each hit came from. `npm exec -- turbo run build --summarize` writes a JSON summary to `.turbo/runs/`, and each task's `cache.source` is `LOCAL`, `REMOTE`, or absent for a miss.
-3. Confirm that the task has caching enabled. Compare the task hashes in two machines' run summaries. If the hash changes, Turbo sees different inputs. Check its [cache troubleshooting guide](https://turborepo.dev/docs/crafting-your-repository/caching#troubleshooting).
+3. Confirm that the task has caching enabled. Compare the task hashes in two machines' run summaries. If the hash changes, `turbo` sees different inputs. Check Turborepo's [cache troubleshooting guide](https://turborepo.dev/docs/crafting-your-repository/caching#troubleshooting).
 4. Confirm that clients use the same server and team. A different team uses a different artifact namespace.
 5. Check the first run for upload errors. A task can succeed and still fail to upload its artifact. See [Uploads fail](#uploads-fail).
 6. If signatures are enabled, confirm that every client has the same `TURBO_REMOTE_CACHE_SIGNATURE_KEY`. A rejected signature is a cache miss. See [Sign artifacts](/sign-artifacts).
@@ -90,4 +90,4 @@ The expiry endpoint requires a JSON body, even when you want the default retenti
 
 ## Report a problem
 
-Include the server version or deployed commit, Turbo version, hosting platform, storage backend, and the failing command or request. Include the response status and relevant logs, with tokens and credentials removed. Report bugs in [GitHub Issues](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/issues). Report vulnerabilities through the [security policy](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/security/policy).
+Include the server version or deployed commit, `turbo` version, hosting platform, storage backend, and the failing command or request. Include the response status and relevant logs, with tokens and credentials removed. Report bugs in [GitHub Issues](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/issues). Report vulnerabilities through the [security policy](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/security/policy).

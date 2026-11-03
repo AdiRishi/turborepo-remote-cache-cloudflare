@@ -41,4 +41,4 @@ Rebuild and redeploy after changing database settings. Check `/stats` and the se
 
 On Cloudflare, remove the `d1_databases` entry from `apps/api/wrangler.jsonc`. Elsewhere, set `database: {}` in `apps/api/nitro.config.ts`.
 
-Rebuild and redeploy. The dashboard then reports that stats are disabled; artifact caching continues to work.
+Rebuild and redeploy. The dashboard then reports that stats are disabled, and artifact caching keeps working.

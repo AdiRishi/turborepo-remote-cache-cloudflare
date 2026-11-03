@@ -9,9 +9,9 @@ Lambda caps a synchronous invocation payload at 6 MB. The event envelope and Bas
 
 ## Build the handler
 
-Clone your copy of the repository and install dependencies with `pnpm install --frozen-lockfile`. Use Node.js 24 or later and the pnpm version in `package.json`. Run the build from the repository root:
+Clone your copy of the repository and install dependencies with `pnpm install --frozen-lockfile`. Use Node.js 24 or later and the pnpm version in `package.json`. The [build setup](/deploy#build-from-source) covers the repository's own remote-cache settings.
 
-The [build setup](/deploy#build-from-source) covers the repository's own remote-cache settings.
+Run the build from the repository root:
 
 ```sh
 NITRO_PRESET=aws_lambda pnpm build

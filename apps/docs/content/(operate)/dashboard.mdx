@@ -18,17 +18,15 @@ The range control at the top picks the last 24 hours, 7 days, 30 days, or 90 day
 - **Storage.** What the server stores, and how the total changed over the range.
 - **Clients.** The CI providers that ran `turbo`, the AI coding agents that started runs, and the `turbo` versions and platforms that moved artifacts.
 
-## Restrict access
-
-The dashboard is public. Anyone with the server's URL can see your team names and usage. To restrict it, put `/` and `/stats` behind your own access control, such as [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/), and leave `/v8/*` reachable with Turbo's bearer token. Protect both dashboard routes. Protecting only `/` leaves the data accessible through `/stats`.
-
 <a id="where-stats-are-stored" />
 <a id="configure-a-database" />
 <a id="turn-stats-off" />
 
-## Stats availability
+The stats live in a database. Cloudflare deploys come with one, and [Configure the stats database](/stats-database) covers every other host.
 
-Stats need a database. Cloudflare creates D1 during deployment. Other hosts may need configuration. See [Configure the stats database](/stats-database).
+## Restrict access
+
+The dashboard is public. Anyone with the server's URL can see your team names and usage. To restrict it, put `/` and `/stats` behind your own access control, such as [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/), and leave `/v8/*` reachable with `turbo`'s bearer token. Protect both dashboard routes. Protecting only `/` leaves the data accessible through `/stats`.
 
 ## When storage numbers update
 

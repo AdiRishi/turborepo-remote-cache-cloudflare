@@ -83,7 +83,7 @@ curl "$CACHE_URL/ping"
 curl -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/artifacts/status"
 ```
 
-The first request answers `pong`, and needs no token. The second answers `{"status":"enabled"}`. A `401` means the token doesn't match the Worker's secret. For anything else, see [Turbo cannot connect](/troubleshooting#turbo-cannot-connect).
+The first request answers `pong`, and needs no token. The second answers `{"status":"enabled"}`. A `401` means the token doesn't match the Worker's secret. For anything else, see [`turbo` cannot connect](/troubleshooting#turbo-cannot-connect).
 
 Then [connect turbo](/connect-turbo) and check that your builds hit the server.
 
