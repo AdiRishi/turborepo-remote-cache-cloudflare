@@ -80,8 +80,14 @@ export interface Moment {
   active: Box;
 }
 
+// How long a line takes to fade out. Matches the island's `duration-300`.
+const FADE_MS = 300;
+
 export const momentAt = (elapsed: number): Moment => {
   const round = Math.min(TASKS.length - 1, Math.floor(elapsed / ROUND));
   const local = elapsed - round * ROUND;
-  return { task: TASKS[round] ?? TASKS[0], round, local, active: activeBox(local) };
+  // While the last round's lines fade out, they keep the task they showed. The loop wraps from the last
+  // task back to the first, so round 0 fades out the last task.
+  const shown = local < FADE_MS ? (round + TASKS.length - 1) % TASKS.length : round;
+  return { task: TASKS[shown] ?? TASKS[0], round, local, active: activeBox(local) };
 };
