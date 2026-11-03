@@ -27,15 +27,11 @@ export const useSeen = <T extends Element>() => {
 };
 
 /**
- * Plays a timeline from 0 to `end` milliseconds once `playing` turns true. It stops at the end and plays
- * again on `replay`, or starts over by itself with `loop`. With reduced motion, it jumps straight to the end.
+ * Plays a timeline from 0 to `end` milliseconds once `playing` turns true, and starts over at the end. With
+ * reduced motion, it jumps straight to the end and stays there.
  */
-export const usePlayback = (
-  end: number,
-  { playing = true, loop = false }: { playing?: boolean; loop?: boolean } = {},
-) => {
+export const usePlayback = (end: number, { playing = true }: { playing?: boolean } = {}) => {
   const [elapsed, setElapsed] = useState(0);
-  const [round, setRound] = useState(0);
 
   useEffect(() => {
     if (!playing) {
@@ -47,20 +43,13 @@ export const usePlayback = (
     }
     const start = performance.now();
     let frame = requestAnimationFrame(function tick(now) {
-      const next = loop ? (now - start) % end : Math.min(now - start, end);
-      setElapsed(next);
-      if (loop || next < end) {
-        frame = requestAnimationFrame(tick);
-      }
+      setElapsed((now - start) % end);
+      frame = requestAnimationFrame(tick);
     });
     return () => {
       cancelAnimationFrame(frame);
     };
-  }, [end, playing, loop, round]);
+  }, [end, playing]);
 
-  const replay = () => {
-    setRound((count) => count + 1);
-  };
-
-  return { elapsed, done: elapsed >= end, replay };
+  return { elapsed };
 };

@@ -1,4 +1,6 @@
-/** The documentation site's lockup: the cache mark and the "Turborepo Remote Cache" wordmark. */
+import { useId } from 'react';
+
+/** The documentation site's lockup: the replay mark and the "Turborepo Remote Cache" wordmark. */
 export function Lockup({ className }: { className?: string }) {
   return (
     <svg
@@ -8,7 +10,7 @@ export function Lockup({ className }: { className?: string }) {
       aria-label="Turborepo Remote Cache"
     >
       <g transform="scale(0.6667)">
-        <MarkBars />
+        <ReplayMark />
       </g>
       <g>
         <path
@@ -38,17 +40,41 @@ export function Lockup({ className }: { className?: string }) {
 export function BrandMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Turborepo Remote Cache">
-      <MarkBars />
+      <ReplayMark />
     </svg>
   );
 }
 
-function MarkBars() {
+/**
+ * The header renders the lockup and the mark and hides one of them. A gradient defined inside a hidden SVG
+ * paints nothing, so each copy defines its own.
+ */
+function ReplayMark() {
+  const gradient = useId();
+  const paint = `url(#${gradient})`;
   return (
-    <g fill="currentColor">
-      <rect width="18" height="7" rx="1.75" />
-      <rect y="17" width="18" height="7" rx="1.75" />
-      <rect x="6" y="8.5" width="18" height="7" rx="1.75" fill="var(--mark)" />
-    </g>
+    <>
+      <defs>
+        <linearGradient id={gradient} x1="20" y1="4" x2="4" y2="20" gradientUnits="userSpaceOnUse">
+          <stop stopColor="var(--brand-from)" />
+          <stop offset="1" stopColor="var(--brand-to)" />
+        </linearGradient>
+      </defs>
+      <circle cx="12" cy="12" r="4.8" fill="none" stroke="currentColor" strokeWidth="3.1" />
+      <path
+        d="M16.557 4.707A8.6 8.6 0 1 1 6.026 5.814"
+        fill="none"
+        stroke={paint}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M8.184 3.73L4.289 4.015L7.763 7.612Z"
+        fill={paint}
+        stroke={paint}
+        strokeWidth="0.6"
+        strokeLinejoin="round"
+      />
+    </>
   );
 }

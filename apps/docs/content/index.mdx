@@ -1,6 +1,6 @@
 ---
 title: Turborepo Remote Cache
-description: A Turborepo remote cache you host yourself, on Cloudflare Workers or any platform Nitro builds for.
+description: Host your Turborepo remote cache on Cloudflare, AWS Lambda, Vercel, Netlify, or Node.js. You need no Vercel account.
 mode: custom
 sidebar:
     hidden: true
@@ -10,7 +10,7 @@ sidebar:
 
 # A Turborepo remote cache you host yourself
 
-Build once, and every laptop and CI runner on your team replays the result from storage you own. One button deploys it to Cloudflare Workers.
+Deploy it to Cloudflare Workers with one button, or run the same server on AWS Lambda, Vercel, Netlify, Node.js, Bun, or Deno. Artifacts stay in R2, Workers KV, or any S3-compatible bucket, and a dashboard shows the build time your cache saves.
 
 [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) [Read the docs](/introduction)
 
@@ -22,18 +22,18 @@ Build once, and every laptop and CI runner on your team replays the result from 
 
 ## Why host your own cache
 
-- **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never touch Vercel.
-- **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges nothing for egress, so the bandwidth of every cache download is free.
+- **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, with no plugin, no fork, and no `turbo login`.
+- **Free to start on Cloudflare.** The Workers free plan includes 100,000 requests a day, and R2 stores 10 GB a month for free. R2 charges nothing for egress, so cache downloads cost no bandwidth.
 - **Your choice of storage.** Keep artifacts in R2, Workers KV, any S3-compatible bucket, or anything with a [Files SDK](https://files-sdk.dev) adapter.
-- **Signed artifacts.** The server stores each artifact's signature and returns it unchanged, so `turbo` can reject anything it didn't sign.
+- **Signed artifacts.** The server stores each artifact's signature and returns it unchanged, so `turbo` can reject any artifact that your own machines didn't sign.
 
 </HomeSection>
 
 <HomeSection>
 
-## See what it saves
+## See the time your cache saves
 
-Every server shows this dashboard at its root. This one runs on made-up numbers, so click around.
+Every server shows this dashboard at its root. This copy uses sample data. Try the controls.
 
 </HomeSection>
 
@@ -55,7 +55,7 @@ Every server shows this dashboard at its root. This one runs on made-up numbers,
         ```
     </Step>
     <Step title="Point turbo at the Worker">
-        Add the Worker to your root `turbo.json`, and give every machine the token as `TURBO_TOKEN`. From then on, a task that runs anywhere replays everywhere else.
+        Add the Worker to your root `turbo.json`, and give every machine the token as `TURBO_TOKEN`.
 
         ```json turbo.json
         {
@@ -66,21 +66,21 @@ Every server shows this dashboard at its root. This one runs on made-up numbers,
         }
         ```
     </Step>
-    <Step title="Sign your artifacts (optional, recommended)">
-        Turn on `remoteCache.signature` and give every machine the same `TURBO_REMOTE_CACHE_SIGNATURE_KEY`. `turbo` then rejects any artifact your own machines didn't sign, even one uploaded with a valid token.
+    <Step title="Sign your artifacts">
+        This step is optional, and we recommend it. Turn on `remoteCache.signature` and give every machine the same `TURBO_REMOTE_CACHE_SIGNATURE_KEY`. `turbo` then rejects any artifact your own machines didn't sign, even one uploaded with a valid token.
     </Step>
 
 </Steps>
 
-[Get started](/get-started) has every step, [Connect turbo](/connect-turbo) brings in your team and CI, and [Sign artifacts](/sign-artifacts) locks it down.
+[Get started](/get-started) has every step. [Connect turbo](/connect-turbo) sets up your team and CI, and [Sign artifacts](/sign-artifacts) explains the signature key.
 
 </HomeSection>
 
 <HomeSection>
 
-## Run it anywhere
+## Deploy to the platform you already use
 
-The same server builds for other platforms and stores artifacts wherever you choose. [Choose a platform](/deploy) compares their artifact size limits.
+The same server builds for six other platforms and stores artifacts in the storage you choose. [Choose a platform](/deploy) compares their artifact size limits.
 
 <Columns cols={2}>
     <Column>

@@ -6,7 +6,7 @@ import type { Activity } from '../../contract';
 
 import { countChange, Delta } from './delta';
 
-/** Every task ends one of three ways. Amber is reserved for this server. */
+/** Every task ends one of three ways. Blue is reserved for this server. */
 const OUTCOMES = [
   {
     name: 'This server',

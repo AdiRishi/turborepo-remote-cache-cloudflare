@@ -23,11 +23,11 @@ function Card({
   return (
     <div
       className={`relative rounded-lg border px-3 pt-4 pb-2.5 transition-colors duration-300 ${
-        active ? 'border-[#ffb224]/70' : 'border-[#23262c]'
+        active ? 'border-[#0096ff]/70' : 'border-[#23262c]'
       } ${className}`}
     >
       <div className="absolute top-0 left-2.5 -translate-y-1/2 bg-[#0e1013] px-1.5 text-[#7d838e]">
-        <span className={active ? 'text-[#ffb224]' : 'text-[#d9dce1]'}>{title}</span> {detail}
+        <span className={active ? 'text-[#0096ff]' : 'text-[#d9dce1]'}>{title}</span> {detail}
       </div>
       {children}
     </div>
@@ -66,7 +66,7 @@ function Wire({
   const moving = share > 0 && share < 1;
   const chip = (top: number, visibility: string) => (
     <span
-      className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-[#ffb224] px-1 text-[10px] leading-4 font-medium text-[#1a1405] shadow-[0_0_12px_rgb(255_178_36/0.6)] ${visibility}`}
+      className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-[#0096ff] px-1 text-[10px] leading-4 font-medium text-[#0e1013] shadow-[0_0_12px_rgb(0_150_255/0.6)] ${visibility}`}
       style={{ top: `${top * 100}%` }}
     >
       {hash}
@@ -101,7 +101,7 @@ function Laptop({ task, local, active }: Moment) {
       className="min-h-[7.5rem] sm:col-start-1 sm:row-start-1"
     >
       <Line show={after(at.laptopCommand)}>
-        <span className="text-[#ffb224]">$</span> turbo run build
+        <span className="text-[#0096ff]">$</span> turbo run build
       </Line>
       <Line show={after(at.laptopMiss)}>
         <span className={task.tone}>{task.name}:build</span> cache miss, executing
@@ -128,8 +128,8 @@ function Account({ task, round, local, active }: Moment) {
   const stored = TASKS.slice(0, after(at.uploaded) ? round + 1 : round);
   const replayed = TASKS.slice(0, after(at.counted) ? round + 1 : round);
   return (
-    <div className="relative rounded-lg border border-dashed border-[#ffb224]/40 px-2.5 pt-6 pb-2.5 sm:col-span-2 sm:row-start-3">
-      <div className="absolute top-0 left-3 -translate-y-1/2 bg-[#0e1013] px-1.5 text-[#ffb224]">
+    <div className="relative rounded-lg border border-dashed border-[#0096ff]/40 px-2.5 pt-6 pb-2.5 sm:col-span-2 sm:row-start-3">
+      <div className="absolute top-0 left-3 -translate-y-1/2 bg-[#0e1013] px-1.5 text-[#0096ff]">
         your cloudflare account
       </div>
       <div className="grid gap-x-2 gap-y-4 sm:grid-cols-[2fr_1fr_1fr]">
@@ -152,7 +152,7 @@ function Account({ task, round, local, active }: Moment) {
           <div className="text-[#7d838e]">{total(stored, 'mb').toFixed(1)} MB</div>
         </Card>
         <Card title="d1" detail="stats" active={false}>
-          <div className={replayed.length > 0 ? 'text-[#ffb224]' : 'text-[#7d838e]'}>
+          <div className={replayed.length > 0 ? 'text-[#0096ff]' : 'text-[#7d838e]'}>
             {total(replayed, 'built').toFixed(1)}s saved
           </div>
           <div className="text-[#7d838e]">
@@ -174,7 +174,7 @@ function Ci({ task, local, active }: Moment) {
       className="min-h-[7.5rem] sm:col-start-2 sm:row-start-1"
     >
       <Line show={after(at.ciCommand)}>
-        <span className="text-[#ffb224]">$</span> turbo run build
+        <span className="text-[#0096ff]">$</span> turbo run build
       </Line>
       <Line show={after(at.downloaded)}>
         <span className={task.tone}>{task.name}:build</span> cache hit, replaying logs
@@ -184,7 +184,9 @@ function Ci({ task, local, active }: Moment) {
       </Line>
       <Line show={after(at.fullTurbo)}>
         Time: {task.replayed}s{' '}
-        <span className="font-medium text-[#ffb224]">&gt;&gt;&gt; FULL TURBO</span>
+        <span className="bg-linear-to-r from-[#0096ff] to-[#ff1e56] bg-clip-text font-medium text-transparent">
+          &gt;&gt;&gt; FULL TURBO
+        </span>
       </Line>
     </Card>
   );
@@ -192,7 +194,7 @@ function Ci({ task, local, active }: Moment) {
 
 export default function CacheFlow() {
   const { ref, seen } = useSeen<HTMLElement>();
-  const { elapsed } = usePlayback(LOOP, { playing: seen, loop: true });
+  const { elapsed } = usePlayback(LOOP, { playing: seen });
   const moment = momentAt(elapsed);
   return (
     <figure
@@ -224,8 +226,8 @@ export default function CacheFlow() {
         />
         <Ci {...moment} />
       </div>
-      <div aria-hidden="true" className="bg-[#ffb224] px-3 py-1 text-[#1a1405]">
-        built once, replayed everywhere
+      <div aria-hidden="true" className="bg-[#0096ff] px-3 py-1 text-[#0e1013]">
+        laptop and ci share one cache
       </div>
     </figure>
   );

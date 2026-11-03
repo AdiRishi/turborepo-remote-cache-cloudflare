@@ -1,6 +1,6 @@
 ---
 title: Sign artifacts
-description: Optional, and recommended. Make turbo sign every artifact it uploads and reject any download it can't verify.
+description: Make turbo sign every artifact it uploads and reject any download it can't verify. This step is optional, and we recommend it.
 ---
 
 With signatures on, `turbo` signs every artifact it uploads with an HMAC-SHA256 key, and it rejects any download whose signature doesn't verify. The server never sees the key, so even someone holding your `TURBO_TOKEN` can't slip in a build that your machines will run.

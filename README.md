@@ -25,7 +25,7 @@ An open-source [Turborepo remote cache](https://turborepo.dev/docs/core-concepts
 ## 🤔 Why should I use this?
 
 - ⚡ **Faster builds.** A task that ran on any machine, with the same inputs, replays from the cache instead of running again.
-- 🌐 **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never touch Vercel.
+- 🌐 **No Vercel account.** `turbo` talks to your server through the official Remote Cache API. No plugin, no fork, no `turbo login`.
 - 💰 **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges [nothing for egress](https://www.cloudflare.com/learning/cloud/what-are-data-egress-fees/), so the bandwidth of every cache download is free.
 - 🌍 **Close to your builds.** The Worker runs in Cloudflare data centers around the world.
 - 💿 **Your choice of storage.** 🪣 [R2](https://turborepo-remote-cache.dev/storage/r2), 🔑 [KV](https://turborepo-remote-cache.dev/storage/kv), any [S3-compatible bucket](https://turborepo-remote-cache.dev/storage/s3), or anything with a [Files SDK](https://files-sdk.dev) adapter.

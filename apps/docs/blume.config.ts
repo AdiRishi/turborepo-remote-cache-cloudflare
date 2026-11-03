@@ -27,11 +27,10 @@ export default defineConfig({
   content: { root: 'content' },
   title: 'Turborepo Remote Cache',
   description:
-    'Self-host the Turborepo remote cache on Cloudflare Workers, Node.js, Vercel, or AWS Lambda, with artifacts in R2, KV, or any S3-compatible bucket.',
+    'A Turborepo remote cache that you host yourself. It runs on Cloudflare Workers, AWS Lambda, Vercel, Netlify, Node.js, Bun, and Deno. The server stores artifacts in R2, Workers KV, any S3-compatible bucket, or a Files SDK adapter.',
   logo: { image: '/brand/lockup.svg', text: '' },
   theme: {
-    accent: { light: '#8f5b00', dark: '#ffb224' },
-    action: '#ffb224',
+    accent: { light: '#0068e0', dark: '#0096ff' },
     radius: 'md',
     mode: 'system',
     fonts: {

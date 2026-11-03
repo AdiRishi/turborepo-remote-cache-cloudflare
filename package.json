@@ -1,7 +1,7 @@
 {
   "name": "turborepo-remote-cache-cloudflare",
   "private": true,
-  "description": "An implementation of the turborepo-remote-cache server custom made for Cloudflare Workers",
+  "description": "A Turborepo remote cache that you host on Cloudflare Workers, AWS Lambda, Vercel, Netlify, Node.js, Bun, or Deno",
   "keywords": [
     "cloudflare-r2",
     "cloudflare-workers",
