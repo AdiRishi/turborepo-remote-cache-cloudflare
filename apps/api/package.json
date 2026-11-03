@@ -1,6 +1,6 @@
 {
   "name": "@turborepo-remote-cache/api",
-  "version": "5.3.0",
+  "version": "5.3.1",
   "private": true,
   "description": "The Turborepo remote cache server, for Cloudflare Workers, AWS Lambda, Vercel, Netlify, Node.js, Bun, and Deno",
   "license": "MIT",
