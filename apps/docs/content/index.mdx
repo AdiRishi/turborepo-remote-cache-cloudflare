@@ -1,8 +1,6 @@
 ---
 title: Turborepo Remote Cache
 description: Host your Turborepo remote cache on Cloudflare, AWS Lambda, Vercel, Netlify, or Node.js. You need no Vercel account.
-seo:
-    title: Self-hosted
 mode: custom
 sidebar:
     hidden: true
@@ -12,7 +10,7 @@ sidebar:
 
 # A Turborepo remote cache you host yourself
 
-`turbo` uploads each task's outputs to your own server. Every laptop and CI runner with the same inputs downloads those outputs and skips the task. Deploy the server to Cloudflare Workers with one button, or run it on AWS Lambda, Vercel, Netlify, Node.js, Bun, or Deno.
+Deploy it to Cloudflare Workers with one button, or run the same server on AWS Lambda, Vercel, Netlify, Node.js, Bun, or Deno. Artifacts stay in R2, Workers KV, or any S3-compatible bucket, and a dashboard shows the build time your cache saves.
 
 [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) [Read the docs](/introduction)
 
@@ -57,7 +55,7 @@ Every server shows this dashboard at its root. This copy uses sample data. Try t
         ```
     </Step>
     <Step title="Point turbo at the Worker">
-        Add the Worker to your root `turbo.json`, and give every machine the token as `TURBO_TOKEN`. After that, a task that runs on one machine replays on every other machine with the same inputs.
+        Add the Worker to your root `turbo.json`, and give every machine the token as `TURBO_TOKEN`.
 
         ```json turbo.json
         {

@@ -3,8 +3,6 @@ title: Introduction
 description: What a remote cache saves your team, and why to run this one in your own account.
 ---
 
-`turbo` caches each task's outputs on your laptop, so a task with unchanged inputs replays instead of running again. A remote cache shares those outputs with your whole team. Once any laptop or CI runner builds a task, every other machine with the same inputs downloads the result and skips the work.
-
 This project is an open-source remote cache server. Deploy it to Cloudflare Workers with one button, or run it on AWS Lambda, Vercel, Netlify, Node.js, Bun, or Deno. Then add a few lines to `turbo.json` to point `turbo` at it.
 
 <CacheFlow />
