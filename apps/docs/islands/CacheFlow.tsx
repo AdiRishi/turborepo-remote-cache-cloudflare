@@ -194,7 +194,7 @@ function Ci({ task, local, active }: Moment) {
 
 export default function CacheFlow() {
   const { ref, seen } = useSeen<HTMLElement>();
-  const { elapsed } = usePlayback(LOOP, { playing: seen, loop: true });
+  const { elapsed } = usePlayback(LOOP, { playing: seen });
   const moment = momentAt(elapsed);
   return (
     <figure

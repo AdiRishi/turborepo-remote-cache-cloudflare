@@ -61,6 +61,12 @@ const commands: Command[] = [
   { pane: 'ci', at: 6600, text: command },
 ];
 
+// When each command exits, its shell prints a fresh prompt.
+const prompts: { pane: PaneId; at: number }[] = [
+  { pane: 'laptop', at: 5650 },
+  { pane: 'ci', at: 9100 },
+];
+
 const lines: Line[] = [
   ...preamble('laptop', 1350),
   ...run('laptop', 1700, [
@@ -102,7 +108,9 @@ const lines: Line[] = [
   ]),
 ];
 
-const END = Math.max(...lines.map((line) => line.at)) + 200;
+// The finished run stays on screen this long before both terminals clear and the loop starts over.
+const HOLD_MS = 4500;
+const LOOP = Math.max(...[...lines, ...prompts].map((event) => event.at)) + HOLD_MS;
 
 const toneClass: Record<Tone, string> = {
   dim: 'text-[#7d838e]',
@@ -126,7 +134,7 @@ const panes: { id: PaneId; title: string; detail: string; prompt?: string; class
 
 // The pane whose output changed most recently, like tmux's active-pane border.
 const activePane = (elapsed: number): PaneId => {
-  const events = [...commands, ...lines].filter((event) => event.at <= elapsed);
+  const events = [...commands, ...lines, ...prompts].filter((event) => event.at <= elapsed);
   return events.reduce<{ pane: PaneId; at: number }>(
     (latest, event) => (event.at >= latest.at ? event : latest),
     {
@@ -135,6 +143,12 @@ const activePane = (elapsed: number): PaneId => {
     },
   ).pane;
 };
+
+function Cursor() {
+  return (
+    <span className="ml-px inline-block h-[1.1em] w-[0.6em] translate-y-[0.2em] bg-[#d9dce1] motion-safe:animate-[cache-replay-blink_1s_steps(2)_infinite]" />
+  );
+}
 
 function Prompt({ prompt, pane, elapsed }: { prompt: string; pane: PaneId; elapsed: number }) {
   const typed = commands.find((entry) => entry.pane === pane);
@@ -145,9 +159,7 @@ function Prompt({ prompt, pane, elapsed }: { prompt: string; pane: PaneId; elaps
   return (
     <div>
       <span className="text-[#0096ff]">{prompt}</span> {visible}
-      {typing && (
-        <span className="ml-px inline-block h-[1.1em] w-[0.6em] translate-y-[0.2em] bg-[#d9dce1] motion-safe:animate-[cache-replay-blink_1s_steps(2)_infinite]" />
-      )}
+      {typing && <Cursor />}
     </div>
   );
 }
@@ -187,35 +199,29 @@ function Pane({
             )}
           </div>
         ))}
+      {pane.prompt && prompts.some((entry) => entry.pane === pane.id && entry.at <= elapsed) && (
+        <div>
+          <span className="text-[#0096ff]">{pane.prompt}</span> <Cursor />
+        </div>
+      )}
     </div>
   );
 }
 
 export default function CacheReplay() {
-  const { elapsed, done, replay } = usePlayback(END);
+  const { elapsed } = usePlayback(LOOP);
   const active = activePane(elapsed);
   return (
     <figure className="not-prose mx-auto mt-12 max-w-6xl overflow-hidden rounded-xl bg-[#0e1013] font-mono text-[11px] leading-[1.7] text-[#d9dce1] shadow-[0_30px_80px_-30px_rgb(14_16_19/0.55)] ring-1 ring-black/10 sm:text-xs dark:ring-white/10">
       <figcaption className="sr-only">
         A laptop runs turbo run build. Three tasks miss the cache, run, and upload their outputs to
         the Worker, which stores them in R2. A CI runner then runs the same command, downloads all
-        three artifacts, and finishes in 1.2 seconds with FULL TURBO.
+        three artifacts, and finishes in 1.2 seconds with FULL TURBO. Then the loop starts over.
       </figcaption>
       <div aria-hidden="true" className="grid gap-x-3 gap-y-5 p-4 pt-6 lg:grid-cols-2">
         {panes.map((pane) => (
           <Pane key={pane.id} pane={pane} elapsed={elapsed} active={pane.id === active} />
         ))}
-      </div>
-      <div className="flex items-center justify-between bg-[#0096ff] px-3 py-1 text-[#0e1013]">
-        <span aria-hidden="true">[acme] 0:turbo*</span>
-        <button
-          type="button"
-          onClick={replay}
-          disabled={!done}
-          className="rounded-sm px-1.5 font-medium underline-offset-2 hover:underline focus-visible:outline-[#0e1013] disabled:invisible"
-        >
-          Replay
-        </button>
       </div>
     </figure>
   );
