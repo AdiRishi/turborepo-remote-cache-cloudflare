@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { usePlayback } from '../lib/playback';
 
 export const client = 'load';
 
@@ -136,35 +136,6 @@ const activePane = (elapsed: number): PaneId => {
   ).pane;
 };
 
-const usePlayback = () => {
-  const [elapsed, setElapsed] = useState(0);
-  const [round, setRound] = useState(0);
-
-  useEffect(() => {
-    if (globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setElapsed(END);
-      return undefined;
-    }
-    const start = performance.now();
-    let frame = requestAnimationFrame(function tick(now) {
-      const next = Math.min(now - start, END);
-      setElapsed(next);
-      if (next < END) {
-        frame = requestAnimationFrame(tick);
-      }
-    });
-    return () => {
-      cancelAnimationFrame(frame);
-    };
-  }, [round]);
-
-  const replay = () => {
-    setRound((count) => count + 1);
-  };
-
-  return { elapsed, done: elapsed >= END, replay };
-};
-
 function Prompt({ prompt, pane, elapsed }: { prompt: string; pane: PaneId; elapsed: number }) {
   const typed = commands.find((entry) => entry.pane === pane);
   const visible = typed
@@ -221,7 +192,7 @@ function Pane({
 }
 
 export default function CacheReplay() {
-  const { elapsed, done, replay } = usePlayback();
+  const { elapsed, done, replay } = usePlayback(END);
   const active = activePane(elapsed);
   return (
     <figure className="not-prose mx-auto mt-12 max-w-6xl overflow-hidden rounded-xl bg-[#0e1013] font-mono text-[11px] leading-[1.7] text-[#d9dce1] shadow-[0_30px_80px_-30px_rgb(14_16_19/0.55)] ring-1 ring-black/10 sm:text-xs dark:ring-white/10">

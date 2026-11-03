@@ -4,42 +4,18 @@ import '@turborepo-remote-cache/dashboard/palette.css';
 import type { StatsRange } from '@turborepo-remote-cache/dashboard/contract';
 
 import { Dashboard } from '@turborepo-remote-cache/dashboard/dashboard';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { demoStats } from '../lib/demo-stats';
+import { useSeen } from '../lib/playback';
 
 export const client = 'visible';
-
-/** Mounts the dashboard once it scrolls into view, so its numbers count up while someone watches. */
-const useSeen = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [seen, setSeen] = useState(false);
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) {
-      return undefined;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setSeen(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.3 },
-    );
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-  return { ref, seen };
-};
 
 export default function DashboardPreview() {
   const [range, setRange] = useState<StatsRange>('30d');
   const stats = useMemo(() => demoStats(range), [range]);
-  const { ref, seen } = useSeen();
+  // Mounting on first sight lets the dashboard's numbers count up while someone watches.
+  const { ref, seen } = useSeen<HTMLDivElement>();
   return (
     <figure
       data-dashboard
