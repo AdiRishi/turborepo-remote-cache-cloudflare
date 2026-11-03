@@ -110,7 +110,7 @@ const toneClass: Record<Tone, string> = {
   api: 'text-[#c9a2ff]',
   web: 'text-[#ff9ac1]',
   ok: 'text-[#8ee09a]',
-  turbo: 'font-medium text-[#ffb224]',
+  turbo: 'bg-linear-to-r from-[#0096ff] to-[#ff1e56] bg-clip-text font-medium text-transparent',
 };
 
 const panes: { id: PaneId; title: string; detail: string; prompt?: string; className: string }[] = [
@@ -144,7 +144,7 @@ function Prompt({ prompt, pane, elapsed }: { prompt: string; pane: PaneId; elaps
   const typing = typed !== undefined && visible.length < typed.text.length;
   return (
     <div>
-      <span className="text-[#ffb224]">{prompt}</span> {visible}
+      <span className="text-[#0096ff]">{prompt}</span> {visible}
       {typing && (
         <span className="ml-px inline-block h-[1.1em] w-[0.6em] translate-y-[0.2em] bg-[#d9dce1] motion-safe:animate-[cache-replay-blink_1s_steps(2)_infinite]" />
       )}
@@ -164,11 +164,11 @@ function Pane({
   return (
     <div
       className={`relative border px-4 pt-7 pb-3 transition-colors duration-300 ${
-        active ? 'border-[#ffb224]/70' : 'border-[#23262c]'
+        active ? 'border-[#0096ff]/70' : 'border-[#23262c]'
       } ${pane.className}`}
     >
       <div className="absolute top-0 left-3 -translate-y-1/2 bg-[#0e1013] px-1.5 text-[#7d838e]">
-        <span className={active ? 'text-[#ffb224]' : 'text-[#d9dce1]'}>{pane.title}</span>{' '}
+        <span className={active ? 'text-[#0096ff]' : 'text-[#d9dce1]'}>{pane.title}</span>{' '}
         {pane.detail}
       </div>
       {pane.prompt && <Prompt prompt={pane.prompt} pane={pane.id} elapsed={elapsed} />}
@@ -206,13 +206,13 @@ export default function CacheReplay() {
           <Pane key={pane.id} pane={pane} elapsed={elapsed} active={pane.id === active} />
         ))}
       </div>
-      <div className="flex items-center justify-between bg-[#ffb224] px-3 py-1 text-[#1a1405]">
+      <div className="flex items-center justify-between bg-[#0096ff] px-3 py-1 text-[#0e1013]">
         <span aria-hidden="true">[acme] 0:turbo*</span>
         <button
           type="button"
           onClick={replay}
           disabled={!done}
-          className="rounded-sm px-1.5 font-medium underline-offset-2 hover:underline focus-visible:outline-[#1a1405] disabled:invisible"
+          className="rounded-sm px-1.5 font-medium underline-offset-2 hover:underline focus-visible:outline-[#0e1013] disabled:invisible"
         >
           Replay
         </button>
