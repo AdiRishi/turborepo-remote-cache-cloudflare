@@ -225,7 +225,7 @@ export default function CacheFlow() {
         <Ci {...moment} />
       </div>
       <div aria-hidden="true" className="bg-[#ffb224] px-3 py-1 text-[#1a1405]">
-        built once, replayed everywhere
+        laptop and ci share one cache
       </div>
     </figure>
   );

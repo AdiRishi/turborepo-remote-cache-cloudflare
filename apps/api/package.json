@@ -2,7 +2,7 @@
   "name": "@turborepo-remote-cache/api",
   "version": "5.3.0",
   "private": true,
-  "description": "A Turborepo remote cache server for Cloudflare Workers and any Nitro deployment target",
+  "description": "The Turborepo remote cache server, for Cloudflare Workers, AWS Lambda, Vercel, Netlify, Node.js, Bun, and Deno",
   "license": "MIT",
   "type": "module",
   "scripts": {

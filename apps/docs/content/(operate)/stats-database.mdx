@@ -1,6 +1,6 @@
 ---
 title: Configure the stats database
-description: Keep dashboard history on persistent storage, or disable stats while retaining the cache.
+description: Keep dashboard history on persistent storage, or turn stats off and keep the cache.
 ---
 
 The server records stats in a database through [Nitro's database layer](https://nitro.build/docs/database). It writes after each response, so stats never slow the cache down, and a failed write never fails a cache request. Without a database, the cache works the same and the dashboard explains that stats are off.
