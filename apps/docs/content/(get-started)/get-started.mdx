@@ -1,29 +1,17 @@
 ---
 title: Get started
-description: Deploy the cache to Cloudflare Workers with one button, then watch a build come back from it.
+description: Deploy the cache to Cloudflare Workers and get your first remote hit.
 ---
 
-We'll deploy the server with one button, give it a token, and run a build twice. The second time, `turbo` doesn't build anything. It replays the whole build from your Worker.
-
-You need a Cloudflare account, a GitHub or GitLab account, and a Turborepo repository with a cacheable `build` task.
+You need a Cloudflare account, a GitHub or GitLab account, and a Turborepo repository. [Deploy to Cloudflare](/deploy/cloudflare) covers every detail, including deploying from a terminal. For another host, [choose a platform](/deploy).
 
 <a id="deploy-with-wrangler" />
 <a id="deploy-on-every-push" />
+<a id="check-the-deployment" />
 
-Prefer a terminal? [Deploy with Wrangler](/deploy/cloudflare#build-and-deploy) instead. To deploy every push to your copy, see [Deploy changes from Git](/deploy/cloudflare#deploy-changes-from-git). Running somewhere other than Cloudflare? [Choose a platform](/deploy).
+## Deploy the Worker
 
-## Before you deploy
-
-1. Turn on R2. If your account has never used it, open **R2 Object Storage** in the [Cloudflare dashboard](https://dash.cloudflare.com/) and follow the steps there. The [free tier](https://developers.cloudflare.com/r2/pricing/) includes 10 GB a month.
-2. Generate a token, and keep it somewhere safe:
-
-    ```sh
-    openssl rand -hex 32
-    ```
-
-    Your Worker and every `turbo` client share this one token. Anyone who has it can read and write every artifact on the server, so treat it like a password.
-
-## Deploy your copy
+If your Cloudflare account has never used R2, turn it on under **R2 Object Storage** in the [Cloudflare dashboard](https://dash.cloudflare.com/) first. Then press the button:
 
 <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare">
     <img
@@ -34,39 +22,23 @@ Prefer a terminal? [Deploy with Wrangler](/deploy/cloudflare#build-and-deploy) i
     />
 </a>
 
-1. Select **Deploy to Cloudflare** and sign in to Cloudflare.
-2. Connect your GitHub or GitLab account. Cloudflare copies this repository into it and creates a Worker that builds from the copy.
-3. Keep the build command, `pnpm run build`, and the deploy command, `pnpm run deploy`. Both run from the repository root, because the server depends on other packages in the workspace.
-4. Wait for the first deploy to finish. It creates the `turborepo-remote-cache` Worker, the `turborepo-cache` R2 bucket, and the `turborepo-cache-stats` D1 database for the [dashboard](/dashboard).
-5. Go to **Workers & Pages**, select the Worker, and open **Settings** > **Variables and Secrets**. Add a secret named `TURBO_TOKEN` with your token as its value.
-6. Copy the Worker's URL, such as `https://turborepo-remote-cache.<your-subdomain>.workers.dev`.
+Sign in, connect GitHub or GitLab, and keep the build and deploy commands Cloudflare fills in. The first deploy creates the Worker, an R2 bucket for artifacts, and a D1 database for the dashboard. Copy the Worker's URL when it's done.
 
-Until `TURBO_TOKEN` is set, every cache request gets a `500`. The deploy worked. The server just won't serve anyone without a token.
+## Set the token
 
-:::tip
-R2 creates the bucket near the machine that runs the first deploy. To pick its location, create the bucket before you deploy. [Cloudflare R2](/storage/r2#choose-where-the-bucket-lives) shows how.
-:::
-
-<a id="check-the-deployment" />
-
-## Check the server
-
-Put your Worker's URL and token in the terminal, then knock on the door:
+Generate a token:
 
 ```sh
-CACHE_URL='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
-export TURBO_TOKEN='<your token>'
-curl "$CACHE_URL/ping"
-curl -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/artifacts/status"
+openssl rand -hex 32
 ```
 
-The first request answers `pong`, and needs no token. The second answers `{"status":"enabled"}`. A `401` means the token doesn't match the Worker's secret. For anything else, see [Turbo cannot connect](/troubleshooting#turbo-cannot-connect).
+In the Worker's **Settings** > **Variables and Secrets**, add it as a secret named `TURBO_TOKEN`. Anyone with this token can read and write your cache, so treat it like a password.
 
 <a id="run-your-first-remote-hit" />
 
-## Connect your repository
+## Point turbo at it
 
-In the same terminal, switch to your Turborepo repository, so the token comes with you. Add the cache to the root `turbo.json`, beside your existing settings:
+In your Turborepo repository, add the Worker's URL to the root `turbo.json`:
 
 ```json turbo.json
 {
@@ -77,20 +49,18 @@ In the same terminal, switch to your Turborepo repository, so the token comes wi
 }
 ```
 
-Use your Worker's URL, with no trailing slash. The team is any name you like, as long as every machine that shares builds uses the same one. `turbo` reads the token from `TURBO_TOKEN`, which you already set.
+Then give your shell the token:
+
+```sh
+export TURBO_TOKEN='<your token>'
+```
 
 ## Get your first remote hit
 
 <include>/_snippets/verify-remote-cache.mdx</include>
 
-## See it on the dashboard
+## Next
 
-Open your Worker's URL in a browser. The [dashboard](/dashboard) at the root already counts the hits you just made and the time they saved.
-
-The dashboard is public, so anyone with the URL can see your team names and usage. [Restrict access](/dashboard#restrict-access) before you share the URL.
-
-## Where to next
-
-- [Connect turbo](/connect-turbo) so your team and CI use the cache on every build.
-- [Sign artifacts](/sign-artifacts) so `turbo` rejects any artifact your own machines didn't sign. It's optional, and we recommend it.
-- Your copy of the repository doesn't follow new releases on its own. [Update your deployment](/update) when you want one.
+- Open your Worker's URL to see those hits on the [dashboard](/dashboard). It's public until you [restrict access](/dashboard#restrict-access).
+- [Connect turbo](/connect-turbo) for the rest of your team and CI.
+- [Sign artifacts](/sign-artifacts). It's optional, and we recommend it.

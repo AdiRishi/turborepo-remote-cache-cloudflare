@@ -1,21 +1,46 @@
 ---
 title: Deploy to Cloudflare
-description: Build and deploy the Worker from your own checkout, or deploy changes automatically from Git.
+description: Every detail of the Cloudflare deployment, from the button or a terminal, plus deploys on every push.
 ---
 
-Wrangler builds the Worker from your checkout and creates its R2 bucket and stats database on the first deploy. For the one-button setup, use [Get started](/get-started).
+[Get started](/get-started) is the short version of this page. Cloudflare Workers is the default platform. It's the only one with built-in R2 and KV storage, a scheduled expiry task, and a stats database that needs no setup.
 
 ## Before you begin
 
-Turn on R2 in your Cloudflare account. Wrangler creates the bucket near the machine that runs the first deploy. To pick its location, [create it before you deploy](/storage/r2#choose-where-the-bucket-lives).
+1. Turn on R2. If your account has never used it, open **R2 Object Storage** in the [Cloudflare dashboard](https://dash.cloudflare.com/) and follow the steps there. The [free tier](https://developers.cloudflare.com/r2/pricing/) includes 10 GB a month.
+2. Generate a token. Your Worker and every `turbo` client share it:
 
-Generate a token for the Worker and your Turbo clients:
+    ```sh
+    openssl rand -hex 32
+    ```
 
-```sh
-openssl rand -hex 32
-```
+    Anyone with this token can read and write every team's artifacts. [One token opens every team](/how-it-works#one-token-opens-every-team) explains why.
 
-## Build and deploy
+:::tip
+The first deploy creates the R2 bucket near the machine that runs it. To pick its location, [create the bucket before you deploy](/storage/r2#choose-where-the-bucket-lives).
+:::
+
+## Deploy with the button
+
+<a href="https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare">
+    <img
+        src="https://deploy.workers.cloudflare.com/button"
+        alt="Deploy to Cloudflare"
+        width="184"
+        height="39"
+    />
+</a>
+
+1. Select **Deploy to Cloudflare** and sign in to Cloudflare.
+2. Connect your GitHub or GitLab account. Cloudflare copies this repository into it and creates a Worker that builds from the copy with [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/).
+3. Keep the build command, `pnpm run build`, and the deploy command, `pnpm run deploy`. Both run from the repository root, because the server depends on other packages in the workspace.
+4. Wait for the first deploy to finish. It creates the `turborepo-remote-cache` Worker, the `turborepo-cache` R2 bucket, and the `turborepo-cache-stats` D1 database for the [dashboard](/dashboard).
+5. Go to **Workers & Pages**, select the Worker, and open **Settings** > **Variables and Secrets**. Add a secret named `TURBO_TOKEN` with your token as its value.
+6. Copy the Worker's URL, such as `https://turborepo-remote-cache.<your-subdomain>.workers.dev`.
+
+Until `TURBO_TOKEN` is set, every cache request gets a `500`. The deploy worked. The server just won't serve anyone without a token.
+
+## Deploy from a terminal
 
 You need [Node.js](https://nodejs.org) 24 or later and [pnpm](https://pnpm.io). Install the version in the repository's `packageManager` field, using the [pnpm installation guide](https://pnpm.io/installation).
 
@@ -36,7 +61,7 @@ You need [Node.js](https://nodejs.org) 24 or later and [pnpm](https://pnpm.io). 
     pnpm run deploy
     ```
 
-    Wrangler opens a browser to sign you in to Cloudflare if you aren't signed in yet. On the first deploy, it creates the `turborepo-cache` R2 bucket and the `turborepo-cache-stats` D1 database for the [dashboard](/dashboard). When it finishes, it prints the Worker's URL, such as `https://turborepo-remote-cache.<your-subdomain>.workers.dev`.
+    Wrangler opens a browser to sign you in to Cloudflare if you aren't signed in yet. On the first deploy, it creates the `turborepo-cache` R2 bucket and the `turborepo-cache-stats` D1 database. When it finishes, it prints the Worker's URL.
 
 4. Set the token:
 
@@ -49,23 +74,18 @@ You need [Node.js](https://nodejs.org) 24 or later and [pnpm](https://pnpm.io). 
 
 ## Check the deployment
 
-`/ping` needs no token. Replace the URL with your Worker's URL:
+Put your Worker's URL and token in the terminal, then knock on the door:
 
 ```sh
 CACHE_URL='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
-curl --fail "$CACHE_URL/ping"
-```
-
-The Worker answers `pong`. Now check the token:
-
-```sh
 export TURBO_TOKEN='<your token>'
-curl --fail -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/artifacts/status"
+curl "$CACHE_URL/ping"
+curl -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/artifacts/status"
 ```
 
-The Worker answers `{"status":"enabled"}`. A `401` response means the token doesn't match `TURBO_TOKEN`.
+The first request answers `pong`, and needs no token. The second answers `{"status":"enabled"}`. A `401` means the token doesn't match the Worker's secret. For anything else, see [Turbo cannot connect](/troubleshooting#turbo-cannot-connect).
 
-[Connect turbo](/connect-turbo) to verify that your builds use the server.
+Then [connect turbo](/connect-turbo) and check that your builds hit the server.
 
 ## Deploy changes from Git
 
@@ -73,7 +93,7 @@ Pick one service to deploy pushes to your copy. If you set up both, both deploy 
 
 ### Workers Builds
 
-If you used the Deploy to Cloudflare button, [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/) is already set up. It deploys every push to your copy's production branch. Keep the build directory at the repository root, the build command at `pnpm run build`, and the deploy command at `pnpm run deploy`.
+If you used the button, Workers Builds is already set up. It deploys every push to your copy's production branch. Keep the build directory at the repository root, the build command at `pnpm run build`, and the deploy command at `pnpm run deploy`.
 
 ### GitHub Actions
 

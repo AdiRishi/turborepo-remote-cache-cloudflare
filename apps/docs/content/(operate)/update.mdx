@@ -46,5 +46,5 @@ If Git refuses with `refusing to merge unrelated histories`, your copy doesn't s
     ```
 
 2. Commit the merge and deploy it the way you deploy today. Push to your production branch for Workers Builds or GitHub Actions, or run `pnpm run deploy` for a manual Cloudflare deploy. Other hosts follow their [platform guide](/deploy).
-3. Check that the server answers `/ping` and `/v8/artifacts/status`, as in [Check the server](/get-started#check-the-deployment), and [check that hits come from the server](/connect-turbo#check-that-hits-come-from-the-server).
+3. Check that the server answers `/ping` and `/v8/artifacts/status`, as in [Check the deployment](/deploy/cloudflare#check-the-deployment), and [check that hits come from the server](/connect-turbo#check-that-hits-come-from-the-server).
 4. Open the dashboard. If stats stopped, look for `[stats]` errors in the [logs](/observability).
