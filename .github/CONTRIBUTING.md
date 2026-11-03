@@ -1,40 +1,41 @@
 # Contributing
 
-Welcome! We're thrilled that you're interested in contributing to `turborepo-remote-cache-cf`. Your contributions will help improve the project and benefit the community.
+Welcome, and thanks for wanting to help! Fixes, docs improvements, and good bug reports are all welcome.
 
----
+You don't need a Cloudflare account to work on the server. The end-to-end suite runs a real Worker and real `turbo` clients on your machine, so you can prove a fix before anything gets deployed.
 
-Here are some guidelines to help you get started:
+## Set up the repository
 
-## Setting Up the Repository
+Install Node.js 24 or later and the pnpm version in `package.json`. Then clone the repository:
 
-To set up the repository on your local machine, follow these steps:
+```sh
+git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
+cd turborepo-remote-cache-cloudflare
+pnpm install --frozen-lockfile
+```
 
-1. Clone the repository using `git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git`.
-2. Move into the project directory with `cd turborepo-remote-cache-cf`.
-3. Install the project dependencies by running `pnpm install`.
+The server lives in `apps/api`, the dashboard in `apps/dashboard`, and the documentation site in `apps/docs`. `packages/files-sdk-kv` is a standalone Files SDK adapter. `packages/spec` contains the upstream API specification and generated types.
 
-## Making a Pull Request
+Run commands from the repository root. You do not need the maintainer's remote-cache credentials to contribute. Without them, Turbo uses the local cache.
 
-Before submitting a pull request, ensure you adhere to the following:
+## Run locally
 
-1. Run lint and test commands to check for any errors. You can do this by running `pnpm lint` and `pnpm test`.
-2. Write unit tests for any changes you make. This helps maintain the quality of the code and ensures that your changes don't accidentally break anything.
-3. Always sign your commits. This confirms that the changes come from a trusted source. Read [this documentation](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification) to learn how to sign commits.
+`pnpm dev` starts the workspace development tasks. For the built Cloudflare Worker, run `pnpm build` followed by `pnpm preview`.
 
-To create a pull request:
+For the documentation site alone, run `pnpm docs:dev`. Before changing the site, read the relevant Blume documentation in `apps/docs/node_modules/blume/docs`.
 
-1. Push your changes to your fork of the repository.
-2. Go to the `turborepo-remote-cache-cf` page in your GitHub account.
-3. Click the `New pull request` button.
+## Check a change
 
-In the `New pull request` page:
+Run `pnpm check` for every change. It runs lint, typechecking, tests, and builds. Use `pnpm lint:fix` to fix formatting and supported lint findings.
 
-1. Choose the original repository as base repository and your fork as the head repository.
-2. Confirm your changes and submit your pull request.
+If a change affects the deployed server, also run `pnpm test:e2e`. This builds a Worker, starts Wrangler locally on port 8787, and tests the HTTP contract and real Turbo clients. It does not deploy to Cloudflare.
 
----
+After changing `wrangler.jsonc` or the API specification, run `pnpm codegen` and include the generated files. Check them with `pnpm codegen:check`. Keep the upstream specification unmodified; put documentation corrections in `apps/docs/openapi-overlay.yaml`.
 
-By contributing to this project, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md).
+Add or update focused tests for changed behavior. Update the matching page in `apps/docs/content` when behavior or configuration changes. When moving a public page, preserve its URL or add a redirect in `apps/docs/blume.config.ts`.
 
-We appreciate your interest in contributing and look forward to your pull requests!
+## Open a pull request
+
+Use a branch such as `fix/cache-expiry` or `docs/client-setup`. Keep the change focused and sign your commits. The pull request should explain the problem, the resulting behavior, and how you verified it.
+
+Repository-specific engineering constraints are recorded in [AGENTS.md](../AGENTS.md). Contributors follow the [Code of Conduct](CODE_OF_CONDUCT.md). Report vulnerabilities privately through the [security policy](SECURITY.md).

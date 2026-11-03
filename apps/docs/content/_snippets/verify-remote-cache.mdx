@@ -1,0 +1,27 @@
+`turbo` uploads a task only when it runs it. A task it restores from your local cache stays on your machine. So start with an empty local cache, and build:
+
+```sh
+rm -rf .turbo/cache
+npm exec -- turbo run build
+```
+
+Every task runs and uploads its outputs to your server. Now clear the local cache again, as if this were a brand new machine, and build again:
+
+```sh
+rm -rf .turbo/cache
+npm exec -- turbo run build
+```
+
+This time nothing runs:
+
+```text
+   • Remote caching enabled
+
+build: cache hit, replaying logs edf677b2880f0799
+
+  Tasks:    1 successful, 1 total
+ Cached:    1 cached, 1 total
+   Time:    19ms >>> FULL TURBO
+```
+
+Your local cache was empty, so every one of those hits came from your server. If tasks still miss, see [Builds keep missing](/troubleshooting#builds-keep-missing).

@@ -1,29 +1,68 @@
 ---
 title: Introduction
-description: How turbo uses a remote cache, what this server stores, and who can read it.
+description: A Turborepo remote cache in your own Cloudflare account. Free to start, one button to deploy, and a dashboard that shows off what it saves.
 ---
 
-Turborepo Remote Cache is an open-source server for the [Turborepo Remote Cache API](https://turborepo.dev/docs/core-concepts/remote-caching#remote-cache-api). It stores the artifacts that `turbo` uploads and returns them to any machine that asks with the right token.
+`turbo` already refuses to build the same thing twice on your laptop. A remote cache spreads that memory across your whole team. Once any laptop or CI runner builds a task, every other machine with the same inputs downloads the result and skips the work.
 
-## How turbo uses the cache
+This project is that remote cache. It's an open-source server you deploy to your own Cloudflare account with one button, then point `turbo` at with a few lines of `turbo.json`.
 
-`turbo` hashes the inputs of every task. Before it runs a task, it asks the cache for an artifact with that hash:
+<CacheFlow />
 
-1. On a hit, `turbo` downloads the artifact, restores the task's outputs and logs, and skips the task.
-2. On a miss, `turbo` runs the task, packs its outputs into an artifact, and uploads it.
+## Stop building the same thing twice
 
-The next machine that runs the task with the same inputs gets a hit, whether it's a teammate's laptop or a CI runner. `turbo` decides what to cache and when. The server only stores and returns artifacts.
+- **CI stops rebuilding the world.** A pull request rebuilds the packages it changed and the ones that depend on them. Everything else replays from the cache.
+- **A fresh clone is ready in seconds.** A new teammate, a new laptop, or a throwaway worktree downloads its builds instead of making them.
+- **Your coding agents stop burning minutes.** An agent that runs the test suite fifty times an afternoon replays every task whose inputs it didn't touch.
 
-## What the server stores
+## Why this one
 
-Each artifact is one object with the key `<team>/<hash>`. The team is the `teamId` or `slug` that `turbo` sends, or `team_default_team` when it sends neither. Beside the artifact, the server keeps the headers that `turbo` uploads with it, such as the task's duration and, for a signed artifact, its signature.
+<CardGroup cols={2}>
+    <Card title="Free to start" icon="piggy-bank">
+        The Workers free plan covers 100,000 requests a day, and R2 stores 10 GB a month for free.
+        R2 charges nothing for egress, so a cache download costs no bandwidth.
+    </Card>
+    <Card title="No Vercel account" icon="key-round">
+        `turbo` talks to your server through the official Remote Cache API. There's no plugin and no
+        fork of `turbo`, and your artifacts never touch Vercel.
+    </Card>
+    <Card title="A dashboard that brags for you" icon="chart-column" href="/dashboard">
+        Open the server's URL to see the time it saved, its hit rate, and which teams, CI providers,
+        and coding agents use it.
+    </Card>
+    <Card title="Signed artifacts" icon="shield-check" href="/sign-artifacts">
+        Turn on signatures, and `turbo` rejects any artifact your own machines didn't sign, even one
+        uploaded with a valid token.
+    </Card>
+    <Card title="Storage you pick" icon="database" href="/storage">
+        R2 by default. Workers KV, any S3-compatible bucket, or anything with a Files SDK adapter
+        works too.
+    </Card>
+    <Card title="Not only Cloudflare" icon="server" href="/deploy">
+        The same server builds for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
+    </Card>
+</CardGroup>
 
-The server deletes artifacts older than 30 days by default. [Retention and expiry](/retention) explains how to change that.
+## Know the trade-offs
 
-## One token opens every team
+<a id="one-token-opens-every-team" />
 
-Every client sends the same bearer token, the server's `TURBO_TOKEN`. Teams keep artifacts apart, but they don't restrict access: anyone with the token can read and write every team's artifacts. Give the token only to people and CI jobs you trust to write to your cache. Run a separate deployment for each group that must stay apart.
+- **One token opens every team.** Anyone with the token reads and writes every team's artifacts. If two groups must stay apart, give each its own deployment.
+- **Your copy is yours.** The button copies this repository into your account, and the copy doesn't update itself. [Merging a new release](/update) is a `git merge` away.
+- **The dashboard is public until you lock it.** Anyone with the URL sees your team names and usage. [Restrict access](/dashboard#restrict-access) before you share it.
+- **Serverless hosts cap artifact size.** Vercel, Netlify, and AWS Lambda top out around 5 MB per upload, while Cloudflare Workers takes 100 MB or more. [Compare platforms](/deploy#artifact-size-limits) before you pick one.
 
-## Where it runs
+## Try it
 
-The server is a [Nitro](https://nitro.build) app, and every build serves the same API. The default build targets Cloudflare Workers. It is the only build with built-in R2 and KV storage, and the only one that CI runs end to end against a real `turbo` client. [Deploy to Cloudflare](/get-started) to start there, or see [Platforms](/deploy) for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
+<CardGroup cols={2}>
+    <Card title="Get started" icon="rocket" href="/get-started">
+        Deploy to Cloudflare and get your first remote hit.
+    </Card>
+    <Card title="How it works" icon="workflow" href="/how-it-works">
+        What `turbo` asks the server, what the server keeps, and who can read it.
+    </Card>
+</CardGroup>
+
+It's MIT-licensed and built in the open. Issues, pull requests, and stars are all welcome.
+
+<GithubInfo />

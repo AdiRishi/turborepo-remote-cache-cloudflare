@@ -9,13 +9,18 @@
     "build": "blume build",
     "dev": "blume dev",
     "preview": "blume preview",
-    "test": "blume validate --strict"
+    "test": "blume validate --strict",
+    "typecheck": "tsc"
   },
   "devDependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "@turborepo-remote-cache/dashboard": "workspace:*",
     "@turborepo-remote-cache/spec": "workspace:*",
     "@types/react": "^19.3.0",
     "blume": "^2.2.6",
     "react": "^19.3.1",
+    "typescript": "^7.0.2",
     "wrangler": "^4.156.0"
   }
 }

@@ -5,6 +5,8 @@ description: What an existing Cloudflare deployment must change for version 5, w
 
 Version 5 rebuilds the server on [Nitro](https://nitro.build) and [Files SDK](https://files-sdk.dev). An existing Cloudflare deployment keeps its `TURBO_TOKEN`, `BUCKET_OBJECT_EXPIRATION_HOURS`, `R2_STORE`, and `KV_STORE` configuration, and its R2 artifacts stay readable.
 
+For later releases, use [Update your deployment](/update).
+
 ## Move your Wrangler changes
 
 The repository is now a pnpm workspace, and the server lives in `apps/api`:

@@ -63,3 +63,36 @@ pre {
         visibility: hidden;
     }
 }
+
+/* The homepage renders the dashboard's components, so its classes and colour tokens come along. */
+@source "../dashboard/src";
+
+/* Page prose styles are unlayered, so they would beat the dashboard's layered utilities. */
+.prose [data-dashboard] :where(h1, h2, h3, h4, p, ul, ol, table) {
+    all: revert-layer;
+}
+
+@layer base {
+    [data-dashboard] :where(h1, h2, h3, h4, h5, h6) {
+        font-family: inherit;
+        letter-spacing: normal;
+    }
+}
+
+@theme inline {
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-destructive: var(--destructive);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-remote: var(--remote);
+    --color-local: var(--local);
+    --color-miss: var(--miss);
+    --color-grid: var(--grid);
+    --color-positive: var(--positive);
+    --color-negative: var(--negative);
+}

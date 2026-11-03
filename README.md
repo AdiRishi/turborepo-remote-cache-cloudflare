@@ -25,7 +25,7 @@ An open-source [Turborepo remote cache](https://turborepo.dev/docs/core-concepts
 ## 🤔 Why should I use this?
 
 - ⚡ **Faster builds.** A task that ran on any machine, with the same inputs, replays from the cache instead of running again.
-- 🌐 **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never leave your storage.
+- 🌐 **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never touch Vercel.
 - 💰 **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges [nothing for egress](https://www.cloudflare.com/learning/cloud/what-are-data-egress-fees/), so the bandwidth of every cache download is free.
 - 🌍 **Close to your builds.** The Worker runs in Cloudflare data centers around the world.
 - 💿 **Your choice of storage.** 🪣 [R2](https://turborepo-remote-cache.dev/storage/r2), 🔑 [KV](https://turborepo-remote-cache.dev/storage/kv), any [S3-compatible bucket](https://turborepo-remote-cache.dev/storage/s3), or anything with a [Files SDK](https://files-sdk.dev) adapter.
@@ -60,19 +60,27 @@ cd apps/api && pnpm exec wrangler secret put TURBO_TOKEN
 
 ## ▲ Point turbo at your cache
 
-Set these variables wherever `turbo` runs, with your Worker's URL and no trailing slash:
+Add your Worker to the root `turbo.json` of your Turborepo repository:
+
+```json
+{
+    "remoteCache": {
+        "apiUrl": "https://turborepo-remote-cache.<your-subdomain>.workers.dev",
+        "teamSlug": "my-team"
+    }
+}
+```
+
+Then give every machine that runs `turbo` the token, in its environment:
 
 ```sh
-export TURBO_API=https://turborepo-remote-cache.<your-subdomain>.workers.dev
-export TURBO_TOKEN=<your token>
-export TURBO_TEAM=my-team
+export TURBO_TOKEN='<your token>'
 ```
 
-Then run a build, and run it again with only the remote cache. The second run replays everything from your Worker:
+Run a build, and every task that runs uploads its outputs to your Worker. A task restored from your local cache doesn't upload, so clear `.turbo/cache` first if you've built this repository before. Then run the same build on any other machine, a teammate's laptop or a CI runner, and it replays:
 
 ```
-$ turbo run build
-$ turbo run build --cache=remote:r
+$ npm exec -- turbo run build
 
 • Remote caching enabled
 
@@ -85,7 +93,7 @@ Cached:    1 cached, 1 total
 
 And that's it 🎉🎉
 
-[Connect turbo](https://turborepo-remote-cache.dev/connect-turbo) covers CI, signed artifacts, and keeping the URL and team in `turbo.json`.
+[Get started](https://turborepo-remote-cache.dev/get-started) walks through the same steps with more detail. [Connect turbo](https://turborepo-remote-cache.dev/connect-turbo) sets up your team and CI. While you're there, [sign your artifacts](https://turborepo-remote-cache.dev/sign-artifacts) too. It's optional, takes one shared key, and stops `turbo` from replaying anything your own machines didn't sign. Your copy doesn't follow new releases on its own, so [Update your deployment](https://turborepo-remote-cache.dev/update) when you want one.
 
 ## 🤝 Contributing
 

@@ -318,6 +318,15 @@ importers:
 
   apps/docs:
     devDependencies:
+      '@fontsource-variable/geist':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource-variable/geist-mono':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@turborepo-remote-cache/dashboard':
+        specifier: workspace:*
+        version: link:../dashboard
       '@turborepo-remote-cache/spec':
         specifier: workspace:*
         version: link:../../packages/spec
@@ -330,6 +339,9 @@ importers:
       react:
         specifier: ^19.3.1
         version: 19.3.1
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
       wrangler:
         specifier: ^4.156.0
         version: 4.156.0(@cloudflare/workers-types@5.20261030.1)(@types/node@22.20.5)

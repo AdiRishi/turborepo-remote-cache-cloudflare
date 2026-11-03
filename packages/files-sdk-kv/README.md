@@ -1,6 +1,6 @@
 # @turborepo-remote-cache/files-sdk-kv
 
-A [Files SDK](https://files-sdk.dev) adapter that stores files in a Cloudflare Workers KV namespace. It targets `files-sdk` 3.1.1.
+A [Files SDK](https://files-sdk.dev) adapter that stores files in a Cloudflare Workers KV namespace. Its supported Files SDK version is declared in `peerDependencies` in [package.json](package.json).
 
 ```ts
 import { kv } from '@turborepo-remote-cache/files-sdk-kv';
@@ -14,7 +14,7 @@ const file = await files.download('reports/q3.pdf', { as: 'stream' });
 
 ## Options
 
-`kv(options)` returns an `Adapter<KVNamespace>`, and `files.raw` is the binding. The options type is exported as `KvAdapterOptions`. `files-sdk` is a peer dependency pinned to 3.1.1, and `KVNamespace` is the type from `@cloudflare/workers-types`.
+`kv(options)` returns an `Adapter<KVNamespace>`, and `files.raw` is the binding. The options type is exported as `KvAdapterOptions`. `files-sdk` is a peer dependency. `KVNamespace` is the type from `@cloudflare/workers-types`.
 
 | Option          | Type          | Description                                                                                                                                                                    |
 | --------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

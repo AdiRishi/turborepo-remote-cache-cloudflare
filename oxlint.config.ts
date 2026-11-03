@@ -18,6 +18,8 @@ export default defineConfig({
     'eslint/no-await-in-loop': 'off',
     'eslint/no-warning-comments': 'off',
     'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
+    // Stylesheets and fonts load for their side effects.
+    'import/no-unassigned-import': ['error', { allow: ['**/*.css', '@fontsource-variable/*'] }],
     'typescript/consistent-type-imports': ['error', { disallowTypeAnnotations: false }],
     'typescript/no-explicit-any': 'error',
     'typescript/no-import-type-side-effects': 'error',

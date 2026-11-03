@@ -5,16 +5,6 @@ description: Find each request's logs, trace, and errors on Cloudflare, send the
 
 On Cloudflare Workers, `apps/api/wrangler.jsonc` turns on [Workers Logs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/), [traces](https://developers.cloudflare.com/workers/observability/traces/), and [Issues](https://developers.cloudflare.com/workers/observability/issues/). Find all three in the Cloudflare dashboard, under the Worker's observability pages.
 
-```jsonc apps/api/wrangler.jsonc
-{
-    "observability": {
-        "enabled": true,
-        "traces": { "enabled": true },
-        "issues": { "enabled": true },
-    },
-}
-```
-
 ## What the server records
 
 | Feature | What you get                                                                                                                                                                                                                                                       |

@@ -60,7 +60,7 @@ To use another age for one run, send `expireInHours`, a number of hours that is 
 
 ## Run expiry from a scheduler
 
-On a platform that doesn't run the task, call the endpoint once a day from a scheduler. This GitHub Actions workflow reads the URL from a `TURBO_API` variable and the token from a `TURBO_TOKEN` secret:
+On a platform that doesn't run the task, call the endpoint once a day from a scheduler. This GitHub Actions workflow reads the URL from a `CACHE_URL` variable and the token from a `TURBO_TOKEN` secret:
 
 ```yaml .github/workflows/cache-expiry.yml
 on:
@@ -72,7 +72,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - run: |
-                  curl --fail -X POST "${{ vars.TURBO_API }}/internal/delete-expired-objects" \
+                  curl --fail -X POST "${{ vars.CACHE_URL }}/internal/delete-expired-objects" \
                     -H "Authorization: Bearer ${{ secrets.TURBO_TOKEN }}" \
                     -H "Content-Type: application/json" \
                     -d '{}'

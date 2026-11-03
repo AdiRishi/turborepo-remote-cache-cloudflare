@@ -1,0 +1,44 @@
+---
+title: Sign artifacts
+description: Optional, and recommended. Make turbo sign every artifact it uploads and reject any download it can't verify.
+---
+
+With signatures on, `turbo` signs every artifact it uploads with an HMAC-SHA256 key, and it rejects any download whose signature doesn't verify. The server never sees the key, so even someone holding your `TURBO_TOKEN` can't slip in a build that your machines will run.
+
+Turn it on for any cache that more than one person or CI job writes to. It takes one setting and a second shared secret, separate from `TURBO_TOKEN`. The token lets a client talk to the server. The key decides which artifacts `turbo` trusts.
+
+## Turn on signatures
+
+1. Add `signature` to `remoteCache` in your root `turbo.json`:
+
+    ```json turbo.json
+    {
+        "remoteCache": {
+            "signature": true
+        }
+    }
+    ```
+
+2. Generate a key once, and store it in your secret manager:
+
+    ```sh
+    openssl rand -hex 32
+    ```
+
+3. Give every machine and CI job that shares artifacts that same key:
+
+    ```sh
+    export TURBO_REMOTE_CACHE_SIGNATURE_KEY='<your signing key>'
+    ```
+
+    In CI, store it as a secret beside `TURBO_TOKEN`. Use at least 32 bytes. `turbo` accepts shorter keys today, but its [`longerSignatureKey`](https://turborepo.dev/docs/reference/configuration#longersignaturekey) future flag rejects them.
+
+4. [Check that hits come from the server](/connect-turbo#check-that-hits-come-from-the-server).
+
+`turbo` treats an artifact it can't verify as a miss. A machine with a different key misses on every signed artifact and runs the task again. A machine with no key can't sign, so it uploads nothing. Artifacts uploaded before you turned signatures on miss once, and the next run replaces them with signed ones.
+
+## Change the key
+
+Give every machine the new key at once. While some machines have the old key and some the new one, each side misses on the other's artifacts. Once they all match, they share builds again.
+
+[Turborepo's signature documentation](https://turborepo.dev/docs/core-concepts/remote-caching#artifact-integrity-and-authenticity-verification) covers the client side in more depth.

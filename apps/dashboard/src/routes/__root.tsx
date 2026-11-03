@@ -36,7 +36,7 @@ function Root() {
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-dashboard suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

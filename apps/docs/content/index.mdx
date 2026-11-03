@@ -10,7 +10,7 @@ sidebar:
 
 # A Turborepo remote cache you host yourself
 
-Every laptop and CI runner on your team shares build outputs through storage you own. Deploy the server to Cloudflare Workers with one button, or build it for Node.js, Vercel, AWS Lambda, and other platforms.
+Build once, and every laptop and CI runner on your team replays the result from storage you own. One button deploys it to Cloudflare Workers.
 
 [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) [Read the docs](/introduction)
 
@@ -22,7 +22,7 @@ Every laptop and CI runner on your team shares build outputs through storage you
 
 ## Why host your own cache
 
-- **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never leave your storage.
+- **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, and your artifacts never touch Vercel.
 - **Free to start.** The Workers free plan includes 100,000 requests a day, and R2 includes 10 GB of storage a month. R2 charges nothing for egress, so the bandwidth of every cache download is free.
 - **Your choice of storage.** Keep artifacts in R2, Workers KV, any S3-compatible bucket, or anything with a [Files SDK](https://files-sdk.dev) adapter.
 - **Signed artifacts.** The server stores each artifact's signature and returns it unchanged, so `turbo` can reject anything it didn't sign.
@@ -31,11 +31,21 @@ Every laptop and CI runner on your team shares build outputs through storage you
 
 <HomeSection>
 
+## See what it saves
+
+Every server shows this dashboard at its root. This one runs on made-up numbers, so click around.
+
+</HomeSection>
+
+<DashboardPreview />
+
+<HomeSection>
+
 ## Set it up
 
 <Steps>
     <Step title="Deploy the Worker">
-        The [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) button copies this repository to your GitHub or GitLab account and deploys it with an R2 bucket. You can also [deploy with Wrangler](/get-started#deploy-with-wrangler).
+        The [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare) button copies this repository to your GitHub or GitLab account and deploys it with an R2 bucket. You can also [deploy with Wrangler](/deploy/cloudflare).
     </Step>
     <Step title="Set a token">
         Generate a long random token and add it to the Worker as a secret named `TURBO_TOKEN`.
@@ -45,18 +55,24 @@ Every laptop and CI runner on your team shares build outputs through storage you
         ```
     </Step>
     <Step title="Point turbo at the Worker">
-        Set these variables wherever `turbo` runs, then run a build twice. The second run replays every task from your Worker.
+        Add the Worker to your root `turbo.json`, and give every machine the token as `TURBO_TOKEN`. From then on, a task that runs anywhere replays everywhere else.
 
-        ```sh
-        export TURBO_API=https://turborepo-remote-cache.<your-subdomain>.workers.dev
-        export TURBO_TOKEN=<your token>
-        export TURBO_TEAM=my-team
+        ```json turbo.json
+        {
+            "remoteCache": {
+                "apiUrl": "https://turborepo-remote-cache.<your-subdomain>.workers.dev",
+                "teamSlug": "my-team"
+            }
+        }
         ```
+    </Step>
+    <Step title="Sign your artifacts (optional, recommended)">
+        Turn on `remoteCache.signature` and give every machine the same `TURBO_REMOTE_CACHE_SIGNATURE_KEY`. `turbo` then rejects any artifact your own machines didn't sign, even one uploaded with a valid token.
     </Step>
 
 </Steps>
 
-[Deploy to Cloudflare](/get-started) has every step, and [Connect turbo](/connect-turbo) covers CI and signed artifacts.
+[Get started](/get-started) has every step, [Connect turbo](/connect-turbo) brings in your team and CI, and [Sign artifacts](/sign-artifacts) locks it down.
 
 </HomeSection>
 
@@ -64,13 +80,13 @@ Every laptop and CI runner on your team shares build outputs through storage you
 
 ## Run it anywhere
 
-The same server builds for other platforms and stores artifacts wherever you choose.
+The same server builds for other platforms and stores artifacts wherever you choose. [Choose a platform](/deploy) compares their artifact size limits.
 
 <Columns cols={2}>
     <Column>
         ### Platforms
 
-        - [Cloudflare Workers](/get-started)
+        - [Cloudflare Workers](/deploy/cloudflare)
         - [Node.js, Bun, and Deno](/deploy/node)
         - [Vercel](/deploy/vercel)
         - [Netlify](/deploy/netlify)

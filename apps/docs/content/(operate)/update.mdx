@@ -1,0 +1,50 @@
+---
+title: Update your deployment
+description: Merge a new release into your copy of the repository, keep your settings, and deploy it.
+---
+
+Your server runs from your own copy of this repository, and that copy doesn't follow upstream releases on its own. To get a release, merge it into your copy and deploy. Your bucket, database, and token stay where they are.
+
+Coming from version 4? Read [Upgrade from v4](/upgrade-from-v4) first.
+
+## Before you merge
+
+1. Read the [server changelog](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/apps/api/CHANGELOG.md) for the release you want. Look for configuration changes and stats database migrations.
+2. If the release migrates the stats database, back it up. Rolling back the code doesn't roll back a migration. Artifacts need no backup, since `turbo` rebuilds any it can't find.
+3. Note the files that hold your settings. You'll keep your side of these when you merge:
+    - `apps/api/wrangler.jsonc`: Worker name, bindings, resource IDs, routes, and variables.
+    - `apps/api/nitro.config.ts`: stats database and expiry schedule.
+    - `apps/api/src/custom-adapter.ts`: custom storage, if you use it.
+    - `.github/workflows/ci.yml` and the root `turbo.json`: your deployment and build cache.
+
+## Merge the release
+
+In a checkout of your copy, add this repository as a remote and fetch its tags:
+
+```sh
+git remote add upstream https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
+git fetch upstream --tags
+```
+
+Server releases are tagged `@turborepo-remote-cache/api@<version>`. Merge the one you want, such as 5.3.0:
+
+```sh
+git merge @turborepo-remote-cache/api@5.3.0
+```
+
+Where the files above conflict, keep your names, IDs, and settings, and take everything else from upstream. Review those files even when Git reports no conflict.
+
+If Git refuses with `refusing to merge unrelated histories`, your copy doesn't share history with this repository. Fork the repository instead, check out the release, and copy your settings from the files above into it. Then point Workers Builds or your CI at the new repository. Future updates merge cleanly from there.
+
+## Deploy and check
+
+1. Install dependencies and run the checks:
+
+    ```sh
+    pnpm install --frozen-lockfile
+    pnpm check
+    ```
+
+2. Commit the merge and deploy it the way you deploy today. Push to your production branch for Workers Builds or GitHub Actions, or run `pnpm run deploy` for a manual Cloudflare deploy. Other hosts follow their [platform guide](/deploy).
+3. Check that the server answers `/ping` and `/v8/artifacts/status`, as in [Check the deployment](/deploy/cloudflare#check-the-deployment), and [check that hits come from the server](/connect-turbo#check-that-hits-come-from-the-server).
+4. Open the dashboard. If stats stopped, look for `[stats]` errors in the [logs](/observability).

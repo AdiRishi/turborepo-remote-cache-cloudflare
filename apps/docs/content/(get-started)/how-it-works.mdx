@@ -1,0 +1,39 @@
+---
+title: How it works
+description: What turbo asks the server, what the server keeps, who can read it, and what you maintain.
+---
+
+Turborepo Remote Cache is an open-source server for the [Turborepo Remote Cache API](https://turborepo.dev/docs/core-concepts/remote-caching#remote-cache-api). It stores the artifacts that `turbo` uploads and returns them to any machine that asks with the right token.
+
+## How turbo uses the cache
+
+`turbo` hashes the inputs of every task. Before it runs a task, it asks the cache for an artifact with that hash:
+
+1. On a hit, `turbo` downloads the artifact, restores the task's outputs and logs, and skips the task.
+2. On a miss, `turbo` runs the task, packs its outputs into an artifact, and uploads it.
+
+The next machine that runs the task with the same inputs gets a hit, whether it's a teammate's laptop or a CI runner. `turbo` decides what to cache and when. The server only stores and returns artifacts.
+
+## What the server stores
+
+Each artifact is one object with the key `<team>/<hash>`. The team is the `teamId` or `slug` that `turbo` sends, or `team_default_team` when it sends neither. Beside the artifact, the server keeps the headers that `turbo` uploads with it, such as the task's duration and, for a signed artifact, its signature.
+
+The server deletes artifacts older than 30 days by default. [Retention and expiry](/retention) explains how to change that.
+
+## One token opens every team
+
+Every client sends the same bearer token, the server's `TURBO_TOKEN`. Teams keep artifacts apart, but they don't restrict access: anyone with the token can read and write every team's artifacts. Give the token only to people and CI jobs you trust to write to your cache. Run a separate deployment for each group that must stay apart.
+
+The dashboard at `/` and its JSON at `/stats` need no token at all. They show team names and usage to anyone with the URL, until you [restrict access](/dashboard#restrict-access).
+
+## Your copy is yours to update
+
+The Deploy to Cloudflare button copies this repository into your account. From then on, the copy is yours. It doesn't follow upstream releases, and nothing upgrades it for you.
+
+Your settings live in that copy too. On Cloudflare, bindings and server variables are in `apps/api/wrangler.jsonc`, and the expiry schedule and stats database are in `apps/api/nitro.config.ts`. Secrets such as `TURBO_TOKEN` stay in your Cloudflare account. On other platforms, server variables come from the host's environment.
+
+[Update your deployment](/update) shows how to merge a release without losing any of it.
+
+## Where it runs
+
+The server is a [Nitro](https://nitro.build) app, and every build serves the same API. The default build targets Cloudflare Workers. It is the only build with built-in R2 and KV storage, and the only one that CI runs end to end against a real `turbo` client. [Get started](/get-started) to deploy there, or [choose a platform](/deploy) for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
