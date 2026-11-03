@@ -1,5 +1,11 @@
 # turborepo-remote-cache-cf
 
+## 5.3.1
+
+### Patch Changes
+
+- [#1084](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/1084) [`b8b5a25`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/b8b5a25b4fd1c9826d5e274f13e0d2048d74b6ba) Thanks [@AdiRishi](https://github.com/AdiRishi)! - Restyle the dashboard with the project's new brand. A ring inside an arrow that comes back around, in Turborepo's blue-to-red gradient, replaces the stacked-bar mark, and Turborepo's blue replaces amber as the colour of this server's share in the charts.
+
 ## 5.3.0
 
 ### Minor Changes
