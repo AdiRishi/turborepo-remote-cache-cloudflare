@@ -1,5 +1,6 @@
 ---
-// Lays out MDX children: a heading, a lede paragraph, and a paragraph of links shown as buttons.
+// Lays out MDX children: a heading, a lede paragraph, and a paragraph of links shown as buttons. A link that
+// wraps an image, such as Cloudflare's own deploy button, shows the image instead of a button frame.
 ---
 
 <section class="home-hero not-prose">
@@ -59,14 +60,21 @@
     border-color: var(--blume-muted-foreground);
   }
 
-  .home-hero :global(p:last-child a:first-child) {
-    border-color: var(--blume-action);
-    background: var(--blume-action);
-    color: var(--blume-action-foreground);
+  .home-hero :global(p:last-child a:has(img)) {
+    padding: 0;
+    border: 0;
+    transition: opacity 150ms;
   }
 
-  .home-hero :global(p:last-child a:first-child:hover) {
-    border-color: var(--blume-accent);
+  .home-hero :global(p:last-child a:has(img):hover) {
+    opacity: 0.85;
+  }
+
+  .home-hero :global(p:last-child img) {
+    display: block;
+    width: auto;
+    height: 100%;
+    margin: 0;
   }
 
   @media (min-width: 64rem) {
