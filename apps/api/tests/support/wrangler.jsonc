@@ -1,0 +1,6 @@
+// Bindings for tests that run the server as a Worker. Miniflare provides them and keeps their data in memory.
+{
+  "compatibility_date": "2026-06-15",
+  "kv_namespaces": [{ "binding": "KV_STORE", "id": "test" }],
+  "r2_buckets": [{ "binding": "R2_STORE", "bucket_name": "test" }]
+}
