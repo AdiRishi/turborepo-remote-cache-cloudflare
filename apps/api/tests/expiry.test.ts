@@ -1,7 +1,7 @@
 import { runTask } from 'nitro/task';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { authorized, randomHash } from './support/client';
+import { authorized, randomHash, send } from './support/client';
 import { adapter, storage } from './support/memory-storage';
 
 vi.mock('../src/custom-adapter', () => import('./support/memory-storage'));
@@ -9,7 +9,7 @@ vi.mock('../src/custom-adapter', () => import('./support/memory-storage'));
 const HOUR = 3_600_000;
 const START = new Date('2026-01-01T00:00:00Z').getTime();
 
-const store = (key: string) => storage.upload(key, new Uint8Array(1));
+const store = (key: string, size = 1) => storage.upload(key, new Uint8Array(size));
 
 const storedKeys = () => [...adapter.raw.keys()].toSorted();
 
@@ -59,6 +59,30 @@ describe('POST /internal/delete-expired-objects', () => {
 
     expect(await deleteExpired()).toEqual({ deleted: 2500 });
     expect(storedKeys()).toEqual([]);
+  });
+
+  test('records what it keeps for the dashboard, per team, counting only <team>/<hash> keys', async () => {
+    // Later than every other test here, so this snapshot is the latest one.
+    const expiredAt = START + 10_000 * HOUR;
+    vi.setSystemTime(expiredAt - 800 * HOUR);
+    await store('team_a/expired', 5);
+    vi.setSystemTime(expiredAt - HOUR);
+    await store('team_a/kept', 3);
+    await store('team_b/kept', 4);
+    await store('notes.txt', 2);
+    vi.setSystemTime(expiredAt);
+
+    expect(await deleteExpired()).toEqual({ deleted: 1 });
+
+    const stats = await send('/stats');
+    expect(await stats.json()).toMatchObject({
+      storage: { latest: { takenAt: expiredAt, artifacts: 2, bytes: 7 } },
+      teams: [
+        { team: 'team_a', storedArtifacts: 1, storedBytes: 3 },
+        { team: 'team_b', storedArtifacts: 1, storedBytes: 4 },
+      ],
+    });
+    expect(storedKeys()).toContain('notes.txt');
   });
 
   test('rejects a negative age', async () => {

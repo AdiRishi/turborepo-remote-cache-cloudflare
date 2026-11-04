@@ -59,6 +59,7 @@ describe('cache events', () => {
       { sessionId: session, source: 'LOCAL', event: 'MISS', hash: randomHash(), duration: 0 },
       { sessionId: session, source: 'REMOTE', event: 'HIT', hash: randomHash(), duration: 1200 },
       { sessionId: session, source: 'LOCAL', event: 'HIT', hash: randomHash(), duration: 300 },
+      { sessionId: session, source: 'LOCAL', event: 'HIT', hash: randomHash() },
       { sessionId: session, source: 'REMOTE', event: 'MISS', hash: randomHash(), duration: 0 },
     ]);
     expect(response.status).toBe(200);
@@ -70,7 +71,7 @@ describe('cache events', () => {
     await expect
       .poll(() => teamActivity(team))
       .toMatchObject({
-        localHits: 1,
+        localHits: 2,
         localMisses: 1,
         remoteHits: 2,
         remoteMisses: 1,
