@@ -34,9 +34,13 @@ describe('artifact upload and download', () => {
     expect(new Uint8Array(await download.arrayBuffer())).toEqual(body);
   });
 
-  test('stores an empty artifact', async () => {
+  test('stores an upload without a body as an empty artifact', async () => {
     const hash = randomHash();
-    await uploadArtifact({ hash, body: new Uint8Array() });
+    const upload = await authorized(`/v8/artifacts/${hash}`, {
+      method: 'PUT',
+      headers: { 'content-length': '0' },
+    });
+    expect(upload.status).toBe(202);
 
     const download = await authorized(`/v8/artifacts/${hash}`);
     expect(download.status).toBe(200);
