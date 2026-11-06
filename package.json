@@ -44,13 +44,13 @@
     "typecheck": "dotenv -e .env.turbo.local -- turbo run typecheck"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^1.0.1",
-    "@changesets/cli": "^3.0.3",
-    "dotenv-cli": "^11.1.0",
-    "oxfmt": "^0.76.0",
-    "oxlint": "^1.91.0",
-    "oxlint-tsgolint": "^7.0.2005",
-    "turbo": "^2.11.10"
+    "@changesets/changelog-github": "catalog:",
+    "@changesets/cli": "catalog:",
+    "dotenv-cli": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "turbo": "catalog:"
   },
   "engines": {
     "node": ">=24"

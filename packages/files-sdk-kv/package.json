@@ -14,15 +14,15 @@
     "typecheck": "tsc -b"
   },
   "devDependencies": {
-    "@cloudflare/vitest-plugin": "^1.5.1",
-    "@cloudflare/workers-types": "^5.20261104.1",
-    "@types/node": "^26.6.6",
-    "@vitest/coverage-istanbul": "^5.1.0",
-    "files-sdk": "3.1.2",
-    "typescript": "^7.0.2",
-    "vitest": "^5.1.0"
+    "@cloudflare/vitest-plugin": "catalog:",
+    "@cloudflare/workers-types": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
+    "files-sdk": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
-    "files-sdk": "3.1.2"
+    "files-sdk": "catalog:"
   }
 }
