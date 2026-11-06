@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/turbo/schema.json",
-  "agentGuidance": true,
+  "agentGuidance": false,
   "cacheMaxAge": "7d",
   "globalDependencies": [".nvmrc", "tsconfig.base.json"],
   "remoteCache": {

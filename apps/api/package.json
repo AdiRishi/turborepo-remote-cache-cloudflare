@@ -20,21 +20,21 @@
   },
   "dependencies": {
     "@turborepo-remote-cache/files-sdk-kv": "workspace:*",
-    "files-sdk": "3.1.2",
-    "nitro": "3.0.261029-rc",
-    "valibot": "^1.5.0"
+    "files-sdk": "catalog:",
+    "nitro": "catalog:",
+    "valibot": "catalog:"
   },
   "devDependencies": {
     "@turborepo-remote-cache/dashboard": "workspace:*",
     "@turborepo-remote-cache/spec": "workspace:*",
-    "@types/node": "^24.19.2",
-    "@vitest/coverage-istanbul": "^5.0.5",
-    "db0": "^0.4.2",
-    "miniflare": "5.20261023.3-beta",
-    "srvx": "^1.0.8",
-    "typescript": "^7.0.2",
-    "vite": "^8.3.5",
-    "vitest": "^5.0.5",
-    "wrangler": "^4.156.0"
+    "@types/node": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
+    "db0": "catalog:",
+    "miniflare": "catalog:",
+    "srvx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "wrangler": "catalog:"
   }
 }

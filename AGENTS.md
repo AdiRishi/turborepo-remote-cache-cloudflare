@@ -20,27 +20,3 @@ Run every command from the repository root.
 4. If you change behaviour or configuration, update the matching page in `apps/docs/content/` in the same change.
 
 Test this project's behaviour, and trust Files SDK, Nitro, and the platforms to do what they document. Tests in `apps/api/tests/contract/` talk only HTTP and use random hashes, because `pnpm test:e2e` runs them against a real Worker whose store can already hold data. For the same reason, each test in `apps/api/e2e/` uses its own team.
-
-## Decisions the code doesn't explain
-
-- `.env.turbo.local` holds the credentials for this repository's own remote cache. Never read, print, or commit it. Without it, `turbo` uses only the local cache.
-- A cache hit replays a task's outputs instead of running it, so an undeclared input hides a failure. Declare every env var, file outside the package, and output that affects a task in `turbo.json`. Write `inputs` as `$TURBO_DEFAULT$` (`$TURBO_EXTENDS$` in a package) followed by `!` exclusions. Depend on `^transit`, not `transit`, because a package's own `transit` hashes all of its files and undoes the exclusions.
-- To change the stats database's tables or data, append a migration to `apps/api/src/migrations/index.ts` and follow the rules written there.
-- The server's variable names predate Nitro, so it reads them through `apps/api/src/utils/env.ts` instead of `runtimeConfig`.
-- `packages/spec` holds the spec unmodified, so `pnpm spec:sync` can replace it. Fix spec problems in `apps/docs/openapi-overlay.yaml`.
-- The `master` ruleset requires the checks `Verify`, `End-to-end`, and `Dependency review` by name. Renaming those jobs blocks merges until the ruleset changes too. Add new CI work as a job in `ci.yml`.
-- Type-aware Oxlint needs TypeScript 7, which rejects `baseUrl`. Use `paths` relative to the tsconfig.
-- The docs homepage renders the dashboard's own `Dashboard` component with demo data from `apps/docs/lib/demo-stats.ts`, typed by the stats contract, so `tsc` in `apps/docs` fails when the contract moves. Keep the dashboard's colours in `apps/dashboard/src/palette.css`, which both sites load.
-- In the docs and README, write every `turbo` command a reader runs in their own repository as `npm exec -- turbo ...`. It works without a global install and with any package manager. The `--` stops npm from taking `turbo` flags such as `--summarize` and `--manual` as its own. Build commands for this repository keep `pnpm`.
-- In the docs, Blume renders the frontmatter `title` as the page's H1 and the `description` below it, so start the body with new information. Write callouts as `:::tip`, with no space after the colons. When you move a page, add a redirect in `apps/docs/blume.config.ts`.
-
-<!-- BEGIN:turborepo-agent-rules -->
-
-# This is NOT the Turborepo you know
-
-Turborepo configuration, task behavior, and CLI commands can vary between installed versions and may differ from your training data. Resolve the `turbo` package from this file's directory or relevant workspace; in monorepos, it may not be visible from the repository root. For example, run `node -p "require.resolve('turbo/package.json')"` from a workspace that depends on `turbo`.
-
-Read `docs/README.md` inside that installed package first, then read the relevant pages from its `docs/` directory before changing Turborepo configuration or commands. Heed deprecation notices. These bundled docs match the installed package version and are available without network access.
-
-This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": true` in the root `turbo.json` or `turbo.jsonc` to opt in; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
-<!-- END:turborepo-agent-rules -->
