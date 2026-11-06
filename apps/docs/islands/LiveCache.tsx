@@ -1,3 +1,5 @@
+// scripts/record-live-cache.ts records this island into the README's GIF. Re-record after a change that shows.
+
 import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
 import '@turborepo-remote-cache/dashboard/palette.css';
