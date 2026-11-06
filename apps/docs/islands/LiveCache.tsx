@@ -194,7 +194,7 @@ export default function LiveCache() {
         ref={ref}
         data-live-cache
         data-loop={LOOP}
-        className="grid gap-x-3 gap-y-5 overflow-hidden rounded-xl bg-[#0e1013] p-4 pt-6 font-mono text-[11px] leading-[1.7] text-[#d9dce1] shadow-[0_30px_80px_-30px_rgb(14_16_19/0.55)] ring-1 ring-black/10 sm:text-xs @2xl:w-[65rem] @2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] @2xl:[zoom:min(1,tan(atan2(100cqw,65rem)))] dark:ring-white/10"
+        className="grid gap-x-3 gap-y-5 overflow-hidden rounded-xl bg-[#0e1013] p-4 pt-6 font-mono text-[11px] leading-[1.7] text-[#d9dce1] shadow-[0_30px_80px_-30px_rgb(14_16_19/0.55)] ring-1 ring-black/10 sm:text-xs @2xl:w-[65rem] @2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] @2xl:[zoom:min(1,tan(atan2(100cqw,65rem)))] dark:ring-white/10"
       >
         <figcaption className="sr-only">
           A laptop runs turbo run build. Three tasks miss the cache, run, and upload their outputs,
