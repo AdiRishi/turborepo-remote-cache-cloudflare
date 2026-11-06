@@ -124,9 +124,11 @@ const step = async () => {
   }, now);
 };
 
-// The first loop counts the dashboard up from zero. Every loop after it is the same.
+// The first loop counts the dashboard up from zero, and every loop after it is the same. Each loop opens by
+// rolling the numbers back from the one before, so the GIF starts a second in, once that has settled.
 const count = Math.round(loop / FRAME_MS);
-for (let index = 0; index < count; index += 1) {
+const settle = Math.round(1000 / FRAME_MS);
+for (let index = 0; index < count + settle; index += 1) {
   await step();
 }
 for (let index = 0; index < count; index += 1) {

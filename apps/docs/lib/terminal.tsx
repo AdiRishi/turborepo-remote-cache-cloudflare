@@ -46,7 +46,7 @@ export const TASKS = [
     hash: '2b7e9d40c1a5f3e8',
     script: 'tsup src/index.ts',
     bytes: 1_100_000,
-    seconds: 21.7,
+    seconds: 41.2,
   },
   {
     name: 'web',
@@ -54,7 +54,7 @@ export const TASKS = [
     hash: 'c61f0e8a37d2b954',
     script: 'next build',
     bytes: 18_600_000,
-    seconds: 48.9,
+    seconds: 183.1,
   },
 ] as const;
 

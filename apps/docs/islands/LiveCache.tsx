@@ -51,11 +51,11 @@ const lines: Line<PaneId>[] = [
     [560, prefix(web), 'cache miss, executing ', [web.hash, 'dim']],
     [700, prefix(api), `> ${api.script}`],
     [850, prefix(web), `> ${web.script}`],
-    [3000, prefix(web), '✓ Compiled successfully in 31.4s'],
+    [3000, prefix(web), '✓ Compiled successfully in 2.4min'],
     [3400, ''],
     [3450, ' Tasks:    3 successful, 3 total'],
     [3500, 'Cached:    0 cached, 3 total'],
-    [3550, '  Time:    48.913s'],
+    [3550, '  Time:    3m12.481s'],
   ]),
   ...preamble('ci', 6850),
   ...run('ci', 7250, [
@@ -65,7 +65,7 @@ const lines: Line<PaneId>[] = [
     [180, prefix(api), `> ${api.script}`],
     [400, prefix(web), 'cache hit, replaying logs ', [web.hash, 'dim']],
     [440, prefix(web), `> ${web.script}`],
-    [480, prefix(web), '✓ Compiled successfully in 31.4s'],
+    [480, prefix(web), '✓ Compiled successfully in 2.4min'],
     [800, ''],
     [850, ' Tasks:    3 successful, 3 total'],
     [900, 'Cached:    3 cached, 3 total'],
@@ -200,7 +200,7 @@ export default function LiveCache() {
           A laptop runs turbo run build. Three tasks miss the cache, run, and upload their outputs,
           and the dashboard counts the work. A CI runner then runs the same command, replays all
           three tasks from the cache, and finishes in 1.2 seconds with FULL TURBO, while the
-          dashboard adds the 1 minute 20 seconds it saved. Then the loop starts over.
+          dashboard adds the 3 minutes 53 seconds it saved. Then the loop starts over.
         </figcaption>
         <div aria-hidden="true" className="grid gap-y-5">
           {terminals.map((pane) => (

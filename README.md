@@ -18,7 +18,7 @@
 
 <br>
 
-![A laptop runs turbo run build and misses the cache on all three tasks. A CI runner then runs the same build, replays every task from the cache, and finishes in 1.2 seconds with FULL TURBO. Beside the terminals, the dashboard counts each upload and hit as it lands and adds the 1 minute 20 seconds the CI run saved.](.github/assets/live-cache.gif)
+![A laptop runs turbo run build and misses the cache on all three tasks. A CI runner then runs the same build, replays every task from the cache, and finishes in 1.2 seconds with FULL TURBO. Beside the terminals, the dashboard counts each upload and hit as it lands and adds the 3 minutes 53 seconds the CI run saved.](.github/assets/live-cache.gif)
 
 ## 🚀 Introduction
 
