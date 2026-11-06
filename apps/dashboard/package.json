@@ -8,7 +8,9 @@
   "exports": {
     ".": "./index.ts",
     "./contract": "./contract.ts",
+    "./components/*": "./src/components/*.tsx",
     "./dashboard": "./src/components/dashboard.tsx",
+    "./lib/*": "./src/lib/*.ts",
     "./palette.css": "./src/palette.css"
   },
   "scripts": {

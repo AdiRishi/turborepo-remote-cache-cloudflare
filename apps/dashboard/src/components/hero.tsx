@@ -49,7 +49,7 @@ function Figure({ label, value, change }: { label: string; value: string; change
   );
 }
 
-function KeyFigures({ current, previous }: { current: Activity; previous: Activity }) {
+export function KeyFigures({ current, previous }: { current: Activity; previous: Activity }) {
   const rate = hitRate(current);
   const serverRate = serverHitRate(current);
   const perRun = savedPerRun(current);
@@ -90,7 +90,7 @@ function KeyFigures({ current, previous }: { current: Activity; previous: Activi
 }
 
 /** All task time in the range, split into what each cache replayed and what ran. */
-function TaskTimeMeter({ current, previous }: { current: Activity; previous: Activity }) {
+export function TaskTimeMeter({ current, previous }: { current: Activity; previous: Activity }) {
   const share = cachedShare(current);
   const shownShare = useTweened(share ?? 0);
   if (share === null) {
@@ -184,7 +184,7 @@ export function Hero({ stats, control }: { stats: Stats; control: ReactNode }) {
   );
 }
 
-export function Timeline({ stats }: { stats: Stats }) {
+export function Timeline({ stats }: { stats: Pick<Stats, 'series' | 'range'> }) {
   return (
     <section aria-label="Time saved per period">
       <h2 className="mb-4 text-sm text-muted-foreground">
