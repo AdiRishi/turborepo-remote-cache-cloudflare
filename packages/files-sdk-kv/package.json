@@ -14,13 +14,13 @@
     "typecheck": "tsc -b"
   },
   "devDependencies": {
-    "@cloudflare/vitest-plugin": "^1.4.11",
-    "@cloudflare/workers-types": "^5.20261030.1",
-    "@types/node": "^24.19.2",
-    "@vitest/coverage-istanbul": "^5.0.5",
+    "@cloudflare/vitest-plugin": "^1.5.1",
+    "@cloudflare/workers-types": "^5.20261104.1",
+    "@types/node": "^26.6.6",
+    "@vitest/coverage-istanbul": "^5.1.0",
     "files-sdk": "3.1.2",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   },
   "peerDependencies": {
     "files-sdk": "3.1.2"
