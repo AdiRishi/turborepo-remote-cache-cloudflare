@@ -1,53 +1,23 @@
+import type { Line, Script, Segment, Task } from '../lib/terminal';
+
 import { usePlayback } from '../lib/playback';
+import {
+  activePane,
+  COMMAND,
+  Frame,
+  lastBeat,
+  preamble,
+  prefix,
+  run,
+  TASKS,
+  Terminal,
+} from '../lib/terminal';
 
 export const client = 'load';
 
 type PaneId = 'laptop' | 'worker' | 'ci';
-type Tone = 'dim' | 'ui' | 'api' | 'web' | 'ok' | 'turbo';
-type Segment = string | readonly [text: string, tone: Tone];
 
-interface Line {
-  pane: PaneId;
-  at: number;
-  segments: readonly Segment[];
-}
-
-interface Command {
-  pane: PaneId;
-  at: number;
-  text: string;
-}
-
-const TYPE_MS = 45;
-const command = 'turbo run build';
-
-const tasks = [
-  { name: '@acme/ui', tone: 'ui', hash: '8f3c2a91d04e7b65', script: 'tsc -b', size: '412 KB' },
-  {
-    name: 'api',
-    tone: 'api',
-    hash: '2b7e9d40c1a5f3e8',
-    script: 'tsup src/index.ts',
-    size: '1.1 MB',
-  },
-  { name: 'web', tone: 'web', hash: 'c61f0e8a37d2b954', script: 'next build', size: '18.6 MB' },
-] as const;
-
-type Task = (typeof tasks)[number];
-
-const [ui, api, web] = tasks;
-const prefix = (task: Task): Segment => [`${task.name}:build: `, task.tone];
-
-const preamble = (pane: PaneId, at: number): Line[] =>
-  [
-    '• Packages in scope: @acme/ui, api, web',
-    '• Running build in 3 packages',
-    '• Remote caching enabled',
-    '',
-  ].map((text, index) => ({ pane, at: at + index * 70, segments: [[text, 'dim']] }));
-
-const run = (pane: PaneId, at: number, lines: [offset: number, ...segments: Segment[]][]): Line[] =>
-  lines.map(([offset, ...segments]) => ({ pane, at: at + offset, segments }));
+const [ui, api, web] = TASKS;
 
 const request = (method: 'PUT' | 'GET', task: Task, status: number, detail: string): Segment[] => [
   [`${method} `, 'dim'],
@@ -56,18 +26,7 @@ const request = (method: 'PUT' | 'GET', task: Task, status: number, detail: stri
   [`  ${detail}`, 'dim'],
 ];
 
-const commands: Command[] = [
-  { pane: 'laptop', at: 500, text: command },
-  { pane: 'ci', at: 6600, text: command },
-];
-
-// When each command exits, its shell prints a fresh prompt.
-const prompts: { pane: PaneId; at: number }[] = [
-  { pane: 'laptop', at: 5650 },
-  { pane: 'ci', at: 9100 },
-];
-
-const lines: Line[] = [
+const lines: Line<PaneId>[] = [
   ...preamble('laptop', 1350),
   ...run('laptop', 1700, [
     [0, prefix(ui), 'cache miss, executing ', [ui.hash, 'dim']],
@@ -108,18 +67,23 @@ const lines: Line[] = [
   ]),
 ];
 
+const script: Script<PaneId> = {
+  commands: [
+    { pane: 'laptop', at: 500, text: COMMAND },
+    { pane: 'ci', at: 6600, text: COMMAND },
+  ],
+  lines,
+  prompts: [
+    { pane: 'laptop', at: 5650 },
+    { pane: 'ci', at: 9100 },
+  ],
+};
+
+const beats = [...script.commands, ...script.lines, ...script.prompts];
+
 // The finished run stays on screen this long before both terminals clear and the loop starts over.
 const HOLD_MS = 4500;
-const LOOP = Math.max(...[...lines, ...prompts].map((event) => event.at)) + HOLD_MS;
-
-const toneClass: Record<Tone, string> = {
-  dim: 'text-[#7d838e]',
-  ui: 'text-[#6cd3e6]',
-  api: 'text-[#c9a2ff]',
-  web: 'text-[#ff9ac1]',
-  ok: 'text-[#8ee09a]',
-  turbo: 'bg-linear-to-r from-[#0096ff] to-[#ff1e56] bg-clip-text font-medium text-transparent',
-};
+const LOOP = lastBeat(beats) + HOLD_MS;
 
 const panes: { id: PaneId; title: string; detail: string; prompt?: string; className: string }[] = [
   { id: 'laptop', title: 'laptop', detail: '~/acme', prompt: '~/acme $', className: 'h-[23.5rem]' },
@@ -132,85 +96,9 @@ const panes: { id: PaneId; title: string; detail: string; prompt?: string; class
   { id: 'ci', title: 'ci', detail: 'github actions', prompt: 'runner $', className: 'h-[23.5rem]' },
 ];
 
-// The pane whose output changed most recently, like tmux's active-pane border.
-const activePane = (elapsed: number): PaneId => {
-  const events = [...commands, ...lines, ...prompts].filter((event) => event.at <= elapsed);
-  return events.reduce<{ pane: PaneId; at: number }>(
-    (latest, event) => (event.at >= latest.at ? event : latest),
-    {
-      pane: 'laptop',
-      at: -1,
-    },
-  ).pane;
-};
-
-function Cursor() {
-  return (
-    <span className="ml-px inline-block h-[1.1em] w-[0.6em] translate-y-[0.2em] bg-[#d9dce1] motion-safe:animate-[cache-replay-blink_1s_steps(2)_infinite]" />
-  );
-}
-
-function Prompt({ prompt, pane, elapsed }: { prompt: string; pane: PaneId; elapsed: number }) {
-  const typed = commands.find((entry) => entry.pane === pane);
-  const visible = typed
-    ? typed.text.slice(0, Math.max(0, Math.floor((elapsed - typed.at) / TYPE_MS)))
-    : '';
-  const typing = typed !== undefined && visible.length < typed.text.length;
-  return (
-    <div>
-      <span className="text-[#0096ff]">{prompt}</span> {visible}
-      {typing && <Cursor />}
-    </div>
-  );
-}
-
-function Pane({
-  pane,
-  elapsed,
-  active,
-}: {
-  pane: (typeof panes)[number];
-  elapsed: number;
-  active: boolean;
-}) {
-  return (
-    <div
-      className={`relative border px-4 pt-7 pb-3 transition-colors duration-300 ${
-        active ? 'border-[#0096ff]/70' : 'border-[#23262c]'
-      } ${pane.className}`}
-    >
-      <div className="absolute top-0 left-3 -translate-y-1/2 bg-[#0e1013] px-1.5 text-[#7d838e]">
-        <span className={active ? 'text-[#0096ff]' : 'text-[#d9dce1]'}>{pane.title}</span>{' '}
-        {pane.detail}
-      </div>
-      {pane.prompt && <Prompt prompt={pane.prompt} pane={pane.id} elapsed={elapsed} />}
-      {lines
-        .filter((line) => line.pane === pane.id && line.at <= elapsed)
-        .map((line) => (
-          <div key={line.at} className="overflow-hidden text-ellipsis whitespace-pre">
-            {line.segments.map((segment) =>
-              typeof segment === 'string' ? (
-                segment || ' '
-              ) : (
-                <span key={segment[0]} className={toneClass[segment[1]]}>
-                  {segment[0] || ' '}
-                </span>
-              ),
-            )}
-          </div>
-        ))}
-      {pane.prompt && prompts.some((entry) => entry.pane === pane.id && entry.at <= elapsed) && (
-        <div>
-          <span className="text-[#0096ff]">{pane.prompt}</span> <Cursor />
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function CacheReplay() {
   const { elapsed } = usePlayback(LOOP);
-  const active = activePane(elapsed);
+  const active = activePane(beats, elapsed, 'laptop');
   return (
     <figure className="not-prose mx-auto mt-12 max-w-6xl overflow-hidden rounded-xl bg-[#0e1013] font-mono text-[11px] leading-[1.7] text-[#d9dce1] shadow-[0_30px_80px_-30px_rgb(14_16_19/0.55)] ring-1 ring-black/10 sm:text-xs dark:ring-white/10">
       <figcaption className="sr-only">
@@ -220,7 +108,15 @@ export default function CacheReplay() {
       </figcaption>
       <div aria-hidden="true" className="grid gap-x-3 gap-y-5 p-4 pt-6 lg:grid-cols-2">
         {panes.map((pane) => (
-          <Pane key={pane.id} pane={pane} elapsed={elapsed} active={pane.id === active} />
+          <Frame
+            key={pane.id}
+            title={pane.title}
+            detail={pane.detail}
+            active={pane.id === active}
+            className={`px-4 pt-7 pb-3 ${pane.className}`}
+          >
+            <Terminal script={script} pane={pane.id} prompt={pane.prompt} elapsed={elapsed} />
+          </Frame>
         ))}
       </div>
     </figure>
