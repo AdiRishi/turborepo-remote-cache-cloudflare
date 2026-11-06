@@ -9,6 +9,7 @@
     "build": "blume build",
     "dev": "blume dev",
     "preview": "blume preview",
+    "record": "node scripts/record-live-cache.ts",
     "test": "blume validate --strict",
     "typecheck": "tsc"
   },
@@ -17,8 +18,10 @@
     "@fontsource-variable/geist-mono": "catalog:",
     "@turborepo-remote-cache/dashboard": "workspace:*",
     "@turborepo-remote-cache/spec": "workspace:*",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "blume": "catalog:",
+    "playwright": "catalog:",
     "react": "catalog:",
     "typescript": "catalog:",
     "wrangler": "catalog:"

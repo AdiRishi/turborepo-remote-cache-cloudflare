@@ -18,5 +18,6 @@ Run every command from the repository root.
 2. If you change anything the built Worker runs, also run `pnpm test:e2e`. That covers `apps/api/src`, `nitro.config.ts`, `vite.config.ts`, `wrangler.jsonc`, and the server's dependencies. The script builds the Worker, starts it under `wrangler dev` on port 8787, and runs the contract tests and the real `turbo` CLI against it.
 3. If you change `wrangler.jsonc` or the spec, run `pnpm codegen` and commit the generated files. CI fails when they are stale.
 4. If you change behaviour or configuration, update the matching page in `apps/docs/content/` in the same change.
+5. The README's GIF is a recording of `apps/docs/islands/LiveCache.tsx`, which renders the dashboard's own components. If you change either in a way that shows, run `pnpm --filter @turborepo-remote-cache/docs record` and commit the new `.github/assets/live-cache.gif`. It needs ffmpeg.
 
 Test this project's behaviour, and trust Files SDK, Nitro, and the platforms to do what they document. Tests in `apps/api/tests/contract/` talk only HTTP and use random hashes, because `pnpm test:e2e` runs them against a real Worker whose store can already hold data. For the same reason, each test in `apps/api/e2e/` uses its own team.
