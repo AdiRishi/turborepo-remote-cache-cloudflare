@@ -64,8 +64,25 @@ pre {
     }
 }
 
+@keyframes cache-ping {
+    to {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
 /* The homepage renders the dashboard's components, so its classes and colour tokens come along. */
 @source "../dashboard/src";
+
+/* The site's Tailwind reads its neutral colours from Blume's variables. Inside a dashboard they follow the
+   dashboard's palette, so a dashboard that is always dark stays dark on a light page. */
+[data-dashboard] {
+    --blume-background: var(--background);
+    --blume-foreground: var(--foreground);
+    --blume-muted: var(--muted);
+    --blume-muted-foreground: var(--muted-foreground);
+    --blume-border: var(--border);
+}
 
 /* Page prose styles are unlayered, so they would beat the dashboard's layered utilities. */
 .prose [data-dashboard] :where(h1, h2, h3, h4, p, ul, ol, table) {

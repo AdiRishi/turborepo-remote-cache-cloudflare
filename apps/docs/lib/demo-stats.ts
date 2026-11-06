@@ -7,7 +7,7 @@ import type {
   TeamActivity,
 } from '@turborepo-remote-cache/dashboard/contract';
 
-const HOUR = 3_600_000;
+export const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 const MB = 1_000_000;
 
@@ -49,7 +49,7 @@ const busyness = (start: number, bucketMs: number) => {
 };
 
 /** `remoteShare` is the share of task lookups that this server answers with a hit. */
-const activity = (runs: number, remoteShare = 0.41): Activity => {
+export const activity = (runs: number, remoteShare = 0.41): Activity => {
   const lookups = runs * 14;
   const localHits = Math.round(lookups * 0.44);
   const remoteHits = Math.round(lookups * remoteShare);
@@ -72,26 +72,25 @@ const activity = (runs: number, remoteShare = 0.41): Activity => {
   };
 };
 
-const sum = (items: readonly Activity[]): Activity =>
-  items.reduce<Activity>(
-    (total, item) => ({
-      localHits: total.localHits + item.localHits,
-      localMisses: total.localMisses + item.localMisses,
-      remoteHits: total.remoteHits + item.remoteHits,
-      remoteMisses: total.remoteMisses + item.remoteMisses,
-      localTimeSavedMs: total.localTimeSavedMs + item.localTimeSavedMs,
-      remoteTimeSavedMs: total.remoteTimeSavedMs + item.remoteTimeSavedMs,
-      runs: total.runs + item.runs,
-      ciRuns: total.ciRuns + item.ciRuns,
-      agentRuns: total.agentRuns + item.agentRuns,
-      uploads: total.uploads + item.uploads,
-      uploadedBytes: total.uploadedBytes + item.uploadedBytes,
-      runTimeMs: total.runTimeMs + item.runTimeMs,
-      downloads: total.downloads + item.downloads,
-      downloadedBytes: total.downloadedBytes + item.downloadedBytes,
-    }),
-    activity(0),
-  );
+export const add = (total: Activity, item: Activity): Activity => ({
+  localHits: total.localHits + item.localHits,
+  localMisses: total.localMisses + item.localMisses,
+  remoteHits: total.remoteHits + item.remoteHits,
+  remoteMisses: total.remoteMisses + item.remoteMisses,
+  localTimeSavedMs: total.localTimeSavedMs + item.localTimeSavedMs,
+  remoteTimeSavedMs: total.remoteTimeSavedMs + item.remoteTimeSavedMs,
+  runs: total.runs + item.runs,
+  ciRuns: total.ciRuns + item.ciRuns,
+  agentRuns: total.agentRuns + item.agentRuns,
+  uploads: total.uploads + item.uploads,
+  uploadedBytes: total.uploadedBytes + item.uploadedBytes,
+  runTimeMs: total.runTimeMs + item.runTimeMs,
+  downloads: total.downloads + item.downloads,
+  downloadedBytes: total.downloadedBytes + item.downloadedBytes,
+});
+
+export const sum = (items: readonly Activity[]): Activity =>
+  items.reduce((total, item) => add(total, item), activity(0));
 
 const shares = (total: number, parts: readonly (readonly [string, number])[]): Share[] =>
   parts.map(([name, share]) => ({ name, count: Math.round(total * share) }));

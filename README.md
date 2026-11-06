@@ -16,6 +16,10 @@
 
 </div>
 
+<br>
+
+![A laptop runs turbo run build and misses the cache on all three tasks. A CI runner then runs the same build, replays every task from the cache, and finishes in 1.2 seconds with FULL TURBO. Beside the terminals, the dashboard counts each upload and hit as it lands and adds the 3 minutes 53 seconds the CI run saved.](.github/assets/live-cache.gif)
+
 ## 🚀 Introduction
 
 An open-source [Turborepo remote cache](https://turborepo.dev/docs/core-concepts/remote-caching) server that you host yourself, **built first for [Cloudflare Workers](https://developers.cloudflare.com/workers/)**. Deploy it in one click, and every laptop and CI runner on your team shares build outputs through storage you own.
