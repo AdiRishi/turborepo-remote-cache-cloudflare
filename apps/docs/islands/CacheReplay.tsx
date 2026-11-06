@@ -1,3 +1,5 @@
+import { formatBytes } from '@turborepo-remote-cache/dashboard/lib/format';
+
 import type { Line, Script, Segment, Task } from '../lib/terminal';
 
 import { usePlayback } from '../lib/playback';
@@ -42,15 +44,15 @@ const lines: Line<PaneId>[] = [
     [3750, '  Time:    48.913s'],
   ]),
   ...run('worker', 2600, [
-    [0, ...request('PUT', ui, 202, `→ R2  ${ui.size}`)],
-    [1700, ...request('PUT', api, 202, `→ R2  ${api.size}`)],
-    [2950, ...request('PUT', web, 202, `→ R2  ${web.size}`)],
+    [0, ...request('PUT', ui, 202, `→ R2  ${formatBytes(ui.bytes)}`)],
+    [1700, ...request('PUT', api, 202, `→ R2  ${formatBytes(api.bytes)}`)],
+    [2950, ...request('PUT', web, 202, `→ R2  ${formatBytes(web.bytes)}`)],
   ]),
   ...preamble('ci', 7400),
   ...run('worker', 7800, [
-    [0, ...request('GET', ui, 200, `← R2  ${ui.size}`)],
-    [90, ...request('GET', api, 200, `← R2  ${api.size}`)],
-    [180, ...request('GET', web, 200, `← R2  ${web.size}`)],
+    [0, ...request('GET', ui, 200, `← R2  ${formatBytes(ui.bytes)}`)],
+    [90, ...request('GET', api, 200, `← R2  ${formatBytes(api.bytes)}`)],
+    [180, ...request('GET', web, 200, `← R2  ${formatBytes(web.bytes)}`)],
   ]),
   ...run('ci', 7950, [
     [0, prefix(ui), 'cache hit, replaying logs ', [ui.hash, 'dim']],

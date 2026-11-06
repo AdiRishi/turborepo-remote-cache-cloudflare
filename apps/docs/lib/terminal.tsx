@@ -1,4 +1,4 @@
-// The scripted terminals that the homepage animations play: what each pane prints, and when.
+// The scripted terminals that the docs' animations play: what each pane prints, and when.
 
 import type { ReactNode } from 'react';
 
@@ -30,9 +30,6 @@ const TYPE_MS = 45;
 
 export const COMMAND = 'turbo run build';
 
-/** How long typing `text` takes, so the output can start once the command is in. */
-export const typingMs = (text: string) => text.length * TYPE_MS;
-
 /** `seconds` is how long the task runs on a cache miss. */
 export const TASKS = [
   {
@@ -40,7 +37,6 @@ export const TASKS = [
     tone: 'ui',
     hash: '8f3c2a91d04e7b65',
     script: 'tsc -b',
-    size: '412 KB',
     bytes: 412_000,
     seconds: 9.4,
   },
@@ -49,7 +45,6 @@ export const TASKS = [
     tone: 'api',
     hash: '2b7e9d40c1a5f3e8',
     script: 'tsup src/index.ts',
-    size: '1.1 MB',
     bytes: 1_100_000,
     seconds: 21.7,
   },
@@ -58,7 +53,6 @@ export const TASKS = [
     tone: 'web',
     hash: 'c61f0e8a37d2b954',
     script: 'next build',
-    size: '18.6 MB',
     bytes: 18_600_000,
     seconds: 48.9,
   },

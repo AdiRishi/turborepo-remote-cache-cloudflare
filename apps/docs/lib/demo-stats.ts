@@ -72,7 +72,6 @@ export const activity = (runs: number, remoteShare = 0.41): Activity => {
   };
 };
 
-/** Adds two activities field by field. */
 export const add = (total: Activity, item: Activity): Activity => ({
   localHits: total.localHits + item.localHits,
   localMisses: total.localMisses + item.localMisses,

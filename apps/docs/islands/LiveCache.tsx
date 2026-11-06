@@ -22,7 +22,7 @@ import { useMemo } from 'react';
 
 import type { Line, Script } from '../lib/terminal';
 
-import { finished, hit, liveStats, upload } from '../lib/live-stats';
+import { finished, hit, liveStats, SAVED_BEFORE_MS, upload } from '../lib/live-stats';
 import { usePlayback, useSeen } from '../lib/playback';
 import {
   activePane,
@@ -106,7 +106,7 @@ const beats = [...script.commands, ...script.lines, ...script.prompts, ...events
 const HOLD_MS = 4500;
 const LOOP = lastBeat(beats) + HOLD_MS;
 
-const baseline = timeSaved(liveStats([]).totals.current);
+const savedAtStart = timeSaved(liveStats([]).totals.current);
 
 /** The dashboard's headline, with a chip for the time this morning's runs have saved so far. */
 function Headline({ saved, gained }: { saved: number; gained: number }) {
@@ -130,13 +130,13 @@ function Headline({ saved, gained }: { saved: number; gained: number }) {
           gained > 0 ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        +{formatDuration(Math.max(shownGain, 1000))}
+        +{formatDuration(shownGain)}
       </span>
     </div>
   );
 }
 
-function Dashboard({ elapsed }: { elapsed: number }) {
+function LiveDashboard({ elapsed }: { elapsed: number }) {
   const landed = events.filter((event) => event.at <= elapsed).length;
   const stats = useMemo(
     () => liveStats(events.slice(0, landed).map((event) => event.activity)),
@@ -150,8 +150,8 @@ function Dashboard({ elapsed }: { elapsed: number }) {
       <div>
         <div className="flex items-center justify-between gap-4 text-sm text-muted-foreground tabular-nums">
           <p>
-            <span className="text-foreground">{formatDuration(stats.allTime.timeSavedMs)}</span>{' '}
-            saved since Apr 3, 2026
+            <span className="text-foreground">{formatDuration(SAVED_BEFORE_MS + saved)}</span> saved
+            since Apr 3, 2026
           </p>
           <p className="flex items-center gap-2.5">
             Last 24 hours
@@ -164,7 +164,7 @@ function Dashboard({ elapsed }: { elapsed: number }) {
             </span>
           </p>
         </div>
-        <Headline saved={saved} gained={saved - baseline} />
+        <Headline saved={saved} gained={saved - savedAtStart} />
         <p className="mt-3 flex items-center gap-3 text-muted-foreground">
           saved in the last 24 hours
           <Delta change={change === null ? null : { ratio: change }} better="up" />
@@ -187,8 +187,8 @@ export default function LiveCache() {
   const { elapsed } = usePlayback(LOOP, { playing: seen });
   const active = activePane(beats, elapsed, 'laptop');
   return (
-    // Wide enough for the panes to sit side by side, the figure keeps its 65rem layout and zooms to fit.
-    // tan(atan2(a, b)) is a / b as a plain number, which zoom needs.
+    // From 42rem wide, the panes sit side by side: the figure keeps its 65rem layout and zooms to fit the
+    // column. tan(atan2(a, b)) is a / b as a plain number, which zoom needs.
     <div className="not-prose mx-auto my-8 max-w-[65rem] @container">
       <figure
         ref={ref}
@@ -221,7 +221,7 @@ export default function LiveCache() {
             data-dashboard
             className="dark h-full [--background:#0e1013] [--blume-font-body:'Geist_Variable',ui-sans-serif,system-ui,sans-serif] [--blume-font-mono:'Geist_Mono_Variable',ui-monospace,monospace] font-sans text-[15px] leading-normal text-foreground"
           >
-            {seen ? <Dashboard elapsed={elapsed} /> : null}
+            {seen ? <LiveDashboard elapsed={elapsed} /> : null}
           </div>
         </Frame>
       </figure>
