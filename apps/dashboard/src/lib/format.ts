@@ -8,8 +8,9 @@ export interface DurationPart {
   unit: 'd' | 'h' | 'm' | 's';
 }
 
-/** Splits a duration into its two most significant units, such as `312h 14m` or `9d 4h`. */
-export const durationParts = (ms: number): DurationPart[] => {
+/** Splits a duration into its two most significant units, such as `47h 14m` or `9d 4h`. */
+export const durationParts = (duration: number): DurationPart[] => {
+  const ms = Math.round(duration / SECOND) * SECOND;
   if (ms >= 2 * DAY) {
     return [
       { value: Math.floor(ms / DAY), unit: 'd' },
@@ -28,7 +29,7 @@ export const durationParts = (ms: number): DurationPart[] => {
       { value: Math.floor((ms % MINUTE) / SECOND), unit: 's' },
     ];
   }
-  return [{ value: Math.round(ms / SECOND), unit: 's' }];
+  return [{ value: ms / SECOND, unit: 's' }];
 };
 
 const integer = new Intl.NumberFormat('en-US');
@@ -54,9 +55,9 @@ const BYTE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'] as const;
 
 /** Decimal units, as storage providers bill them. */
 export const formatBytes = (bytes: number) => {
-  const exponent = Math.min(
-    BYTE_UNITS.length - 1,
-    Math.max(0, Math.floor(Math.log10(Math.max(bytes, 1)) / 3)),
+  // A value of 999.5 or more prints as 1,000, which belongs in the next unit.
+  const exponent = BYTE_UNITS.findIndex(
+    (_, index) => index === BYTE_UNITS.length - 1 || bytes / 1000 ** index < 999.5,
   );
   const value = bytes / 1000 ** exponent;
   const digits = value >= 100 || exponent === 0 ? 0 : 1;
@@ -97,8 +98,6 @@ export const formatBucket = (start: number, bucketMs: number, { long = false } =
   return (long ? utcDayLong : utcDay).format(start);
 };
 
-export const formatDay = (day: number) => utcDayLong.format(day);
-
 const relativeTime = new Intl.RelativeTimeFormat('en-US', { numeric: 'auto' });
 
 export const formatAge = (timestamp: number, now = Date.now()) => {
@@ -107,10 +106,10 @@ export const formatAge = (timestamp: number, now = Date.now()) => {
     return 'just now';
   }
   if (elapsed < HOUR) {
-    return relativeTime.format(-Math.round(elapsed / MINUTE), 'minute');
+    return relativeTime.format(-Math.floor(elapsed / MINUTE), 'minute');
   }
   if (elapsed < DAY) {
-    return relativeTime.format(-Math.round(elapsed / HOUR), 'hour');
+    return relativeTime.format(-Math.floor(elapsed / HOUR), 'hour');
   }
-  return relativeTime.format(-Math.round(elapsed / DAY), 'day');
+  return relativeTime.format(-Math.floor(elapsed / DAY), 'day');
 };

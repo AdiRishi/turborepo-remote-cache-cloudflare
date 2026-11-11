@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 
-import { authorized, randomHash, readError, send } from '../support/client';
+import { authorized, randomHash, readError, send, uploadArtifact } from '../support/client';
 
 vi.mock('../../src/custom-adapter', () => import('../support/memory-storage'));
 
@@ -12,6 +12,36 @@ const CREDENTIALS = [
 ] as const;
 
 const PROTECTED_PATHS = ['/v8/artifacts/status', `/v8/artifacts/${randomHash()}`, '/internal/x'];
+
+const jsonPost = (body: unknown) => ({
+  method: 'POST',
+  body: JSON.stringify(body),
+  headers: { 'content-type': 'application/json' },
+});
+
+const WRITES = [
+  {
+    request: 'an artifact upload',
+    path: `/v8/artifacts/${randomHash()}`,
+    init: { method: 'PUT', body: new Uint8Array(8), headers: { 'content-length': '8' } },
+  },
+  {
+    request: 'an artifact existence check',
+    path: `/v8/artifacts/${randomHash()}`,
+    init: { method: 'HEAD' },
+  },
+  {
+    request: 'an artifact query',
+    path: '/v8/artifacts',
+    init: jsonPost({ hashes: [randomHash()] }),
+  },
+  { request: 'a cache events report', path: '/v8/artifacts/events', init: jsonPost([]) },
+  {
+    request: 'an expiry run',
+    path: '/internal/delete-expired-objects',
+    init: jsonPost({ expireInHours: 1_000_000 }),
+  },
+];
 
 describe('authentication', () => {
   test.each(
@@ -25,6 +55,43 @@ describe('authentication', () => {
       code: 'unauthorized',
       message: 'Missing or invalid bearer token',
     });
+  });
+
+  test.each(WRITES)('rejects $request without a valid token', async ({ path, init }) => {
+    const missing = await send(path, init);
+    expect(missing.status).toBe(401);
+
+    const wrong = await send(path, {
+      ...init,
+      headers: { ...init.headers, authorization: 'Bearer wrong-token' },
+    });
+    expect(wrong.status).toBe(401);
+  });
+
+  test('stores nothing from an upload it rejects', async () => {
+    const hash = randomHash();
+    const rejected = await send(`/v8/artifacts/${hash}`, {
+      method: 'PUT',
+      body: new Uint8Array(8),
+      headers: { 'content-length': '8' },
+    });
+    expect(rejected.status).toBe(401);
+
+    const lookup = await authorized(`/v8/artifacts/${hash}`);
+    expect(lookup.status).toBe(404);
+  });
+
+  test('deletes nothing in an expiry run it rejects', async () => {
+    const hash = randomHash();
+    const upload = await uploadArtifact({ hash, body: new Uint8Array(8) });
+    expect(upload.status).toBe(202);
+
+    // Expiring everything is safe here only because the request carries no token.
+    const rejected = await send('/internal/delete-expired-objects', jsonPost({ expireInHours: 0 }));
+    expect(rejected.status).toBe(401);
+
+    const download = await authorized(`/v8/artifacts/${hash}`);
+    expect(download.status).toBe(200);
   });
 
   test('reports remote caching as enabled to an authorized client', async () => {
@@ -90,6 +157,16 @@ describe('routing', () => {
     expect(response.headers.get('allow')).toBe('GET, HEAD, PUT');
     expect((await readError(response)).code).toBe('method_not_allowed');
   });
+
+  test.each(['/V8/artifacts/status', '/%76%38/artifacts/status'])(
+    'does not serve the protected status route at %s without a token',
+    async (path) => {
+      const response = await send(path);
+      // The status depends on whether the transport decodes the path, and the real Worker can
+      // answer an unmatched path from the dashboard's static assets, so only the body is fixed.
+      expect(await response.text()).not.toContain('"enabled"');
+    },
+  );
 
   test('serves the health check without authentication', async () => {
     const response = await send('/ping');

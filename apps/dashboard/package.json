@@ -16,6 +16,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite dev",
+    "test": "vitest run",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -45,6 +46,7 @@
     "tailwindcss": "catalog:",
     "tw-animate-css": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }

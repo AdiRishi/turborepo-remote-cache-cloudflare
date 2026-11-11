@@ -6,5 +6,5 @@
     "types": ["node", "vite/client"],
     "paths": { "@/*": ["./src/*"] }
   },
-  "include": ["index.ts", "contract.ts", "vite.config.ts", "src"]
+  "include": ["index.ts", "contract.ts", "vite.config.ts", "vitest.config.ts", "src", "tests"]
 }
