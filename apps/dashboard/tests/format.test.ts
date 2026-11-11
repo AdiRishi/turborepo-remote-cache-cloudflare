@@ -14,7 +14,10 @@ describe('formatDuration', () => {
   test.each([
     [0, '0s'],
     [1_400, '1s'],
+    [59_400, '59s'],
+    [59_600, '1m 0s'],
     [90_000, '1m 30s'],
+    [3_599_600, '1h 0m'],
     [4_440_000, '1h 14m'],
     [169_200_000, '47h 0m'],
     [187_200_000, '2d 4h'],
@@ -31,6 +34,7 @@ describe('formatBytes', () => {
     [1_000, '1 KB'],
     [1_500, '1.5 KB'],
     [999_499, '999 KB'],
+    [999_950, '1 MB'],
     [1_234_567, '1.2 MB'],
     [123_456_789, '123 MB'],
     [5_000_000_000, '5 GB'],
@@ -80,6 +84,10 @@ describe('formatAge', () => {
   test.each([
     [30_000, 'just now'],
     [60_000, '1 minute ago'],
+    [3_570_000, '59 minutes ago'],
+    [5_400_000, '1 hour ago'],
+    [84_960_000, '23 hours ago'],
+    [129_600_000, 'yesterday'],
     [259_200_000, '3 days ago'],
   ])('calls a timestamp %i ms old %s', (elapsed, expected) => {
     expect(formatAge(0, elapsed)).toBe(expected);
