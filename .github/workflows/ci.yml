@@ -185,7 +185,7 @@ jobs:
   release:
     name: Release
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    needs: verify
+    needs: [verify, e2e]
     runs-on: ubuntu-latest
     concurrency:
       group: release
