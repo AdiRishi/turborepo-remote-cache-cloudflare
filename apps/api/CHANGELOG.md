@@ -1,5 +1,11 @@
 # turborepo-remote-cache-cf
 
+## 5.3.2
+
+### Patch Changes
+
+- [#1091](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/pull/1091) [`1473381`](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/commit/1473381bf9ac0b154264d7f6d7cf3fc3a7589917) Thanks [@AdiRishi](https://github.com/AdiRishi)! - The dashboard rounds durations, sizes, and ages into the right unit. 59.6 seconds now reads `1m 0s`, not `60s`. 999,950 bytes reads `1 MB`, not `1,000 KB`. A snapshot 59.5 minutes old reads "59 minutes ago", not "60 minutes ago".
+
 ## 5.3.1
 
 ### Patch Changes
