@@ -113,21 +113,14 @@ jobs:
           command: ${{ github.event_name == 'pull_request' && format('preview --name pr-{0}', github.event.pull_request.number) || 'deploy' }}
 
   # Keeps the old github.io URLs redirecting to turborepo-remote-cache.dev.
-  docs-github-pages:
-    name: Docs · GitHub Pages
+  docs-github-pages-build:
+    name: Docs · GitHub Pages build
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: verify
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pages: write
-      id-token: write
-    concurrency:
-      group: pages
-      cancel-in-progress: false
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      pages: read
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -146,6 +139,23 @@ jobs:
         with:
           path: apps/docs/dist-github-pages
 
+  # deploy-pages lists the run's artifacts once and does not retry. Right after an upload in the same
+  # job, that list can still be empty.
+  docs-github-pages:
+    name: Docs · GitHub Pages
+    needs: docs-github-pages-build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
       - name: Deploy
         id: deploy
         uses: actions/deploy-pages@v5
