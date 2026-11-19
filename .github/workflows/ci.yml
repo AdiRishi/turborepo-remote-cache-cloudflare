@@ -92,8 +92,6 @@ jobs:
     environment:
       name: ${{ github.event_name == 'pull_request' && 'docs-preview' || 'docs-cloudflare' }}
       url: ${{ steps.deploy.outputs.deployment-url }}
-    env:
-      DOCS_CLOUDFLARE_DEPLOYMENT: true
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -114,6 +112,7 @@ jobs:
           workingDirectory: apps/docs
           command: ${{ github.event_name == 'pull_request' && format('preview --name pr-{0}', github.event.pull_request.number) || 'deploy' }}
 
+  # Keeps the old github.io URLs redirecting to turborepo-remote-cache.dev.
   docs-github-pages:
     name: Docs · GitHub Pages
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -140,14 +139,12 @@ jobs:
         uses: actions/configure-pages@v6
 
       - name: Build
-        run: |
-          pnpm build --filter=@turborepo-remote-cache/docs
-          touch apps/docs/dist/.nojekyll
+        run: pnpm build --filter=@turborepo-remote-cache/docs
 
       - name: Upload
         uses: actions/upload-pages-artifact@v5
         with:
-          path: apps/docs/dist
+          path: apps/docs/dist-github-pages
 
       - name: Deploy
         id: deploy
