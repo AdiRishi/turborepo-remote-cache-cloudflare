@@ -119,7 +119,8 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v9
         env:
-          PREVIEW_URL: ${{ steps.deploy.outputs.deployment-url }}
+          PREVIEW_URL: ${{ steps.deploy.outputs.preview-url }}
+          COMMIT_URL: ${{ steps.deploy.outputs.preview-deployment-url }}
         with:
           script: |
             const marker = '<!-- docs-preview -->';
@@ -128,9 +129,8 @@ jobs:
               marker,
               '### Docs preview',
               '',
-              process.env.PREVIEW_URL,
-              '',
-              `Built from ${sha.slice(0, 7)}.`,
+              `- Latest: ${process.env.PREVIEW_URL}`,
+              `- Commit ${sha.slice(0, 7)}: ${process.env.COMMIT_URL}`,
             ].join('\n');
 
             const comments = await github.paginate(github.rest.issues.listComments, {
