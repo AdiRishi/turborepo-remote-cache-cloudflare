@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Security updates target the latest release. Check [GitHub Releases](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/releases) for the current server version, and follow [Update your deployment](https://turborepo-remote-cache.dev/update) to upgrade your copy.
+Security updates target the latest release. Check [GitHub Releases](https://github.com/AdiRishi/turborepo-remote-cache/releases) for the current server version, and follow [Update your deployment](https://turborepo-remote-cache.dev/update) to upgrade your copy.
 
 ## Report a vulnerability
 

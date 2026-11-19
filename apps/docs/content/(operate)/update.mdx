@@ -9,7 +9,7 @@ Coming from version 4? Read [Upgrade from v4](/upgrade-from-v4) first.
 
 ## Before you merge
 
-1. Read the [server changelog](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/apps/api/CHANGELOG.md) for the release you want. Look for configuration changes and stats database migrations.
+1. Read the [server changelog](https://github.com/AdiRishi/turborepo-remote-cache/blob/master/apps/api/CHANGELOG.md) for the release you want. Look for configuration changes and stats database migrations.
 2. If the release migrates the stats database, back it up. Rolling back the code doesn't roll back a migration. Artifacts need no backup, since `turbo` rebuilds any it can't find.
 3. Note the files that hold your settings. You'll keep your side of these when you merge:
     - `apps/api/wrangler.jsonc`: Worker name, bindings, resource IDs, routes, and variables.
@@ -22,7 +22,7 @@ Coming from version 4? Read [Upgrade from v4](/upgrade-from-v4) first.
 In a checkout of your copy, add this repository as a remote and fetch its tags:
 
 ```sh
-git remote add upstream https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
+git remote add upstream https://github.com/AdiRishi/turborepo-remote-cache.git
 git fetch upstream --tags
 ```
 

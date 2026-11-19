@@ -1,9 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@4.0.1/schema.json",
-  "changelog": [
-    "@changesets/changelog-github",
-    { "repo": "AdiRishi/turborepo-remote-cache-cloudflare" }
-  ],
+  "changelog": ["@changesets/changelog-github", { "repo": "AdiRishi/turborepo-remote-cache" }],
   "commit": false,
   "fixed": [],
   "linked": [],

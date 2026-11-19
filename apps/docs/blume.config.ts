@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import apiPackage from '../api/package.json' with { type: 'json' };
 
-const repositoryUrl = 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare';
+const repositoryUrl = 'https://github.com/AdiRishi/turborepo-remote-cache';
 const changelogUrl = `${repositoryUrl}/blob/master/apps/api/CHANGELOG.md`;
 const measurementId = 'G-4FKXFQBLZR';
 const site = 'https://turborepo-remote-cache.dev';
@@ -37,7 +37,7 @@ export default defineConfig({
   },
   github: {
     owner: 'AdiRishi',
-    repo: 'turborepo-remote-cache-cloudflare',
+    repo: 'turborepo-remote-cache',
     branch: 'master',
     dir: 'apps/docs',
   },

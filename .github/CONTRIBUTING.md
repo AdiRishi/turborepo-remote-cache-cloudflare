@@ -9,8 +9,8 @@ You don't need a Cloudflare account to work on the server. The end-to-end suite 
 Install Node.js 24 or later and the pnpm version in `package.json`. Then clone the repository:
 
 ```sh
-git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
-cd turborepo-remote-cache-cloudflare
+git clone https://github.com/AdiRishi/turborepo-remote-cache.git
+cd turborepo-remote-cache
 pnpm install --frozen-lockfile
 ```
 
