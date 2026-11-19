@@ -8,11 +8,7 @@ import apiPackage from '../api/package.json' with { type: 'json' };
 const repositoryUrl = 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare';
 const changelogUrl = `${repositoryUrl}/blob/master/apps/api/CHANGELOG.md`;
 const measurementId = 'G-4FKXFQBLZR';
-
-const deployment =
-  process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true'
-    ? { site: 'https://turborepo-remote-cache.dev' }
-    : { site: 'https://adirishi.github.io', base: '/turborepo-remote-cache-cloudflare' };
+const site = 'https://turborepo-remote-cache.dev';
 
 // Pages that moved. The VitePress site also served every page at `<route>.html`.
 const movedPages: Record<string, string> = {
@@ -73,14 +69,9 @@ export default defineConfig({
   ]),
   analytics: [
     script({
-      content: `window['ga-disable-${measurementId}'] = !(
-        location.hostname === 'turborepo-remote-cache.dev' ||
-        (location.hostname === 'adirishi.github.io' &&
-          (location.pathname === '/turborepo-remote-cache-cloudflare' ||
-            location.pathname.startsWith('/turborepo-remote-cache-cloudflare/')))
-      );`,
+      content: `window['ga-disable-${measurementId}'] = location.origin !== '${site}';`,
     }),
     googleAnalytics({ id: measurementId }),
   ],
-  deployment,
+  deployment: { site },
 });

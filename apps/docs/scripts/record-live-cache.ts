@@ -12,7 +12,7 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import { chromium } from 'playwright';
 
 const PORT = 4321;
-const PAGE = `http://localhost:${PORT}/turborepo-remote-cache-cloudflare/live-cache`;
+const PAGE = `http://localhost:${PORT}/live-cache`;
 const OUTPUT = join(import.meta.dirname, '../../../.github/assets/live-cache.gif');
 
 const FPS = 25;

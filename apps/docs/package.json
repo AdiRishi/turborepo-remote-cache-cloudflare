@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "blume build",
+    "build": "blume build && node scripts/build-github-pages.ts",
     "dev": "blume dev",
     "preview": "blume preview",
     "record": "node scripts/record-live-cache.ts",
