@@ -1,66 +1,74 @@
 ---
-title: Introduction
-description: What a remote cache saves your team, and why to run this one in your own account.
+title: Overview
+description: Architecture, request flow, security model, and trade-offs of Turborepo Remote Cache.
 ---
 
-This project is an open-source remote cache server. Deploy it to Cloudflare Workers with one button, or run it on AWS Lambda, Vercel, Netlify, Node.js, Bun, or Deno. Then add a few lines to `turbo.json` to point `turbo` at it.
+Turborepo Remote Cache is an open-source, self-hosted implementation of the [Turborepo Remote Cache v8 API](https://turborepo.dev/docs/core-concepts/remote-caching#remote-cache-api). Deploy it into your own Cloudflare account in a click, or build it for Node.js, Bun, Deno, Vercel, Netlify, or AWS Lambda, to share build artifacts across every machine running `turbo`.
 
 <CacheFlow />
 
-## Stop building the same thing twice
+## Why teams run a remote cache
 
-- **CI rebuilds only what changed.** A pull request rebuilds the packages it changed and the ones that depend on them. Everything else replays from the cache.
-- **A fresh clone skips its first build.** A new teammate, a new laptop, or a throwaway worktree downloads its builds instead of making them.
-- **Coding agents rerun less.** An agent that runs the test suite fifty times an afternoon replays every task whose inputs it didn't touch.
+Local caching only helps the machine that ran the build. A remote cache shares task outputs across everyone and everything touching your monorepo:
 
-## Why run this one
+- **Faster CI pipelines.** Pull requests only rebuild affected packages and their dependents; unchanged tasks download and replay in milliseconds.
+- **Instant onboarding and worktrees.** Fresh clones, new laptops, and ephemeral git worktrees pull warm artifacts instead of compiling from scratch.
+- **Faster coding-agent loops.** Agents iterating on tests and typechecks across branches replay every untouched task instead of re-executing the workspace.
 
-<CardGroup cols={2}>
-    <Card title="Free to start on Cloudflare" icon="piggy-bank">
-        The Workers free plan covers 100,000 requests a day, and R2 stores 10 GB a month for free.
-        R2 charges nothing for egress, so a cache download costs no bandwidth.
-    </Card>
-    <Card title="No Vercel account" icon="key-round">
-        `turbo` talks to your server through the official Remote Cache API. There's no plugin, no
-        fork of `turbo`, and no `turbo login`.
-    </Card>
-    <Card title="A dashboard of the time saved" icon="chart-column" href="/dashboard">
-        Open the server's URL to see the time it saved, its hit rate, and which teams, CI providers,
-        and coding agents use it.
-    </Card>
-    <Card title="Signed artifacts" icon="shield-check" href="/sign-artifacts">
-        Turn on signatures, and `turbo` rejects any artifact your own machines didn't sign, even one
-        uploaded with a valid token.
-    </Card>
-    <Card title="Your choice of storage" icon="database" href="/storage">
-        R2 by default. Workers KV, any S3-compatible bucket, or anything with a Files SDK adapter
-        works too.
-    </Card>
-    <Card title="Not only Cloudflare" icon="server" href="/deploy">
-        The same server builds for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
-    </Card>
-</CardGroup>
+<a id="how-turbo-uses-the-cache" />
 
-## Know the trade-offs
+## How a build flows
+
+`turbo` hashes the inputs of each task (files, environment variables, dependencies, and configuration) and checks the remote cache before executing anything:
+
+1. **Lookup:** `turbo` queries `HEAD` or `GET /v8/artifacts/:hash` with your team identifier and bearer token.
+2. **Cache hit:** The server streams the archived output and metadata headers back. `turbo` restores the files, replays the terminal logs, and skips execution.
+3. **Cache miss:** `turbo` executes the task, packs its outputs, and uploads the archive via `PUT /v8/artifacts/:hash`. Every subsequent machine with the same inputs hits the cache.
+
+<a id="what-the-server-stores" />
+
+The server stores each artifact under `<team>/<hash>`, where `<team>` comes from the `teamId` or `slug` query parameter (falling back to `team_default_team` if omitted). Alongside the payload, it preserves headers uploaded by `turbo`, including task duration (`x-artifact-duration`) and artifact signatures (`x-artifact-tag`).
+
+Artifacts expire after 30 days by default via a daily cleanup task. See [Retention and expiry](/retention) to adjust the TTL or schedule.
+
+<a id="where-it-runs" />
+
+## Architecture
+
+- **Server ([Nitro](https://nitro.build)):** Compiles the same H3 application to Cloudflare Workers (`cloudflare_module`, the default and end-to-end tested build) as well as Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
+- **Storage ([Files SDK](https://files-sdk.dev)):** Abstracts artifact storage across Cloudflare R2, Workers KV, any S3-compatible bucket, or a [custom adapter](/storage/custom-adapter).
+- **Analytics ([Dashboard](/dashboard)):** Served at `/` with a JSON endpoint at `/stats`. Usage records are written asynchronously after each HTTP response so database latency or outages never slow down or fail a build.
+
+## Security model and trade-offs
+
+Keep these security boundaries and trade-offs in mind before deploying to production:
 
 <a id="one-token-opens-every-team" />
+<a id="your-copy-is-yours-to-update" />
 
-- **One token opens every team.** Anyone with the token reads and writes every team's artifacts. If two groups must stay apart, give each its own deployment.
-- **Your copy doesn't update itself.** The button copies this repository into your account. To get a new release, [merge it into your copy](/update).
-- **The dashboard is public until you restrict it.** Anyone with the URL sees your team names and usage. [Restrict access](/dashboard#restrict-access) before you share it.
-- **Serverless hosts cap artifact size.** Vercel, Netlify, and AWS Lambda accept about 5 MB per upload. Cloudflare Workers accepts 100 MB or more. [Compare platforms](/deploy#artifact-size-limits) before you pick one.
+- **One shared bearer token across teams.** All `/v8/*` and `/internal/*` endpoints authenticate against `TURBO_TOKEN` using constant-time SHA-256 comparison. Teams separate artifact namespaces, not permissions: anyone with `TURBO_TOKEN` can read and write artifacts for any team. If two groups must be isolated, run separate deployments.
+- **Client-side integrity via signing.** Enable [artifact signing](/sign-artifacts) on any shared cache. `turbo` signs uploads and verifies downloads locally using HMAC-SHA256; the server never sees the signing key, so a compromised bearer token cannot poison builds.
+- **Public dashboard by default.** `/` and `/stats` require no authentication and expose team names and usage statistics. Put both routes behind [Cloudflare Access or a reverse proxy](/dashboard#restrict-access) before sharing the URL.
+- **Self-managed updates.** Deploying forks this repository into your account. Your deployment won't auto-update; pull upstream releases when ready by [merging tagged versions](/update).
+- **Serverless payload limits.** Vercel, Netlify, and AWS Lambda cap request bodies at roughly 4.5–6 MB. Cloudflare Workers accepts 100 MB+ (and long-running Node.js, Bun, or Deno servers have no built-in cap). Check [platform limits](/deploy#artifact-size-limits) if your monorepo produces large build outputs.
 
-## Try it
+## Next steps
 
 <CardGroup cols={2}>
-    <Card title="Get started" icon="rocket" href="/get-started">
-        Deploy to Cloudflare and get your first remote hit.
+    <Card title="Quickstart" icon="rocket" href="/get-started">
+        Deploy to Cloudflare Workers and verify your first remote cache hit.
     </Card>
-    <Card title="How it works" icon="workflow" href="/how-it-works">
-        What `turbo` asks the server, what the server keeps, and who can read it.
+    <Card title="Connect Turborepo" icon="plug" href="/connect-turbo">
+        Configure `turbo.json`, developer machines, and CI pipelines.
+    </Card>
+    <Card title="Artifact signing" icon="shield-check" href="/sign-artifacts">
+        Verify downloads with HMAC-SHA256 so compromised tokens can't poison builds.
+    </Card>
+    <Card title="Choose a platform" icon="server" href="/deploy">
+        Compare Cloudflare Workers, Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
     </Card>
 </CardGroup>
 
-The project is MIT-licensed and developed on GitHub. Issues and pull requests are welcome.
+Turborepo Remote Cache is MIT-licensed and open source. Bug reports and pull requests are welcome on GitHub.
 
 <GithubInfo />

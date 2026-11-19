@@ -1,58 +1,58 @@
 ---
-title: Choose a platform
-description: Compare where the server can run, how each platform stores artifacts and runs expiry, and the largest artifact it can carry.
+title: Platforms
+description: Compare hosting targets, artifact size limits, scheduled expiry, and stats database support across platforms.
 ---
 
-The server is a [Nitro](https://nitro.build) app, and every build serves the same API. Cloudflare Workers is the default, and the only platform that gets storage, scheduled expiry, and a stats database without extra setup. It is also the only build that CI runs end to end against a real `turbo` client. Start there unless you already have a host in mind.
+Because the server is a [Nitro](https://nitro.build) application, the same codebase builds for Cloudflare Workers, long-running Node.js/Bun/Deno processes, Vercel, Netlify, and AWS Lambda.
 
-| Platform                                 | Storage                                       | Expiry task           | Stats database                              |
-| ---------------------------------------- | --------------------------------------------- | --------------------- | ------------------------------------------- |
-| [Cloudflare Workers](/deploy/cloudflare) | R2 by default, or KV, S3, or a custom adapter | Cron trigger          | D1, created on the first deploy             |
-| [Node.js, Bun, and Deno](/deploy/node)   | S3 or a custom adapter                        | In the server process | SQLite on Node.js and Deno. Bun needs setup |
-| [Vercel](/deploy/vercel)                 | S3 or a custom adapter                        | Vercel Cron Jobs      | Configure a hosted database                 |
-| [Netlify](/deploy/netlify)               | S3 or a custom adapter                        | None                  | Configure a hosted database                 |
-| [AWS Lambda](/deploy/aws-lambda)         | S3 or a custom adapter                        | None                  | Configure a hosted database                 |
+**Cloudflare Workers is the recommended default.** It's the only target that provisions artifact storage (R2), scheduled expiry, and a stats database (D1) automatically, and it's the target tested end-to-end against the real `turbo` CLI in CI.
 
-Where the table says **None**, call `POST /internal/delete-expired-objects` from a scheduler once a day. [Retention and expiry](/retention#run-expiry-from-a-scheduler) shows how. [Configure the stats database](/stats-database) covers the database column.
+| Platform                                 | Artifact storage                        | Scheduled expiry     | Stats database                              |
+| ---------------------------------------- | --------------------------------------- | -------------------- | ------------------------------------------- |
+| [Cloudflare Workers](/deploy/cloudflare) | R2 (default), KV, S3, or custom adapter | Built-in cron        | D1 (auto-created on first deploy)           |
+| [Node.js, Bun, and Deno](/deploy/node)   | S3 or custom adapter                    | In-process scheduler | SQLite on Node.js & Deno; configure for Bun |
+| [Vercel](/deploy/vercel)                 | S3 or custom adapter                    | Vercel Cron Jobs     | External hosted DB required                 |
+| [Netlify](/deploy/netlify)               | S3 or custom adapter                    | External scheduler   | External hosted DB required                 |
+| [AWS Lambda](/deploy/aws-lambda)         | S3 or custom adapter                    | External scheduler   | External hosted DB required                 |
+
+On platforms without built-in scheduling, trigger `POST /internal/delete-expired-objects` daily from an external cron (see [Run expiry from a scheduler](/retention#run-expiry-from-a-scheduler)). For database options on non-Cloudflare hosts, see [Stats database](/stats-database).
 
 ## Artifact size limits
 
-An artifact over the host's request limit can't be uploaded, so its task never hits the remote cache:
+If a build output exceeds your host's HTTP payload cap, `turbo` cannot upload it and that task will miss on every remote build:
 
-| Platform               | Largest upload                                                                                                                                                                                    |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cloudflare Workers     | 100 MB on Free and Pro zones, 200 MB on Business. The zone's plan sets it, not the Workers plan. [Limits](https://developers.cloudflare.com/workers/platform/limits/#request-and-response-limits) |
-| Node.js, Bun, and Deno | No limit, unless a proxy in front of the server sets one.                                                                                                                                         |
-| Vercel                 | 4.5 MB. [Limits](https://vercel.com/docs/functions/limitations#request-body-size)                                                                                                                 |
-| Netlify                | About 4.5 MB. [Limits](https://docs.netlify.com/build/functions/configuration/)                                                                                                                   |
-| AWS Lambda             | Under 6 MB, because the artifact travels Base64-encoded inside the event. [Quotas](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)                                       |
+| Platform               | Max upload payload                                                                                                                                                                      |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cloudflare Workers     | 100 MB (Free & Pro zones), 200 MB (Business). Determined by zone plan, not Workers plan. [Docs](https://developers.cloudflare.com/workers/platform/limits/#request-and-response-limits) |
+| Node.js, Bun, and Deno | Unlimited (constrained only by any reverse proxy in front of the process).                                                                                                              |
+| Vercel                 | 4.5 MB. [Docs](https://vercel.com/docs/functions/limitations#request-body-size)                                                                                                         |
+| Netlify                | ~4.5 MB (6 MB envelope minus Base64 overhead). [Docs](https://docs.netlify.com/build/functions/configuration/)                                                                          |
+| AWS Lambda             | Under 6 MB (synchronous payload limit minus event envelope and Base64 overhead). [Docs](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)                        |
 
-Build outputs often exceed 4.5 MB. For a repository with large outputs, choose Cloudflare Workers or a long-running server.
+Modern monorepo build artifacts (Next.js `.next` bundles, Rust/Wasm outputs, large TypeScript builds) routinely cross 4.5 MB. Choose **Cloudflare Workers** or a **Node.js / Bun / Deno** server unless you know your artifacts stay small.
 
-Storage can set a lower limit than the host. KV holds at most 25 MiB per artifact, and the S3 adapter buffers each upload in memory, so a large artifact needs a host with the memory to match.
+Storage backends can impose tighter limits than the host: Workers KV caps values at 25 MiB, and the S3 adapter buffers uploads in memory, so very large uploads require sufficient runtime RAM.
 
 ## Build from source
 
-Every platform builds from your copy of the repository. You need Node.js 24 or later and the pnpm version in `package.json`. Run `pnpm install` and every build command from the repository root.
+Every non-button deployment builds from your fork of the repository using Node.js 24+ and the pnpm version specified in `package.json`. Run `pnpm install` and build commands from the repository root, setting `NITRO_PRESET` for your target runtime:
 
-`NITRO_PRESET` chooses the target:
-
-| Platform           | `NITRO_PRESET`                   |
-| ------------------ | -------------------------------- |
-| Cloudflare Workers | `cloudflare_module`, the default |
-| Node.js            | `node_server`                    |
-| Bun                | `bun`                            |
-| Deno               | `deno_server`                    |
-| Vercel             | `vercel`, detected on Vercel     |
-| Netlify            | `netlify`, detected on Netlify   |
-| AWS Lambda         | `aws_lambda`                     |
+| Platform           | `NITRO_PRESET`                |
+| ------------------ | ----------------------------- |
+| Cloudflare Workers | `cloudflare_module` (default) |
+| Node.js            | `node_server`                 |
+| Bun                | `bun`                         |
+| Deno               | `deno_server`                 |
+| Vercel             | `vercel` (auto-detected)      |
+| Netlify            | `netlify` (auto-detected)     |
+| AWS Lambda         | `aws_lambda`                  |
 
 ```sh
 NITRO_PRESET=node_server pnpm build
 ```
 
-:::warning
-The root `turbo.json` sends this repository's own builds to the maintainer's cache. If `TURBO_TOKEN` is set when you build, `turbo` sends your token there. Remove `remoteCache` from the root `turbo.json`, or point it at your own server, before you build with a token in the environment.
+:::warning[Check root `turbo.json` before building with `TURBO_TOKEN` set]
+This repository's root `turbo.json` points at the maintainer's own remote cache. If `TURBO_TOKEN` is exported in your shell or CI environment during a build, `turbo` will send your token there. Remove the `remoteCache` block from the root `turbo.json`, or update it to your own server URL, before building.
 :::
 
-Nitro has presets for more platforms. CI runs only the Cloudflare build end to end.
+Other [Nitro presets](https://nitro.build/deploy) may also work, though only the Cloudflare Workers build runs full end-to-end `turbo` tests in CI.

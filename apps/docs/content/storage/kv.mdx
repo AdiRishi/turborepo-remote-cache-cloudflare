@@ -1,40 +1,47 @@
 ---
 title: Cloudflare KV
-description: Store artifacts in a Workers KV namespace, within KV's 25 MiB limit per artifact.
+description: Store artifacts in Cloudflare Workers KV, including size limits, propagation trade-offs, and TTL behavior.
 ---
 
-The Worker stores each artifact as one entry in the namespace bound as `KV_STORE`. The artifact is the value, and its size, upload time, and headers are the entry's metadata.
+On Cloudflare Workers, you can store artifacts in a Workers KV namespace bound as `KV_STORE`. Each artifact is stored as a KV value, with its byte length, upload timestamp, and `turbo` headers stored in KV metadata.
 
-## Check the limits first
+## Limitations to check first
 
-- An artifact can be at most 25 MiB. The server rejects a larger upload with a `400` error, so that task never reaches the remote cache.
-- KV is eventually consistent. A new artifact is readable at once in the region that wrote it, but other regions can take 60 seconds or more to see it.
+- **25 MiB hard ceiling:** KV rejects values over 25 MiB. The server returns `400` on larger uploads, so oversized tasks will never cache remotely.
+- **Eventual consistency:** Newly written artifacts are immediately readable in the edge region that wrote them, but propagation to other regions can take 60 seconds or more.
 
-## Bind a namespace
+For most monorepos, [Cloudflare R2](/storage/r2) is a better fit.
 
-1. In `apps/api/wrangler.jsonc`, add a `KV_STORE` binding:
+## Bind a KV namespace
 
-    ```jsonc apps/api/wrangler.jsonc
-    {
-        "kv_namespaces": [{ "binding": "KV_STORE" }],
-    }
-    ```
+<Steps>
+    <Step title="Add the KV_STORE binding">
+        Add `kv_namespaces` to `apps/api/wrangler.jsonc`:
 
-    With no `id`, `wrangler deploy` creates the namespace and links it to the Worker. To use a namespace you already have, add its `id`.
+        ```jsonc apps/api/wrangler.jsonc
+        {
+            "kv_namespaces": [{ "binding": "KV_STORE" }],
+        }
+        ```
 
-2. Remove the `r2_buckets` entry, unless you want to keep the binding. When both are bound, the server uses KV.
+        Omitting `id` lets `wrangler deploy` create and bind a new namespace automatically. To reuse an existing namespace, include its `id`.
+    </Step>
+    <Step title="Remove the R2 binding (optional)">
+        When both `KV_STORE` and `R2_STORE` are bound, `KV_STORE` wins automatically. Remove `r2_buckets` from `wrangler.jsonc` if you no longer need the unused R2 binding.
+    </Step>
+    <Step title="Rebuild and deploy">
+        ```sh
+        pnpm build
+        pnpm run deploy
+        ```
+    </Step>
 
-3. Build and deploy the Worker:
-
-    ```sh
-    pnpm build
-    pnpm run deploy
-    ```
+</Steps>
 
 ## How entries expire
 
-The server writes each entry with a TTL of `BUCKET_OBJECT_EXPIRATION_HOURS`, so KV deletes artifacts on its own. The daily expiry task also runs, and deletes any entry that has outlived that age.
+Every KV write attaches an `expirationTtl` matching `BUCKET_OBJECT_EXPIRATION_HOURS`, so Cloudflare expires entries automatically. The daily `cache:delete-expired` task also runs against the current `BUCKET_OBJECT_EXPIRATION_HOURS` setting and removes any entry older than that threshold.
 
-KV fixes the TTL when the server writes an entry. After you change `BUCKET_OBJECT_EXPIRATION_HOURS`, entries written earlier keep their old TTL.
+KV locks an entry's native `expirationTtl` at write time, so raising `BUCKET_OBJECT_EXPIRATION_HOURS` does not extend previously written entries. Lowering `BUCKET_OBJECT_EXPIRATION_HOURS`, however, causes the next daily cleanup sweep to delete existing entries older than the new limit unless scheduled expiry is disabled.
 
-If you used KV with version 4, read [Upgrade from v4](/upgrade-from-v4#stored-artifacts) for what happens to its entries.
+Upgrading an existing KV cache from v4? Read [Upgrading from v4](/upgrade-from-v4#stored-artifacts) for how v4 metadata is handled.

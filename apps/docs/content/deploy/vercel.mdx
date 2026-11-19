@@ -1,39 +1,49 @@
 ---
-title: Deploy to Vercel
-description: Deploy the server to Vercel Functions with an S3-compatible bucket, and let Vercel Cron Jobs run the expiry task.
+title: Vercel
+description: Deploy Turborepo Remote Cache to Vercel Functions with S3-compatible storage and Vercel Cron Jobs.
 sidebar:
     label: Vercel
 ---
 
-:::warning
-Vercel limits a request or response body to 4.5 MB, so larger artifacts never reach the cache. Check the size of your build outputs before you choose Vercel.
+:::warning[4.5 MB payload limit]
+Vercel Functions cap HTTP request and response bodies at 4.5 MB. Larger build artifacts fail to upload and will never hit the remote cache. Check your typical artifact sizes before deploying on Vercel (see [Artifact size limits](/deploy#artifact-size-limits)).
 :::
 
 ## Create the project
 
-Start with your own copy of the repository and the [build setup](/deploy#build-from-source).
+Start from your fork of this repository (review [Build from source](/deploy#build-from-source) first):
 
-1. Import your copy of the repository into Vercel.
-2. Set **Root Directory** to `apps/api`. Keep **Include source files outside of the Root Directory in the Build Step** on, because the server uses packages from `packages/`.
-3. Set the build command to `pnpm exec turbo run build`. Run from `apps/api`, it builds the [dashboard](/dashboard) and then the server. Nitro detects Vercel and builds the `vercel` preset. To make the choice explicit, set the `NITRO_PRESET` environment variable to `vercel`.
-4. Add the environment variables below, then deploy.
+<Steps>
+    <Step title="Import into Vercel">
+        Import your fork in the Vercel dashboard and set **Root Directory** to `apps/api`. Keep **Include source files outside of the Root Directory in the Build Step** enabled, since the API imports workspace packages from `packages/`.
+    </Step>
+    <Step title="Set the build command">
+        Set **Build Command** to:
 
-| Variable                                              | Value                                                                                                     |
-| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `TURBO_TOKEN`                                         | Your token.                                                                                               |
-| `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, and the keys | Your bucket. See [S3-compatible storage](/storage/s3).                                                    |
-| `CRON_SECRET`                                         | A random string. Vercel sends it with each cron request, and the server rejects cron requests without it. |
+        ```sh
+        pnpm exec turbo run build
+        ```
 
-## Point turbo at the production URL
+        Running from `apps/api` builds the [dashboard](/dashboard) first, then compiles the API. Nitro auto-detects Vercel and selects the `vercel` preset (you can also set `NITRO_PRESET=vercel` explicitly).
+    </Step>
+    <Step title="Add environment variables and deploy">
+        | Variable | Purpose |
+        | --- | --- |
+        | `TURBO_TOKEN` | Bearer token shared with `turbo` clients. |
+        | `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Artifact storage. See [S3-compatible storage](/storage/s3). |
+        | `CRON_SECRET` | Random secret Vercel attaches to scheduled cron calls; requests without it are rejected. |
+    </Step>
 
-Use the project's production URL as `remoteCache.apiUrl`, such as `https://<project>.vercel.app`. Vercel's default Deployment Protection puts preview URLs behind a Vercel login, which `turbo` can't pass.
+</Steps>
 
-## Verify the deployment
+## Use the production URL
 
-[Connect turbo](/connect-turbo) to the production URL and verify a remote hit. For dashboard history, [configure a hosted stats database](/stats-database).
+Point `remoteCache.apiUrl` at your project's **production** URL (such as `https://<project>.vercel.app`), not a preview URL. Vercel Deployment Protection gates preview deployments behind a login screen that `turbo` cannot pass.
 
-## The expiry task
+Follow [Connect Turborepo](/connect-turbo) to verify remote hits. Because Vercel's filesystem is read-only, [configure a hosted stats database](/stats-database) if you want dashboard history.
 
-The build turns the server's schedule into a Vercel Cron Job at `/_vercel/cron`, set to `0 3 * * *` (03:00 UTC). On the Hobby plan, Vercel runs it at some point between 03:00 and 03:59.
+## Scheduled expiry
 
-Without `CRON_SECRET`, anyone who finds the cron URL can run the expiry task. The task deletes only expired artifacts, but set the secret anyway.
+The Vercel build automatically registers a Vercel Cron Job at `/_vercel/cron` scheduled for `0 3 * * *` (03:00 UTC; on the Hobby plan, Vercel triggers it within the 03:00–03:59 UTC window).
+
+Always set `CRON_SECRET`; without it, the `/_vercel/cron` endpoint can be invoked publicly.

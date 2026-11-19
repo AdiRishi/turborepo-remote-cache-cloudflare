@@ -1,30 +1,38 @@
 ---
-title: Deploy to Netlify
-description: Deploy the server to Netlify Functions with an S3-compatible bucket, and run the expiry task from a scheduler.
+title: Netlify
+description: Deploy Turborepo Remote Cache to Netlify Functions with S3-compatible storage and an external expiry scheduler.
 sidebar:
     label: Netlify
 ---
 
-:::warning
-Netlify buffers at most 6 MB per request and Base64-encodes binary data inside that limit, so artifacts larger than about 4.5 MB never reach the cache.
+:::warning[~4.5 MB payload limit]
+Netlify Functions cap buffered payloads at 6 MB and Base64-encode binary bodies, leaving roughly 4.5 MB for each artifact. Larger outputs will fail to upload. Check [Artifact size limits](/deploy#artifact-size-limits) before choosing Netlify.
 :::
 
 ## Create the site
 
-Start with your own copy of the repository and the [build setup](/deploy#build-from-source).
+Start from your fork of this repository (review [Build from source](/deploy#build-from-source) first):
 
-1. Import your copy of the repository into Netlify.
-2. Leave **Base directory** empty, so Netlify installs the whole workspace from the repository root.
-3. Set **Package directory** to `apps/api`.
-4. Set the build command to `pnpm exec turbo run build --filter=@turborepo-remote-cache/api` and the publish directory to `apps/api/dist`. `turbo` builds the [dashboard](/dashboard) before the server.
-5. Add `TURBO_TOKEN` and the [S3 variables](/storage/s3) as environment variables, then deploy.
+<Steps>
+    <Step title="Import your fork into Netlify">
+        Leave **Base directory** empty so Netlify installs dependencies across the full pnpm workspace from the repository root, and set **Package directory** to `apps/api`.
+    </Step>
+    <Step title="Configure build and publish settings">
+        - **Build command:** `pnpm exec turbo run build --filter=@turborepo-remote-cache/api`
+        - **Publish directory:** `apps/api/dist`
 
-Nitro detects Netlify and builds the `netlify` preset. To make the choice explicit, set `NITRO_PRESET` to `netlify`.
+        Turborepo builds the [dashboard](/dashboard) before the server, and Nitro auto-detects the `netlify` preset (set `NITRO_PRESET=netlify` if you prefer pinning it explicitly).
+    </Step>
+    <Step title="Add environment variables and deploy">
+        Set `TURBO_TOKEN` and your [S3 storage variables](/storage/s3) in Netlify's site settings, then trigger a deploy.
+    </Step>
 
-## Verify the deployment
+</Steps>
 
-[Connect turbo](/connect-turbo) to the production URL and verify a remote hit. For dashboard history, [configure a hosted stats database](/stats-database).
+## Verify and enable stats
 
-## The expiry task
+Follow [Connect Turborepo](/connect-turbo) using your production site URL to confirm remote hits. Because Netlify Functions have a read-only filesystem, [configure a hosted stats database](/stats-database) to persist dashboard metrics.
 
-The Netlify build doesn't schedule the expiry task. Call `POST /internal/delete-expired-objects` once a day from a scheduler you already run. [Retention and expiry](/retention#run-expiry-from-a-scheduler) shows a GitHub Actions workflow that does it.
+## Scheduled expiry
+
+The Netlify build does not run scheduled tasks automatically. Call `POST /internal/delete-expired-objects` once a day from an external scheduler. [Run expiry from a scheduler](/retention#run-expiry-from-a-scheduler) includes a ready-to-use GitHub Actions workflow.

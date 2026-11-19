@@ -4,12 +4,12 @@ export default defineMeta({
   title: 'Operate',
   order: 4,
   pages: [
-    'update',
-    'retention',
     'dashboard',
     'stats-database',
+    'retention',
     'observability',
-    'troubleshooting',
+    'update',
     'upgrade-from-v4',
+    'troubleshooting',
   ],
 });

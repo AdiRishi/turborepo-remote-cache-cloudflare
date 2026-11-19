@@ -17,13 +17,14 @@ const movedPages: Record<string, string> = {
   '/configuration/project-configuration': '/retention',
   '/configuration/r2-storage': '/storage/r2',
   '/configuration/kv-storage': '/storage/kv',
+  '/how-it-works': '/introduction',
 };
 
 export default defineConfig({
   content: { root: 'content' },
   title: 'Turborepo Remote Cache',
   description:
-    'A Turborepo remote cache that you host yourself. It runs on Cloudflare Workers, AWS Lambda, Vercel, Netlify, Node.js, Bun, and Deno. The server stores artifacts in R2, Workers KV, any S3-compatible bucket, or a Files SDK adapter.',
+    'Self-hosted remote cache server for Turborepo. One-click deploy to Cloudflare Workers and R2, or run on Node.js, Bun, Deno, Vercel, Netlify, or AWS Lambda with S3-compatible storage.',
   logo: { image: '/brand/lockup.svg', text: '' },
   theme: {
     accent: { light: '#0068e0', dark: '#0096ff' },
