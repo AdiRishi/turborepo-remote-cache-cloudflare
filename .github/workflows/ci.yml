@@ -5,6 +5,7 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+    types: [opened, synchronize, reopened, closed]
   schedule:
     - cron: '0 6 * * 1'
   workflow_dispatch:
@@ -23,7 +24,7 @@ env:
 jobs:
   verify:
     name: Verify
-    if: github.event_name != 'schedule'
+    if: github.event_name != 'schedule' && github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -58,7 +59,7 @@ jobs:
 
   e2e:
     name: End-to-end
-    if: github.event_name != 'schedule'
+    if: github.event_name != 'schedule' && github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -72,7 +73,7 @@ jobs:
 
   dependency-review:
     name: Dependency review
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -86,7 +87,7 @@ jobs:
   # Pull requests get a Worker Preview, linked from a PR comment; master deploys https://turborepo-remote-cache.dev.
   docs-cloudflare:
     name: Docs · Cloudflare Workers
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+    if: (github.event_name == 'pull_request' && github.event.action != 'closed') || (github.event_name == 'push' && github.ref == 'refs/heads/master')
     needs: verify
     runs-on: ubuntu-latest
     permissions:
@@ -146,6 +147,30 @@ jobs:
             } else {
               await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });
             }
+
+  docs-preview-cleanup:
+    name: Docs · Delete preview
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      # A pull request closed before its first docs deploy has no Preview to delete.
+      - name: Delete preview
+        working-directory: apps/docs
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
+          PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+        run: |
+          if ! output=$(pnpm exec wrangler preview delete --name "$PREVIEW_NAME" --skip-confirmation 2>&1); then
+            echo "$output"
+            grep -q 'Preview not found' <<<"$output" || exit 1
+          fi
 
   deploy:
     name: Deploy · Cloudflare Workers
