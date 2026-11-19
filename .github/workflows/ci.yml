@@ -137,7 +137,9 @@ jobs:
               ...context.repo,
               issue_number: context.issue.number,
             });
-            const existing = comments.find((comment) => comment.body?.startsWith(marker));
+            const existing = comments.find(
+              (comment) => comment.user?.login === 'github-actions[bot]' && comment.body?.startsWith(marker),
+            );
 
             if (existing) {
               await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
