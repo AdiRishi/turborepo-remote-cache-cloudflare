@@ -1,13 +1,13 @@
 ---
 title: Cloudflare R2
-description: Store artifacts in an R2 bucket bound to the Worker, and choose the bucket's name and location.
+description: Configure the default R2 bucket binding on Cloudflare Workers and control bucket naming and geographic placement.
 ---
 
-The Worker stores each artifact as one object in the bucket bound as `R2_STORE`. This is the default configuration.
+Cloudflare R2 is the default artifact store on Cloudflare Workers. Each artifact is stored as a single object under `<team>/<hash>` in the bucket bound as `R2_STORE`, with zero egress fees and no credentials to rotate.
 
-## Use another bucket
+## Use a different bucket
 
-`apps/api/wrangler.jsonc` binds a bucket named `turborepo-cache`:
+`apps/api/wrangler.jsonc` binds `turborepo-cache` by default:
 
 ```jsonc apps/api/wrangler.jsonc
 {
@@ -21,21 +21,19 @@ The Worker stores each artifact as one object in the bucket bound as `R2_STORE`.
 }
 ```
 
-To use another bucket, change `bucket_name` and deploy again. If the bucket doesn't exist, `wrangler deploy` creates it. Keep the binding name `R2_STORE`, because the server looks for that name.
+Change `bucket_name` and redeploy to point at another bucket (`wrangler deploy` creates the bucket if it doesn't already exist). Leave `"binding": "R2_STORE"` unchanged, since that's the binding name the server looks for.
 
 ## Choose where the bucket lives
 
-Without a location hint, R2 creates a bucket near the request that creates it. When Wrangler creates the bucket, that request comes from the machine or CI runner that runs the first deploy.
-
-To pick the location, create the bucket before the first deploy. Choose the hint closest to most of your builds, such as your CI region:
+When Wrangler auto-creates a bucket on first deploy, Cloudflare places it near the machine executing that deploy. To pin the bucket close to your CI runners or primary engineering region, create it ahead of time with a location hint:
 
 ```sh
 cd apps/api
 pnpm exec wrangler r2 bucket create turborepo-cache --location enam
 ```
 
-Cloudflare lists the hints in [Data location](https://developers.cloudflare.com/r2/reference/data-location/#location-hints). R2 sets the location only when it creates a bucket. To move the cache, create a bucket in the new location and change `bucket_name`.
+See Cloudflare's [R2 data location hints](https://developers.cloudflare.com/r2/reference/data-location/#location-hints) for valid values. A bucket's location is immutable after creation; to move an existing cache, create a new bucket in the target region and update `bucket_name` in `wrangler.jsonc`.
 
-## Use R2 from another platform
+## Access R2 from outside Cloudflare
 
-A server outside Cloudflare reaches R2 through its S3-compatible API. [S3-compatible storage](/storage/s3#cloudflare-r2) shows the variables.
+Deployments on Node.js, Bun, Deno, Vercel, Netlify, or AWS Lambda can still store artifacts in R2 via its S3-compatible endpoint. See [S3-compatible storage (Cloudflare R2)](/storage/s3#cloudflare-r2).

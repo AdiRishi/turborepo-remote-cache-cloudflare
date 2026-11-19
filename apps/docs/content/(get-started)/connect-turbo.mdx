@@ -1,16 +1,16 @@
 ---
-title: Connect turbo
-description: Point every laptop and CI job at your cache, and check that their hits come from it.
+title: Connect Turborepo
+description: Configure your repository, developer machines, and CI pipelines to share a remote cache.
 ---
 
-A cached build is only worth something if the next machine can find it. Give every laptop and CI job the same URL, token, and team, and they all share one cache.
+Every laptop and CI runner that shares the same server URL, `TURBO_TOKEN`, and team slug shares one remote cache. The cleanest setup commits the non-secret URL and team in `turbo.json` and distributes only `TURBO_TOKEN` through environment variables or a secret manager.
 
 <a id="turbojson" />
 <a id="choose-where-to-set-them" />
 
-## Commit the URL and team
+## Configure `turbo.json`
 
-Add `remoteCache` to the root `turbo.json` of your repository, beside your existing settings:
+Add `remoteCache` to your repository's root `turbo.json`:
 
 ```json turbo.json
 {
@@ -21,44 +21,44 @@ Add `remoteCache` to the root `turbo.json` of your repository, beside your exist
 }
 ```
 
-Use the server's origin, with no trailing slash and no `/v8`. The team is any name you like, as long as machines that share builds use the same one. Teams keep artifacts apart, but [one token opens every team](/how-it-works#one-token-opens-every-team).
+Use your server's bare HTTPS origin with no trailing slash and no `/v8` suffix. `teamSlug` can be any identifier you want; machines sharing artifacts just need to agree on the same value. Keep in mind that teams separate artifact namespaces rather than permissions (see [Security model and trade-offs](/introduction#one-token-opens-every-team)).
 
-Commit the change. Every clone now knows where the cache is, and each machine needs only the token:
+Commit `turbo.json`, then export `TURBO_TOKEN` in each developer's shell profile (or load it via direnv / your secret manager):
 
 ```sh
-export TURBO_TOKEN='<your token>'
+export TURBO_TOKEN='<your-token>'
 ```
 
-Keep the token out of Git. `TURBO_API` and `TURBO_TEAM` in a machine's environment win over `turbo.json`, so clear any stale ones if a machine talks to the wrong server.
+Never commit `TURBO_TOKEN` to Git. Note that `TURBO_API` and `TURBO_TEAM` environment variables override `turbo.json`, so unset any stale values if `turbo` talks to the wrong host.
 
 <a id="turbo-login---manual" />
 
-### Or log in with turbo
+### Alternative: `turbo login --manual`
 
-`turbo login --manual` asks for each value and checks the token against your server:
+If you prefer storing credentials in Turborepo's user config instead of exporting `TURBO_TOKEN` in your shell, run:
 
 ```sh
 npm exec -- turbo login --manual
 ```
 
-Answer its prompts:
+When prompted:
 
-1. At **Remote Cache URL**, enter the server's URL.
-2. At **How do you want to specify your team?**, choose **slug** and enter the team name. Choose **id** only for a name that starts with `team_`.
-3. At **Enter token**, paste the token.
+1. **Remote Cache URL:** Enter your server's origin (e.g. `https://cache.example.com`).
+2. **How do you want to specify your team?** Pick **slug** and enter your team name (use **id** only for IDs prefixed with `team_`).
+3. **Enter token:** Paste your `TURBO_TOKEN`.
 
-`turbo` saves the token in your user configuration and writes the URL and team to the root `turbo.json`. Commit that change, and everyone else only has to log in.
+Turborepo validates the token against your server, writes the token to your local user config, and updates `turbo.json` with the URL and team.
 
-[Client configuration](/client-configuration) lists every other place `turbo` reads these values from.
+For all configuration sources and precedence rules, see [Client configuration](/client-configuration).
 
-## Set up CI
+## Configure CI
 
-Store the token as a secret in your CI provider and pass it to every step that runs `turbo`. The URL and team come from the committed `turbo.json`. If you didn't commit them, set `TURBO_API` and `TURBO_TEAM` as well.
+Store `TURBO_TOKEN` as a secret in your CI provider and expose it to any step that invokes `turbo`. Because `apiUrl` and `teamSlug` live in `turbo.json`, CI jobs only need the token (if you didn't commit `remoteCache` in `turbo.json`, pass `TURBO_API` and `TURBO_TEAM` as well).
 
 <Tabs>
 <Tab title="GitHub Actions">
 
-Add a repository secret named `TURBO_TOKEN` under **Settings** > **Secrets and variables** > **Actions**, then pass it to the job:
+Create a repository secret named `TURBO_TOKEN` under **Settings** > **Secrets and variables** > **Actions** and pass it into your workflow:
 
 ```yaml .github/workflows/ci.yml
 jobs:
@@ -68,27 +68,27 @@ jobs:
             TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
         steps:
             - uses: actions/checkout@v7
-            # Install Node.js and your dependencies here.
+            # Install Node.js and dependencies here
             - run: npm exec -- turbo run build
 ```
 
 </Tab>
 <Tab title="GitLab CI">
 
-Add a masked `TURBO_TOKEN` variable under **Settings** > **CI/CD** > **Variables**. GitLab passes project variables to every job, so the job only has to run `turbo`:
+Add a masked `TURBO_TOKEN` variable under **Settings** > **CI/CD** > **Variables**. GitLab injects project variables into jobs automatically:
 
 ```yaml .gitlab-ci.yml
 build:
     image: node:24
     script:
-        # Install your dependencies here.
+        # Install dependencies here
         - npm exec -- turbo run build
 ```
 
 </Tab>
 <Tab title="Other CI">
 
-Read the token from the provider's secret store before the step that runs `turbo`:
+Expose `TURBO_TOKEN` from your CI provider's secret store before calling `turbo`:
 
 ```sh
 export TURBO_TOKEN="$CACHE_TOKEN_SECRET"
@@ -102,6 +102,6 @@ npm exec -- turbo run build
 
 <include>/_snippets/verify-remote-cache.mdx</include>
 
-## Sign artifacts
+## Enable artifact signing
 
-Signing is optional, and we recommend it. With signatures on, `turbo` rejects any artifact your own machines didn't sign, so a leaked token can't slip a build onto your laptops or CI. [Sign artifacts](/sign-artifacts) takes one setting and one shared key.
+For any cache shared by multiple developers or CI runners, enable [Artifact signing](/sign-artifacts). It takes one flag in `turbo.json` and a shared signing key, ensuring `turbo` rejects any artifact that wasn't produced by your own machines even if `TURBO_TOKEN` leaks.

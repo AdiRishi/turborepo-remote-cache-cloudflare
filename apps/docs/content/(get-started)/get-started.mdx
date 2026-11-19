@@ -1,68 +1,81 @@
 ---
-title: Get started
-description: Deploy the cache to Cloudflare Workers and get your first remote hit.
+title: Quickstart
+description: Deploy Turborepo Remote Cache to Cloudflare Workers and verify your first remote hit in minutes.
 ---
 
-<LiveCache />
+This guide takes you from zero to a working remote cache on Cloudflare Workers with R2 storage and D1 analytics. You'll need a Cloudflare account, a GitHub or GitLab account, and a Turborepo repository.
 
-You need a Cloudflare account, a GitHub or GitLab account, and a Turborepo repository. [Deploy to Cloudflare](/deploy/cloudflare) covers every detail, including deploying from a terminal. For another host, [choose a platform](/deploy).
+Prefer deploying via the Wrangler CLI? See [Cloudflare Workers](/deploy/cloudflare). Deploying elsewhere? Start with [Platforms](/deploy).
 
 <a id="deploy-with-wrangler" />
 <a id="deploy-on-every-push" />
 <a id="check-the-deployment" />
-
-## Deploy the Worker
-
-If your Cloudflare account has never used R2, turn it on under **R2 Object Storage** in the [Cloudflare dashboard](https://dash.cloudflare.com/) first. Then press the button:
-
-<a href="https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache">
-    <img
-        src="https://deploy.workers.cloudflare.com/button"
-        alt="Deploy to Cloudflare"
-        width="184"
-        height="39"
-    />
-</a>
-
-Sign in, connect GitHub or GitLab, and keep the build and deploy commands Cloudflare fills in. The first deploy creates the Worker, an R2 bucket for artifacts, and a D1 database for the dashboard. Copy the Worker's URL when it's done.
-
-## Set the token
-
-Generate a token:
-
-```sh
-openssl rand -hex 32
-```
-
-In the Worker's **Settings** > **Variables and Secrets**, add it as a secret named `TURBO_TOKEN`. Anyone with this token can read and write your cache, so treat it like a password.
-
 <a id="run-your-first-remote-hit" />
 
-## Point turbo at it
+<Steps>
+    <Step title="Enable R2 and deploy the Worker">
+        If you haven't used R2 on your Cloudflare account yet, open **R2 Object Storage** in the [Cloudflare dashboard](https://dash.cloudflare.com/) and activate it first (10 GB/month is free).
 
-In your Turborepo repository, add the Worker's URL to the root `turbo.json`:
+        Then deploy the server:
 
-```json turbo.json
-{
-    "remoteCache": {
-        "apiUrl": "https://turborepo-remote-cache.<your-subdomain>.workers.dev",
-        "teamSlug": "my-team"
-    }
-}
-```
+        <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache">
+            <img
+                src="https://deploy.workers.cloudflare.com/button"
+                alt="Deploy to Cloudflare"
+                width="184"
+                height="39"
+            />
+        </a>
 
-Then give your shell the token:
+        Sign in, connect GitHub or GitLab, and keep the pre-filled build and deploy commands (`pnpm run build` and `pnpm run deploy`). The first deployment provisions the Worker, an R2 bucket (`turborepo-cache`), and a D1 database (`turborepo-cache-stats`) for the dashboard. Copy the resulting `*.workers.dev` URL once the deploy finishes.
+    </Step>
+    <Step title="Set TURBO_TOKEN">
+        Generate a random bearer token:
 
-```sh
-export TURBO_TOKEN='<your token>'
-```
+        ```sh
+        openssl rand -hex 32
+        ```
 
-## Get your first remote hit
+        In your Worker's **Settings** > **Variables and Secrets**, add a secret named `TURBO_TOKEN` with that value. Treat it like a password: anyone holding it can read and write artifacts across all teams on this deployment.
+    </Step>
+    <Step title="Point Turborepo at your Worker">
+        Add the Worker's origin (no trailing slash, no `/v8`) and a team slug to your repository's root `turbo.json`:
 
-<include>/_snippets/verify-remote-cache.mdx</include>
+        ```json turbo.json
+        {
+            "remoteCache": {
+                "apiUrl": "https://turborepo-remote-cache.<your-subdomain>.workers.dev",
+                "teamSlug": "my-team"
+            }
+        }
+        ```
 
-## Next
+        Export the token in your shell:
 
-- Open your Worker's URL to see those hits on the [dashboard](/dashboard). It's public until you [restrict access](/dashboard#restrict-access).
-- [Connect turbo](/connect-turbo) for the rest of your team and CI.
-- [Sign artifacts](/sign-artifacts). It's optional, and we recommend it.
+        ```sh
+        export TURBO_TOKEN='<your-token>'
+        ```
+    </Step>
+    <Step title="Verify your first remote hit">
+        <include>/_snippets/verify-remote-cache.mdx</include>
+    </Step>
+
+</Steps>
+
+## Next steps
+
+<CardGroup cols={2}>
+    <Card title="Connect Turborepo" icon="plug" href="/connect-turbo">
+        Roll out the cache to teammates and wire `TURBO_TOKEN` into CI.
+    </Card>
+    <Card title="Artifact signing" icon="shield-check" href="/sign-artifacts">
+        Enable HMAC-SHA256 verification for shared caches.
+    </Card>
+    <Card title="Dashboard" icon="chart-column" href="/dashboard">
+        Open your Worker's root URL to inspect hits and time saved, and restrict public access
+        before sharing it.
+    </Card>
+    <Card title="Retention and expiry" icon="clock" href="/retention">
+        Adjust the 30-day default TTL or trigger manual cache cleanup.
+    </Card>
+</CardGroup>

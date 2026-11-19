@@ -1,44 +1,53 @@
 ---
-title: Deploy to AWS Lambda
-description: Build the server as an AWS Lambda handler with Amazon S3 storage, use the function's role for credentials, and schedule the expiry task.
+title: AWS Lambda
+description: Deploy Turborepo Remote Cache as an AWS Lambda function backed by Amazon S3 using IAM execution roles.
 sidebar:
     label: AWS Lambda
 ---
 
-:::warning
-Lambda caps a synchronous invocation payload at 6 MB. The event envelope and Base64 encoding reduce the size available for a binary artifact. Check the [artifact size limits](/deploy#artifact-size-limits) before choosing Lambda.
+:::warning[< 6 MB payload limit]
+AWS Lambda caps synchronous invocation payloads at 6 MB, and Base64 encoding plus the event envelope shrink usable artifact size further. Review [Artifact size limits](/deploy#artifact-size-limits) before choosing Lambda for large monorepos.
 :::
 
-## Build the handler
+## Build the Lambda bundle
 
-Clone your copy of the repository and install dependencies with `pnpm install --frozen-lockfile`. Use Node.js 24 or later and the pnpm version in `package.json`. The [build setup](/deploy#build-from-source) covers the repository's own remote-cache settings.
+Requires Node.js 24+ and the pnpm version in `package.json`. Clone your fork, run `pnpm install --frozen-lockfile` from the repository root, and check the `turbo.json` warning in [Build from source](/deploy#build-from-source).
 
-Run the build from the repository root:
+Build the Lambda output from the repository root:
 
 ```sh
 NITRO_PRESET=aws_lambda pnpm build
 ```
 
-1. Package the contents of `apps/api/.output/server` as the function code.
-2. Choose a Node.js runtime, and set the handler to `index.handler`.
-3. Give the function an HTTPS endpoint that `turbo` can reach, such as a Lambda function URL or an API Gateway HTTP API.
+Then deploy the bundle:
 
-## Configure storage
+1. Package the contents of `apps/api/.output/server` as your Lambda deployment archive.
+2. Select a Node.js runtime and set the handler to `index.handler`.
+3. Expose the function over HTTPS via a Lambda Function URL or an API Gateway HTTP API.
 
-Set these variables on the function:
+## Configure environment and IAM permissions
+
+Set the token and bucket details on the Lambda function:
 
 ```sh
-TURBO_TOKEN=<your token>
+TURBO_TOKEN=<your-token>
 S3_BUCKET=my-turborepo-cache
 S3_ENDPOINT=https://s3.us-east-1.amazonaws.com
 ```
 
-Leave the `S3_*` keys and `S3_REGION` unset to use the function's execution role. Lambda puts the role's credentials in `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN`, and its region in `AWS_REGION`, and the server reads all four. The role needs `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject`, and `s3:ListBucket` on the bucket.
+Leave `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, and `S3_REGION` unset to authenticate with the function's IAM execution role. Lambda populates `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`, and `AWS_REGION` automatically, and the server falls back to all four.
 
-## Verify the deployment
+Grant the execution role these permissions on your bucket:
 
-[Connect turbo](/connect-turbo) to the production URL and verify a remote hit. For dashboard history, [configure a hosted stats database](/stats-database).
+- `s3:GetObject`
+- `s3:PutObject`
+- `s3:DeleteObject`
+- `s3:ListBucket`
 
-## The expiry task
+## Verify and enable stats
 
-The Lambda build doesn't schedule the expiry task. Call `POST /internal/delete-expired-objects` once a day from any scheduler that can send an HTTPS request with a header, such as a CI cron job. [Retention and expiry](/retention#run-expiry-from-a-scheduler) shows the request.
+Follow [Connect Turborepo](/connect-turbo) with your HTTPS endpoint to verify remote hits. Because Lambda's filesystem is ephemeral, [configure a hosted stats database](/stats-database) if you want dashboard history.
+
+## Scheduled expiry
+
+The Lambda preset does not wire up EventBridge schedules automatically. Trigger `POST /internal/delete-expired-objects` daily from EventBridge Scheduler, GitHub Actions, or any HTTP cron. See [Run expiry from a scheduler](/retention#run-expiry-from-a-scheduler).

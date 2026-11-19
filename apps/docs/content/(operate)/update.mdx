@@ -1,50 +1,59 @@
 ---
-title: Update your deployment
-description: Merge a new release into your copy of the repository, keep your settings, and deploy it.
+title: Updating your deployment
+description: Merge upstream releases into your fork while preserving your bindings, configuration, and secrets.
+sidebar:
+    label: Updating
 ---
 
-Your server runs from your own copy of this repository, and that copy doesn't follow upstream releases on its own. To get a release, merge it into your copy and deploy. Your bucket, database, and token stay where they are.
+Because your server deploys from your own fork of this repository, it won't upgrade itself automatically. Pull in new releases by merging the release tag into your fork and redeploying. Your R2 bucket, stats database, and `TURBO_TOKEN` secret stay intact.
 
-Coming from version 4? Read [Upgrade from v4](/upgrade-from-v4) first.
+Upgrading from version 4? Follow [Upgrading from v4](/upgrade-from-v4) first.
 
 ## Before you merge
 
-1. Read the [server changelog](https://github.com/AdiRishi/turborepo-remote-cache/blob/master/apps/api/CHANGELOG.md) for the release you want. Look for configuration changes and stats database migrations.
-2. If the release migrates the stats database, back it up. Rolling back the code doesn't roll back a migration. Artifacts need no backup, since `turbo` rebuilds any it can't find.
-3. Note the files that hold your settings. You'll keep your side of these when you merge:
-    - `apps/api/wrangler.jsonc`: Worker name, bindings, resource IDs, routes, and variables.
-    - `apps/api/nitro.config.ts`: stats database and expiry schedule.
-    - `apps/api/src/custom-adapter.ts`: custom storage, if you use it.
-    - `.github/workflows/ci.yml` and the root `turbo.json`: your deployment and build cache.
+1. Check the [API changelog](https://github.com/AdiRishi/turborepo-remote-cache/blob/master/apps/api/CHANGELOG.md) for breaking configuration changes or stats database migrations.
+2. Back up your stats database if the release includes a schema migration (rolling back application code does not revert migrations). Cached artifacts don't need backups, since `turbo` rebuilds anything missing.
+3. Know which files hold your local customizations so you keep your side during conflict resolution:
+    - `apps/api/wrangler.jsonc`: Worker name, bindings, resource IDs, custom routes, and `vars`
+    - `apps/api/nitro.config.ts`: stats database connector and expiry schedule
+    - `apps/api/src/custom-adapter.ts`: custom Files SDK storage adapter (if used)
+    - `.github/workflows/ci.yml` and root `turbo.json`: your deployment workflow and remote cache settings
 
-## Merge the release
+## Merge an upstream release
 
-In a checkout of your copy, add this repository as a remote and fetch its tags:
+Add the upstream repository as a remote and fetch tags:
 
 ```sh
 git remote add upstream https://github.com/AdiRishi/turborepo-remote-cache.git
 git fetch upstream --tags
 ```
 
-Server releases are tagged `@turborepo-remote-cache/api@<version>`. Merge the one you want, such as 5.3.0:
+Server releases are tagged `@turborepo-remote-cache/api@<version>`. Merge your target version (for example, `5.3.0`):
 
 ```sh
 git merge @turborepo-remote-cache/api@5.3.0
 ```
 
-Where the files above conflict, keep your names, IDs, and settings, and take everything else from upstream. Review those files even when Git reports no conflict.
+Resolve any conflicts in the customized files above by keeping your resource names, IDs, and settings while accepting upstream changes everywhere else. Review those files even after a clean merge to be sure nothing was overwritten.
 
-If Git refuses with `refusing to merge unrelated histories`, your copy doesn't share history with this repository. Fork the repository instead, check out the release, and copy your settings from the files above into it. Then point Workers Builds or your CI at the new repository. Future updates merge cleanly from there.
+:::note[Unrelated Git histories]
+If Git exits with `refusing to merge unrelated histories`, your copy was created without shared Git ancestry (for example, via a template copy). Fork the upstream repository cleanly, check out the release tag, copy over your settings from the files listed above, and point Workers Builds or CI at the new fork. Future merges will apply cleanly.
+:::
 
-## Deploy and check
+## Verify and deploy
 
-1. Install dependencies and run the checks:
+<Steps>
+    <Step title="Install and run checks">
+        ```sh
+        pnpm install --frozen-lockfile
+        pnpm check
+        ```
+    </Step>
+    <Step title="Commit and deploy">
+        Commit the merge and deploy using your normal workflow: push to your production branch for Workers Builds or GitHub Actions, run `pnpm run deploy` for manual Cloudflare deploys, or follow your [platform guide](/deploy).
+    </Step>
+    <Step title="Smoke-test the live server">
+        Confirm `/ping` and `/v8/artifacts/status` respond cleanly ([Check the deployment](/deploy/cloudflare#check-the-deployment)), run the [remote-hit check](/connect-turbo#check-that-hits-come-from-the-server), and open the dashboard. If stats stop recording, inspect `[stats]` entries in your [logs](/observability).
+    </Step>
 
-    ```sh
-    pnpm install --frozen-lockfile
-    pnpm check
-    ```
-
-2. Commit the merge and deploy it the way you deploy today. Push to your production branch for Workers Builds or GitHub Actions, or run `pnpm run deploy` for a manual Cloudflare deploy. Other hosts follow their [platform guide](/deploy).
-3. Check that the server answers `/ping` and `/v8/artifacts/status`, as in [Check the deployment](/deploy/cloudflare#check-the-deployment), and [check that hits come from the server](/connect-turbo#check-that-hits-come-from-the-server).
-4. Open the dashboard. If stats stopped, look for `[stats]` errors in the [logs](/observability).
+</Steps>

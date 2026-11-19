@@ -1,25 +1,23 @@
 ---
 title: Logs and traces
-description: Find each request's logs, trace, and errors on Cloudflare, or send them to your own tools. On other platforms, the server reports the same data.
+description: Inspect request logs, OpenTelemetry traces, and error grouping on Cloudflare Workers and other runtimes.
 ---
 
-On Cloudflare Workers, `apps/api/wrangler.jsonc` turns on [Workers Logs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/), [traces](https://developers.cloudflare.com/workers/observability/traces/), and [Issues](https://developers.cloudflare.com/workers/observability/issues/). Find all three in the Cloudflare dashboard, under the Worker's observability pages.
+On Cloudflare Workers, `apps/api/wrangler.jsonc` enables [Workers Logs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/), [Workers Traces](https://developers.cloudflare.com/workers/observability/traces/), and [Issues](https://developers.cloudflare.com/workers/observability/issues/) out of the box, along with uploaded source maps so stack traces resolve to exact TypeScript lines in `apps/api/src`.
 
-## What the server records
+## What gets recorded on Cloudflare
 
-| Feature | What you get                                                                                                                                                                                                                                                       |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Logs    | One log for each request, with its method, URL, and status. The server adds an error log with a stack trace when a request fails with a `500` error, and a log that starts with `[stats]` when it can't write the [dashboard](/dashboard)'s stats.                 |
-| Traces  | One trace for each request. Cloudflare adds a span for every R2, KV, and D1 call. The server adds spans named by route, such as `GET /v8/artifacts/:hash`, for each route and middleware. The route spans sit beside the storage spans instead of containing them. |
-| Issues  | Uncaught exceptions, `5xx` responses, and error logs, with repeats of the same failure grouped together. A failed stats write appears here, though the request that caused it still succeeded.                                                                     |
+| Signal     | Details                                                                                                                                                              |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Logs**   | One entry per request (method, URL, status), full stack traces on `500` errors, and `[stats]` error entries when an async dashboard DB write fails.                  |
+| **Traces** | End-to-end request trace with automatic Cloudflare spans for R2, KV, and D1 operations alongside sibling route/middleware spans (such as `GET /v8/artifacts/:hash`). |
+| **Issues** | Grouped uncaught exceptions, `5xx` responses, and error logs, including background `[stats]` failures even when the underlying cache request succeeded.              |
 
-The build writes source maps and Wrangler uploads them, so stack traces point at the files in `apps/api/src`.
+## Configure sampling
 
-## Sample requests
+`turbo` makes at least one HTTP request per task, producing one log event and roughly six trace spans per request. Starting December 1, 2026, Cloudflare meters logs and traces under [Cloudflare Observability pricing](https://developers.cloudflare.com/workers/observability/logs/workers-logs/#pricing).
 
-`turbo` sends at least one request for every task in a run. Each request writes one log and about six spans. From December 1, 2026, Cloudflare bills logs and traces under [Cloudflare Observability pricing](https://developers.cloudflare.com/workers/observability/logs/workers-logs/#pricing).
-
-To keep only a share of requests, set a sampling rate between `0` and `1`. Each request is kept or dropped as a whole. This keeps 10% of logs and 5% of traces:
+Use `head_sampling_rate` (between `0` and `1`) in `apps/api/wrangler.jsonc` to sample whole requests. For example, to keep 10% of logs and 5% of traces:
 
 ```jsonc apps/api/wrangler.jsonc
 {
@@ -32,11 +30,11 @@ To keep only a share of requests, set a sampling rate between `0` and `1`. Each 
 }
 ```
 
-To turn a feature off, set its `enabled` to `false`, and deploy.
+Set `enabled: false` on any signal you want to turn off completely, then redeploy.
 
-## Send logs and traces to your own tools
+## Export via OpenTelemetry
 
-Cloudflare exports logs and traces over OpenTelemetry to tools such as Honeycomb, Grafana Cloud, Axiom, and Sentry. Create a destination in the Cloudflare dashboard, as [Export OpenTelemetry data](https://developers.cloudflare.com/workers/observability/exporting-opentelemetry-data/) describes, then name it in `destinations`:
+Cloudflare can stream logs and traces over OpenTelemetry to Honeycomb, Grafana Cloud, Axiom, Sentry, and other OTLP backends. Create a destination in the Cloudflare dashboard (see [Export OpenTelemetry data](https://developers.cloudflare.com/workers/observability/exporting-opentelemetry-data/)), then reference its name in `apps/api/wrangler.jsonc`:
 
 ```jsonc apps/api/wrangler.jsonc
 {
@@ -49,37 +47,41 @@ Cloudflare exports logs and traces over OpenTelemetry to tools such as Honeycomb
 }
 ```
 
-To send data only to the destination and not keep it in the Cloudflare dashboard, also set `persist` to `false`.
+Add `"persist": false` under `logs` or `traces` if you want to forward telemetry without storing a copy in Cloudflare.
 
-## On other platforms
+## Other platforms
 
-The server writes the same error logs to standard error, so the platform's own logs show them.
+On Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda, error logs and `[stats]` failures write to `stderr` so your host's log collector captures them automatically.
 
-The server publishes each request through Node.js [tracing channels](https://nodejs.org/api/diagnostics_channel.html#class-tracingchannel), on every runtime that supports them:
+The server also emits standard Node.js [`diagnostics_channel` tracing channels](https://nodejs.org/api/diagnostics_channel.html#class-tracingchannel) wherever supported:
 
-| Channel        | Covers                                                                    |
-| -------------- | ------------------------------------------------------------------------- |
-| `srvx.request` | The whole request, with the response, when the server runs as a process.  |
-| `h3.request`   | Each route and middleware, named by route, such as `/v8/artifacts/:hash`. |
-| `db0.query`    | Each query to the stats database.                                         |
+| Channel        | Scope                                                                  |
+| -------------- | ---------------------------------------------------------------------- |
+| `srvx.request` | Full HTTP request/response lifecycle on standalone server runtimes.    |
+| `h3.request`   | Individual route and middleware handlers (e.g. `/v8/artifacts/:hash`). |
+| `db0.query`    | Queries against the stats database.                                    |
 
-On Vercel, Nitro adds these spans to [Vercel's traces](https://vercel.com/docs/tracing) when Vercel collects a trace for the request. On Node.js, Bun, and Deno, a monitoring agent that reads tracing channels, or your own subscriber, can use them. This subscriber writes a JSON line for each request:
+On Vercel, Nitro automatically attaches these spans to [Vercel Traces](https://vercel.com/docs/tracing). On Node.js, Bun, or Deno, APM agents or custom subscribers can consume them directly. For example, to emit structured JSON access logs:
 
 ```js access-log.mjs
 import { subscribe } from 'node:diagnostics_channel';
 
 subscribe('tracing:srvx.request:asyncEnd', ({ request, result }) => {
     console.log(
-        JSON.stringify({ method: request.method, url: request.url, status: result.status }),
+        JSON.stringify({
+            method: request.method,
+            url: request.url,
+            status: result.status,
+        }),
     );
 });
 ```
 
-Load it before the server starts. `--enable-source-maps` makes Node.js print stack traces at the source lines:
+Preload the subscriber with source maps enabled:
 
 ```sh
 cd apps/api
 node --enable-source-maps --import ./access-log.mjs .output/server/index.mjs
 ```
 
-To see each request's spans as a timeline while you develop, set `experimental.tracingLogger` to `true` in `apps/api/nitro.config.ts`.
+During local development, set `experimental: { tracingLogger: true }` in `apps/api/nitro.config.ts` to print per-request span timelines to the terminal.

@@ -1,48 +1,50 @@
 ---
 title: Client configuration
-description: The URL, token, and team that turbo sends to this server.
+description: Reference of environment variables, turbo.json keys, and precedence rules for connecting Turborepo to your server.
 ---
 
-| Value       | Environment variable               | `turbo.json` key       | Meaning                                                                                      |
-| ----------- | ---------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------- |
-| URL         | `TURBO_API`                        | `remoteCache.apiUrl`   | The server's origin, such as `https://cache.example.com`, without a trailing slash or `/v8`. |
-| Token       | `TURBO_TOKEN`                      | None                   | The server's bearer token.                                                                   |
-| Team slug   | `TURBO_TEAM`                       | `remoteCache.teamSlug` | The artifact namespace shared by participating clients.                                      |
-| Team ID     | `TURBO_TEAMID`                     | `remoteCache.teamId`   | An alternative to a slug. `turbo` sends IDs that start with `team_`.                         |
-| Signing key | `TURBO_REMOTE_CACHE_SIGNATURE_KEY` | None                   | The shared key used when `remoteCache.signature` is `true`.                                  |
+Turborepo reads remote cache settings from environment variables, config files, and CLI flags:
 
-`turbo` reads these values from the following sources. An earlier source wins over a later one:
+| Setting     | Environment variable               | `turbo.json` key       | Description                                                                             |
+| ----------- | ---------------------------------- | ---------------------- | --------------------------------------------------------------------------------------- |
+| Server URL  | `TURBO_API`                        | `remoteCache.apiUrl`   | Bare server origin (e.g. `https://cache.example.com`), without trailing slash or `/v8`. |
+| Token       | `TURBO_TOKEN`                      | —                      | Shared bearer token matching the server's `TURBO_TOKEN`.                                |
+| Team slug   | `TURBO_TEAM`                       | `remoteCache.teamSlug` | Artifact namespace shared across participating machines.                                |
+| Team ID     | `TURBO_TEAMID`                     | `remoteCache.teamId`   | Alternative namespace identifier; `turbo` expects IDs prefixed with `team_`.            |
+| Signing key | `TURBO_REMOTE_CACHE_SIGNATURE_KEY` | —                      | Shared HMAC-SHA256 key used when `remoteCache.signature` is `true`.                     |
 
-1. Command-line flags
+## Precedence order
+
+When the same setting is defined in multiple places, the highest-priority source wins:
+
+1. Command-line flags (`--api`, `--token`, `--team`)
 2. `TURBO_*` environment variables
-3. `.turbo/config.json` in the repository
-4. The user configuration that `turbo login` writes
+3. `.turbo/config.json` in the repository root
+4. User configuration written by `turbo login`
 5. `turbo.json`
 
-Turborepo's [configuration reference](https://turborepo.dev/docs/reference/configuration#remotecache) and [system environment variables](https://turborepo.dev/docs/reference/system-environment-variables) describe each source.
+See Turborepo's [configuration reference](https://turborepo.dev/docs/reference/configuration#remotecache) and [system environment variables](https://turborepo.dev/docs/reference/system-environment-variables) for additional options.
 
-## Environment-only configuration
+## Environment-only setup
 
-When no project configuration is committed, all three connection values are needed:
+If you prefer not to commit `remoteCache` to `turbo.json`, export all three connection variables:
 
 ```sh
 export TURBO_API='https://cache.example.com'
-export TURBO_TOKEN='<your token>'
+export TURBO_TOKEN='<your-token>'
 export TURBO_TEAM='my-team'
 ```
 
-## Checkout-local configuration
+## Per-checkout configuration
 
-`.turbo/config.json` stores settings for one checkout:
+You can also store settings for a single local checkout in `.turbo/config.json`:
 
 ```json .turbo/config.json
 {
     "apiUrl": "https://cache.example.com",
     "teamSlug": "my-team",
-    "token": "<your token>"
+    "token": "<your-token>"
 }
 ```
 
-The file holds the token, so keep `.turbo` in your `.gitignore`.
-
-[Connect turbo](/connect-turbo) covers the recommended setup and how to check it.
+Ensure `.turbo` is listed in `.gitignore` so the token is never committed. For team-wide and CI setup, see [Connect Turborepo](/connect-turbo).

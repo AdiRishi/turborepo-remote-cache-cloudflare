@@ -1,6 +1,6 @@
 ---
 title: Turborepo Remote Cache
-description: Host your Turborepo remote cache on Cloudflare, AWS Lambda, Vercel, Netlify, or Node.js. You need no Vercel account.
+description: Self-hosted remote cache server for Turborepo on Cloudflare Workers, R2, or any runtime and S3-compatible bucket.
 mode: custom
 sidebar:
     hidden: true
@@ -8,9 +8,9 @@ sidebar:
 
 <HomeHero>
 
-# A Turborepo remote cache you host yourself
+# Self-hosted remote cache for Turborepo
 
-Deploy it to Cloudflare Workers with one button, or run the same server on AWS Lambda, Vercel, Netlify, Node.js, Bun, or Deno. Artifacts stay in R2, Workers KV, or any S3-compatible bucket, and a dashboard shows the build time your cache saves.
+Share build outputs across CI, teammates, and coding agents without a Vercel account or egress fees. Deploy to Cloudflare Workers and R2 in one click, or bring your own runtime and S3 bucket.
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache) [Read the docs](/introduction)
 
@@ -20,20 +20,20 @@ Deploy it to Cloudflare Workers with one button, or run the same server on AWS L
 
 <HomeSection>
 
-## Why host your own cache
+## Why self-host
 
-- **No Vercel account.** `turbo` talks to your server through the official Remote Cache API, with no plugin, no fork, and no `turbo login`.
-- **Free to start on Cloudflare.** The Workers free plan includes 100,000 requests a day, and R2 stores 10 GB a month for free. R2 charges nothing for egress, so cache downloads cost no bandwidth.
-- **Your choice of storage.** Keep artifacts in R2, Workers KV, any S3-compatible bucket, or anything with a [Files SDK](https://files-sdk.dev) adapter.
-- **Signed artifacts.** The server stores each artifact's signature and returns it unchanged, so `turbo` can reject any artifact that your own machines didn't sign.
+- **Drop-in v8 API** Implements the official Turborepo Remote Cache specification natively. Set `remoteCache.apiUrl` in `turbo.json` and export `TURBO_TOKEN`. No Vercel account or `turbo login` required.
+- **Zero egress on Cloudflare R2** Cloudflare's free tier covers 100,000 Workers requests a day and 10 GB of R2 storage. Because R2 charges nothing for egress, heavy CI downloads never run up bandwidth bills.
+- **End-to-end artifact signing** Stores and returns `x-artifact-tag` headers untouched so `turbo` verifies HMAC-SHA256 signatures locally. Your signing key never leaves your machines.
+- **Portable runtime and storage** Built on [Nitro](https://nitro.build) and [Files SDK](https://files-sdk.dev). Run on Cloudflare Workers, Node.js, Bun, Deno, Vercel, Netlify, or AWS Lambda with R2, KV, S3, or a custom adapter.
 
 </HomeSection>
 
 <HomeSection>
 
-## See the time your cache saves
+## Built-in analytics
 
-Every server shows this dashboard at its root. This copy uses sample data. Try the controls.
+Every deployment ships with a live dashboard at `/`. Track build time saved, local vs. remote hit rates, storage growth, and usage across teams, CI providers, and coding agents. Switch time ranges in the live preview below (loaded with sample data).
 
 </HomeSection>
 
@@ -41,21 +41,21 @@ Every server shows this dashboard at its root. This copy uses sample data. Try t
 
 <HomeSection>
 
-## Set it up
+## Up and running in minutes
 
 <Steps>
-    <Step title="Deploy the Worker">
-        The [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache) button copies this repository to your GitHub or GitLab account and deploys it with an R2 bucket. You can also [deploy with Wrangler](/deploy/cloudflare).
+    <Step title="Deploy the server">
+        Use the [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache) button to fork this repository and provision a Worker, an R2 bucket, and a D1 stats database automatically. Prefer the CLI? Follow the [Cloudflare Workers guide](/deploy/cloudflare).
     </Step>
-    <Step title="Set a token">
-        Generate a long random token and add it to the Worker as a secret named `TURBO_TOKEN`.
+    <Step title="Generate a bearer token">
+        Create a 32-byte secret and add it to your Worker as `TURBO_TOKEN`:
 
         ```sh
         openssl rand -hex 32
         ```
     </Step>
-    <Step title="Point turbo at the Worker">
-        Add the Worker to your root `turbo.json`, and give every machine the token as `TURBO_TOKEN`.
+    <Step title="Point turbo at your deployment">
+        Commit `remoteCache` in your root `turbo.json` and export `TURBO_TOKEN` on developer machines and in CI:
 
         ```json turbo.json
         {
@@ -66,21 +66,21 @@ Every server shows this dashboard at its root. This copy uses sample data. Try t
         }
         ```
     </Step>
-    <Step title="Sign your artifacts">
-        This step is optional, and we recommend it. Turn on `remoteCache.signature` and give every machine the same `TURBO_REMOTE_CACHE_SIGNATURE_KEY`. `turbo` then rejects any artifact your own machines didn't sign, even one uploaded with a valid token.
+    <Step title="Enable artifact signing">
+        Recommended for any shared cache. Set `"signature": true` in `turbo.json` and share `TURBO_REMOTE_CACHE_SIGNATURE_KEY` across trusted machines so `turbo` rejects unsigned or tampered artifacts.
     </Step>
 
 </Steps>
 
-[Get started](/get-started) has every step. [Connect turbo](/connect-turbo) sets up your team and CI, and [Sign artifacts](/sign-artifacts) explains the signature key.
+Follow the [Quickstart](/get-started) for a full walkthrough, [Connect Turborepo](/connect-turbo) for CI setup, or [Artifact signing](/sign-artifacts) to configure HMAC verification.
 
 </HomeSection>
 
 <HomeSection>
 
-## Deploy to the platform you already use
+## Runs on your stack
 
-The same server builds for six other platforms and stores artifacts in the storage you choose. [Choose a platform](/deploy) compares their artifact size limits.
+Cloudflare Workers is the turnkey default with R2 storage, scheduled expiry, and D1 analytics wired up automatically. The same server builds for six other runtimes and any S3-compatible bucket. See [Platforms](/deploy) to compare payload size limits before choosing a serverless host.
 
 <Columns cols={2}>
     <Column>
@@ -97,8 +97,8 @@ The same server builds for six other platforms and stores artifacts in the stora
 
         - [Cloudflare R2](/storage/r2)
         - [Cloudflare KV](/storage/kv)
-        - [S3-compatible storage](/storage/s3)
-        - [A custom Files SDK adapter](/storage/custom-adapter)
+        - [S3-compatible buckets](/storage/s3)
+        - [Custom Files SDK adapters](/storage/custom-adapter)
     </Column>
 
 </Columns>

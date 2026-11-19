@@ -1,19 +1,19 @@
 ---
 title: Retention and expiry
-description: Change how long the server keeps artifacts, change or stop the daily expiry task, and run expiry on demand.
+description: Configure artifact retention, customize the daily cleanup schedule, or trigger expiry manually.
 ---
 
-The server keeps each artifact for `BUCKET_OBJECT_EXPIRATION_HOURS`, 720 hours (30 days) by default. The `cache:delete-expired` task runs every day at 03:00 UTC, lists every object in the store, and deletes the ones older than that. It also deletes any object whose upload time the store doesn't report.
+By default, cached artifacts are retained for `BUCKET_OBJECT_EXPIRATION_HOURS`, which defaults to `720` hours (30 days). Each day at 03:00 UTC, the `cache:delete-expired` task scans the bucket, removes objects older than that threshold (as well as any object without a `lastModified` timestamp), and records fresh storage totals for the dashboard.
 
-An artifact's age counts from its upload. Downloads don't reset it, so even an artifact that every build uses expires on schedule. The next run that needs it misses, runs the task, and uploads a fresh copy.
+Age is measured from the original upload time, not last download. Frequently hit artifacts still expire on schedule and are repopulated cleanly on the next build.
 
-:::warning
-The task deletes every old object in the store, not only artifacts. Give the cache a bucket or namespace of its own.
+:::warning[Use a dedicated bucket or namespace]
+`cache:delete-expired` deletes every expired object in the configured store, not just objects matching a prefix. Never share the cache bucket or KV namespace with unrelated data.
 :::
 
-## Change the retention period
+## Change the retention window
 
-On Cloudflare Workers, edit `vars` in `apps/api/wrangler.jsonc` and deploy:
+On Cloudflare Workers, update `vars` in `apps/api/wrangler.jsonc` and redeploy:
 
 ```jsonc apps/api/wrangler.jsonc
 {
@@ -23,13 +23,11 @@ On Cloudflare Workers, edit `vars` in `apps/api/wrangler.jsonc` and deploy:
 }
 ```
 
-On other platforms, set `BUCKET_OBJECT_EXPIRATION_HOURS` in the server's environment. The value is a whole number of hours, at least `1`.
+On all other platforms, set `BUCKET_OBJECT_EXPIRATION_HOURS` in the server's environment. The value must be a whole number of hours (`>= 1`). When using [Workers KV](/storage/kv#how-entries-expire), this value also sets each KV entry's TTL on write.
 
-With [KV storage](/storage/kv#how-entries-expire), the value is also each entry's TTL.
+## Change or disable the schedule
 
-## Change the schedule
-
-Edit `scheduledTasks` in `apps/api/nitro.config.ts` and rebuild. The key is a cron expression in UTC:
+Edit `scheduledTasks` in `apps/api/nitro.config.ts` using a UTC cron expression, then rebuild and redeploy:
 
 ```ts apps/api/nitro.config.ts
 scheduledTasks: {
@@ -37,17 +35,15 @@ scheduledTasks: {
 },
 ```
 
-To stop the task, remove the entry. Artifacts then stay until you delete them, except in KV, where the TTL still applies.
-
-Not every platform runs the schedule. [Choose a platform](/deploy) shows which ones do.
+Remove the entry to disable automatic cleanup altogether (note that KV entries will still expire via their write-time TTL). Check [Platforms](/deploy) to see which hosts run Nitro schedules natively.
 
 ## Run expiry on demand
 
-`POST /internal/delete-expired-objects` runs the same deletion and returns how many objects it deleted. It needs the `TURBO_TOKEN` bearer token and a JSON body. `{}` uses `BUCKET_OBJECT_EXPIRATION_HOURS`:
+Trigger cleanup manually with an authenticated `POST /internal/delete-expired-objects` request. Send `{}` to use the configured `BUCKET_OBJECT_EXPIRATION_HOURS`:
 
 ```sh
 curl -X POST https://cache.example.com/internal/delete-expired-objects \
-  -H "Authorization: Bearer <your token>" \
+  -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
@@ -56,11 +52,11 @@ curl -X POST https://cache.example.com/internal/delete-expired-objects \
 { "deleted": 42 }
 ```
 
-To use another age for one run, send `expireInHours`, a number of hours that is `0` or more. `{"expireInHours": 0}` clears the cache. A request without a JSON body, or with a negative `expireInHours`, returns a `400` error.
+To override the retention window for a single run, pass `expireInHours` (`>= 0`). Passing `{"expireInHours": 0}` purges the entire cache. Omitting a valid JSON body or passing a negative number returns `400`.
 
 ## Run expiry from a scheduler
 
-On a platform that doesn't run the task, call the endpoint once a day from a scheduler. This GitHub Actions workflow reads the URL from a `CACHE_URL` variable and the token from a `TURBO_TOKEN` secret:
+On platforms without built-in task scheduling (Netlify, AWS Lambda), invoke the internal endpoint daily from an external cron. For example, with GitHub Actions using a `CACHE_URL` repository variable and `TURBO_TOKEN` secret:
 
 ```yaml .github/workflows/cache-expiry.yml
 on:

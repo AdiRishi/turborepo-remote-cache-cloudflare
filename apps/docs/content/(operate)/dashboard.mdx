@@ -1,45 +1,49 @@
 ---
 title: Dashboard
-description: The page at the server's root shows the time saved, the hit rate, the storage used, and usage by team, CI provider, and coding agent.
+description: Inspect build time saved, cache hit rates, storage growth, and team/CI/agent activity from the built-in dashboard.
 ---
 
-Open the server's URL in a browser, such as `https://turborepo-remote-cache.<your-subdomain>.workers.dev`. The page needs no token and refreshes every minute.
+Every deployment serves a live analytics dashboard at `/` (for example, `https://turborepo-remote-cache.<your-subdomain>.workers.dev`). It refreshes automatically every minute and requires no login unless you put an access layer in front of it.
 
-## What it shows
+<LiveCache />
 
-The range control at the top picks the last 24 hours, 7 days, 30 days, or 90 days. Every figure covers that range and shows its change from the same stretch of time one range earlier. The line beside the control shows the time saved since the server recorded its first run.
+## Metrics
 
-- **Time saved.** After every run, `turbo` reports each cache lookup, and a hit carries the duration of the task it replayed. The dashboard adds those durations up, for this server and for the local cache on each machine.
-- **Share of task time from a cache.** Time saved, divided by time saved plus the run time of the tasks that ran. `turbo` reports that run time with each upload, so tasks that ran without uploading aren't counted.
-- **Tasks.** Every task checks the cache on its own machine first, and asks the server only when that misses. A task that misses both runs. The dashboard splits tasks into those three outcomes and shows the share that came from a cache.
-- **Server hit rate.** The share of lookups that reached this server and found the artifact. It shows how well the server serves the tasks that need it.
-- **Saved per run and runs.** Time saved divided by runs, and the number of `turbo` runs.
-- **Teams.** Runs, hit rate, time saved with its trend, storage, and downloads for each team, which is the `teamId` or `slug` that `turbo` sends. The table appears when more than one team uses the server.
-- **Storage.** What the server stores, and how the total changed over the range.
-- **Clients.** The CI providers that ran `turbo`, the AI coding agents that started runs, and the `turbo` versions and platforms that moved artifacts.
+Use the range picker at the top to switch between the last **24 hours**, **7 days**, **30 days**, or **90 days**. Every metric compares the selected window against the preceding period of the same length, while the summary line beside the picker shows cumulative time saved since the first recorded run.
+
+- **Time saved:** Total task duration replayed from cache (both remote hits from this server and local hits on client machines), derived from the cache events `turbo` reports after each run.
+- **Share of task time cached:** Time saved divided by total task time (cached durations plus executed task durations reported on upload; tasks that execute without uploading are excluded).
+- **Task breakdown:** Splits every task lookup into local hits, remote hits, and full misses, alongside the combined cache share.
+- **Server hit rate:** Percentage of lookups reaching this server (after a local miss) that returned a cached artifact.
+- **Saved per run & total runs:** Average time saved per `turbo` invocation and total run count.
+- **Teams:** Per-team breakdown of runs, hit rate, time saved (with trend), storage footprint, and downloads, grouped by `teamId` or `slug`. Appears once more than one team reports activity.
+- **Storage:** Current artifact count and total bytes stored, plus change over the selected window.
+- **Clients:** Breakdown by CI provider, AI coding agent, `turbo` CLI version, and OS/architecture.
 
 <a id="where-stats-are-stored" />
 <a id="configure-a-database" />
 <a id="turn-stats-off" />
 
-The stats live in a database. Cloudflare deploys come with one, and [Configure the stats database](/stats-database) covers every other host.
+Cloudflare deployments provision a D1 stats database automatically. For other hosts, or to turn analytics off, see [Stats database](/stats-database).
 
 ## Restrict access
 
-The dashboard is public. Anyone with the server's URL can see your team names and usage. To restrict it, put `/` and `/stats` behind your own access control, such as [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/), and leave `/v8/*` reachable with `turbo`'s bearer token. Protect both dashboard routes. Protecting only `/` leaves the data accessible through `/stats`.
+By default, `/` and `/stats` are publicly readable without a token, exposing team names and usage metrics to anyone with the URL.
+
+To lock the dashboard down, place `/` and `/stats` behind an authentication proxy such as [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/) while leaving `/v8/*` accessible via `turbo`'s bearer token. Protect **both** routes; gating only `/` still leaves `/stats` readable.
 
 ## When storage numbers update
 
-The [expiry task](/retention) measures storage while it deletes expired artifacts. A new server shows no storage numbers until that task first succeeds.
+Storage size and artifact counts are recorded by the daily [expiry task](/retention) rather than incremented per upload, so a fresh deployment shows empty storage figures until expiry runs once.
 
-To measure now, [run expiry on demand](/retention#run-expiry-on-demand). This also deletes expired objects. On Netlify and Lambda, configure an [external schedule](/retention#run-expiry-from-a-scheduler) to keep measurements current.
+To populate storage metrics immediately, [run expiry on demand](/retention#run-expiry-on-demand) (which also purges expired objects). On Netlify and AWS Lambda, configure an [external schedule](/retention#run-expiry-from-a-scheduler) so storage figures stay up to date.
 
 ## Read the stats as JSON
 
-`GET /stats` returns everything the dashboard shows. It needs no token. The optional `range` query parameter is `24h`, `7d`, `30d`, or `90d`, and defaults to `30d`:
+`GET /stats` returns the raw payload powering the dashboard with no authentication required. Pass `range=24h`, `7d`, `30d` (default), or `90d`:
 
 ```sh
-curl "https://<your server>/stats?range=7d"
+curl "https://<your-server>/stats?range=7d"
 ```
 
-The response has `"enabled": false` when the server has no stats database. Day buckets are UTC days, and every duration is in milliseconds.
+When no stats database is configured, the response returns `"enabled": false`. Daily buckets are aligned to UTC midnight and all durations are in milliseconds.
