@@ -22,7 +22,7 @@ The first deploy creates the R2 bucket near the machine that runs it. To pick it
 
 ## Deploy with the button
 
-<a href="https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare">
+<a href="https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache">
     <img
         src="https://deploy.workers.cloudflare.com/button"
         alt="Deploy to Cloudflare"
@@ -47,8 +47,8 @@ You need [Node.js](https://nodejs.org) 24 or later and [pnpm](https://pnpm.io). 
 1. Clone the repository and install its dependencies:
 
     ```sh
-    git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
-    cd turborepo-remote-cache-cloudflare
+    git clone https://github.com/AdiRishi/turborepo-remote-cache.git
+    cd turborepo-remote-cache
     pnpm install
     ```
 
@@ -97,7 +97,7 @@ If you used the button, Workers Builds is already set up. It deploys every push 
 
 ### GitHub Actions
 
-The repository's [CI workflow](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/blob/master/.github/workflows/ci.yml) deploys pushes to `master` after checks and end-to-end tests pass. To use it in your copy:
+The repository's [CI workflow](https://github.com/AdiRishi/turborepo-remote-cache/blob/master/.github/workflows/ci.yml) deploys pushes to `master` after checks and end-to-end tests pass. To use it in your copy:
 
 1. Delete the `release`, `docs-cloudflare`, `docs-github-pages-build`, and `docs-github-pages` jobs. They publish this project's releases and documentation.
 2. Add these repository secrets under **Settings** > **Secrets and variables** > **Actions**:

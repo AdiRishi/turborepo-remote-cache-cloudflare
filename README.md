@@ -8,7 +8,7 @@
 <br>
 <br>
 
-[![CI](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/actions/workflows/ci.yml/badge.svg)](https://github.com/AdiRishi/turborepo-remote-cache-cloudflare/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/github/AdiRishi/turborepo-remote-cache-cloudflare/badge.svg)](https://coveralls.io/github/AdiRishi/turborepo-remote-cache-cloudflare) ![GitHub License](https://img.shields.io/github/license/AdiRishi/turborepo-remote-cache-cloudflare) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](.github/CONTRIBUTING.md)
+[![CI](https://github.com/AdiRishi/turborepo-remote-cache/actions/workflows/ci.yml/badge.svg)](https://github.com/AdiRishi/turborepo-remote-cache/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/github/AdiRishi/turborepo-remote-cache/badge.svg)](https://coveralls.io/github/AdiRishi/turborepo-remote-cache) ![GitHub License](https://img.shields.io/github/license/AdiRishi/turborepo-remote-cache) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](.github/CONTRIBUTING.md)
 
 <a href="https://turborepo-remote-cache.dev" target="_blank">
   <img src="https://img.shields.io/badge/Visit-Developer%20Docs-%230572BE?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Visit Developer Docs">
@@ -38,7 +38,7 @@ An open-source [Turborepo remote cache](https://turborepo.dev/docs/core-concepts
 
 ## ⚡️ Quick start
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache-cloudflare)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AdiRishi/turborepo-remote-cache)
 
 The button copies this repository to your GitHub or GitLab account and deploys it as a Worker with an R2 bucket. When it finishes, add a secret named `TURBO_TOKEN` to the Worker, with a long random value such as the output of `openssl rand -hex 32`.
 
@@ -48,8 +48,8 @@ You need Node.js 24 or later and pnpm. [Wrangler](https://developers.cloudflare.
 
 ```sh
 # 1. Clone the repository
-git clone https://github.com/AdiRishi/turborepo-remote-cache-cloudflare.git
-cd turborepo-remote-cache-cloudflare
+git clone https://github.com/AdiRishi/turborepo-remote-cache.git
+cd turborepo-remote-cache
 
 # 2. Install packages
 pnpm install
