@@ -99,7 +99,7 @@ If you used the button, Workers Builds is already set up. It deploys every push 
 
 The repository's [CI workflow](https://github.com/AdiRishi/turborepo-remote-cache/blob/master/.github/workflows/ci.yml) deploys pushes to `master` after checks and end-to-end tests pass. To use it in your copy:
 
-1. Delete the `release`, `docs-cloudflare`, `docs-github-pages-build`, and `docs-github-pages` jobs. They publish this project's releases and documentation.
+1. Delete the `release` and `docs-cloudflare` jobs. They publish this project's releases and documentation.
 2. Add these repository secrets under **Settings** > **Secrets and variables** > **Actions**:
     - `CLOUDFLARE_API_TOKEN`: a token that can edit Workers, R2, and D1.
     - `CLOUDFLARE_ACCOUNT_ID`: your Cloudflare account ID.
